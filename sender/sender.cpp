@@ -7,14 +7,69 @@
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string>
+
+#include "y4m_reader.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFFER_LENGTH 2048
 #define DEFAULT_PORT 27015
 
+enum ECodec
+{
+	H265,
+}
+
+struct SParams
+{
+	int	   Port;
+	int	   PacketSize;
+	ECodec Codec;
+};
+
 int main(int argc, char* argv[])
 {
+	SParams Params = {
+		DEFAULT_PORT,
+		DEFAULT_BUFFER_LENGTH,
+		ECodec::H265,
+	};
+
+	// Parse command line
+	for (int i = 1; i < argc; i++)
+	{
+		// Colon after a letter indicates that that arg param has a following arg
+		char* arg = argv[i];
+		// increment by one to skip over the '-' when passing params
+		switch (*(arg + 1))
+		{
+			case 'h':
+				// TODO (belchy06): Print help
+
+				return -1;
+
+			case 'p':
+				Params.Port = atoi(arg + 3);
+				continue;
+
+			case 'c':
+				std::string CodecStr(arg + 3);
+				if (CodecStr == "H265")
+				{
+					Params.Codec = ECodec::H265;
+				}
+				continue;
+
+			default:
+				continue;
+		}
+	}
+
+	// Encode sequence
+
+	// Transmit
 	SOCKET			   Socket;
 	struct sockaddr_in Server, Si_other;
 	int				   Slen, Recvlen;

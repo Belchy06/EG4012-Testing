@@ -9,6 +9,7 @@
                 "/EHsc",
                 "/nologo",
                 "/Fe${workspaceFolder}\\bin\\sender.exe",
+                "${workspaceFolder}\\sender\\y4m_reader.cpp",
                 "${workspaceFolder}\\sender\\sender.cpp"
             ],
             "options": {

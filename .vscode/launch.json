@@ -9,7 +9,9 @@
             "request": "launch",
             "program": "${workspaceFolder}\\bin\\sender.exe",
             "preLaunchTask": "Build Sender",
-            "args": [],
+            "args": [
+                "-p 1023",
+            ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "integratedTerminal",
@@ -20,7 +22,9 @@
             "request": "launch",
             "program": "${workspaceFolder}\\bin\\receiver.exe",
             "preLaunchTask": "Build Receiver",
-            "args": [],
+            "args": [
+                "",
+            ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "integratedTerminal",
