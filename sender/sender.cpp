@@ -47,6 +47,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
                 Config.Codec = ECodec::CODEC_H265;
             } else if(CodecStr == "AV1") {
                 Config.Codec = ECodec::CODEC_AV1;
+            } else if(CodecStr == "XVC") {
+                Config.Codec = ECodec::CODEC_XVC;
             } else {
                 Config.Codec = ECodec::CODEC_UNDEFINED;
             }
@@ -160,4 +162,9 @@ void Sender::ValidateArgs()
 		std::cerr << "Error: Invalid codec" << std::endl;
 		std::exit(-1);
 	}
+}
+
+void Sender::Test()
+{
+	WrappedEncoder = EncoderFactory::Create(Config.Codec);
 }

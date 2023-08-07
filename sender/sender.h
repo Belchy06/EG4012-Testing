@@ -3,8 +3,9 @@
 
 #include "common.h"
 #include "encoder.h"
-#include "y4m_reader.h"
+#include "encoder_factory.h"
 
+#include "y4m_reader.h"
 #include <fstream>
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -23,6 +24,7 @@ public:
 
 	void ParseArgs(int argc, const char* argv[]);
 	void ValidateArgs();
+	void Test();
 
 private:
 	struct

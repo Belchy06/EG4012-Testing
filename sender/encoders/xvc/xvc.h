@@ -13,6 +13,6 @@ class XVCEncoder : public Encoder
 	virtual void Encode() override;
 
 private:
-	const xvc_encoder_api*	xvc_api_ = nullptr;
-	xvc_encoder_parameters* params_ = nullptr;
+	const xvc_encoder_api*	Api;
+	xvc_encoder_parameters* Params;
 };

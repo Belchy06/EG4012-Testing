@@ -20,13 +20,15 @@
                 "${workspaceFolder}\\sender\\encoders\\encoder.cpp",
                 "${workspaceFolder}\\sender\\encoders\\libde265\\libde265.cpp",
                 "${workspaceFolder}\\sender\\encoders\\xvc\\xvc.cpp",
+                "${workspaceFolder}\\sender\\encoders\\encoder_factory.cpp",
 
                 "${workspaceFolder}\\sender\\y4m_reader.cpp",
                 "${workspaceFolder}\\sender\\sender.cpp",
                 "${workspaceFolder}\\sender\\main.cpp",
                 // TODO (belchy06): These should probably be DLLs that we load at runtime depending on the chosen coder
-                "${workspaceFolder}\\third_party\\libde265\\bin_x64\\lib\\libde265.lib",
-                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcencd.lib"
+                "${workspaceFolder}\\third_party\\libde265\\bin_x86\\lib\\libde265.lib",
+                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Release\\xvcenc.lib",
+                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Release\\xvcdec.lib"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
