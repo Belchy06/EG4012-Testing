@@ -11,138 +11,74 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFFER_LENGTH 512
-#define DEFAULT_PORT "27015"
+#define DEFAULT_PORT 27015
 
 int main()
 {
-	WSADATA WsaData;
-	int		Result;
+	SOCKET			   Socket;
+	struct sockaddr_in Server, Si_other;
+	int				   Slen, Recvlen;
+	char			   Buf[DEFAULT_BUFFER_LENGTH];
+	WSADATA			   WsaData;
 
-	SOCKET ListenSocket = INVALID_SOCKET;
-	SOCKET ClientSocket = INVALID_SOCKET;
-
-	struct addrinfo* AddrInfo = NULL;
-	struct addrinfo	 Hints;
-
-	int	 SendResult;
-	char RecvBuf[DEFAULT_BUFFER_LENGTH];
-	int	 RecvBufLength = DEFAULT_BUFFER_LENGTH;
+	Slen = sizeof(Si_other);
 
 	// Initialize Winsock
-	Result = WSAStartup(MAKEWORD(2, 2), &WsaData);
-	if (Result != 0)
+	printf("Initializing Winsock\n");
+	if (WSAStartup(MAKEWORD(2, 2), &WsaData) != 0)
 	{
-		printf("WSAStartup failed with error: %d\n", Result);
+		printf("Initialization failed with error: %d\n", WSAGetLastError());
 		return -1;
 	}
 
-	ZeroMemory(&Hints, sizeof(Hints));
-	Hints.ai_family = AF_INET;
-	Hints.ai_socktype = SOCK_STREAM;
-	Hints.ai_protocol = IPPROTO_UDP;
-	Hints.ai_flags = AI_PASSIVE;
-
-	// Resolve the server address and port
-	Result = getaddrinfo(NULL, DEFAULT_PORT, &Hints, &AddrInfo);
-	if (Result != 0)
+	// Create a socket
+	if ((Socket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 	{
-		printf("getaddrinfo failed with error: %d\n", Result);
-		WSACleanup();
+		printf("socket failed with error: %d", WSAGetLastError());
 		return -1;
 	}
 
-	// Create a SOCKET for the server to listen for client connections
-	ListenSocket = socket(AddrInfo->ai_family, AddrInfo->ai_socktype, AddrInfo->ai_protocol);
-	if (ListenSocket == INVALID_SOCKET)
+	// Prepare the sockaddr_in structure
+	Server.sin_family = AF_INET;
+	Server.sin_addr.s_addr = INADDR_ANY;
+	Server.sin_port = htons(DEFAULT_PORT);
+
+	// Bind
+	if (bind(Socket, (struct sockaddr*)&Server, sizeof(Server)) == SOCKET_ERROR)
 	{
-		printf("listen failed with error: %d\n", WSAGetLastError());
-		freeaddrinfo(AddrInfo);
-		WSACleanup();
+		printf("Bind failed with error: %d", WSAGetLastError());
 		return -1;
 	}
 
-	// Setup the UDP listening socket
-	Result = bind(ListenSocket, AddrInfo->ai_addr, (int)AddrInfo->ai_addrlen);
-	if (Result == SOCKET_ERROR)
+	// keep listening for data
+	while (true)
 	{
-		printf("bind failed with error: %d\n", WSAGetLastError());
-		freeaddrinfo(AddrInfo);
-		closesocket(ListenSocket);
-		WSACleanup();
-		return -1;
-	}
+		printf("Waiting for data...");
+		fflush(stdout);
 
-	freeaddrinfo(AddrInfo);
+		// clear the buffer by filling null, it might have previously received data
+		memset(Buf, '\0', DEFAULT_BUFFER_LENGTH);
 
-	Result = listen(ListenSocket, SOMAXCONN);
-	if (Result == SOCKET_ERROR)
-	{
-		printf("listen failed with error: %d\n", WSAGetLastError());
-		closesocket(ListenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	// Accept a client socket
-	ClientSocket = accept(ListenSocket, NULL, NULL);
-	if (ClientSocket == INVALID_SOCKET)
-	{
-		printf("accept failed with error: %d\n", WSAGetLastError());
-		closesocket(ListenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	// No longer need server socket
-	closesocket(ListenSocket);
-
-	// Receive until the peer shuts down the connection
-	do
-	{
-
-		Result = recv(ClientSocket, RecvBuf, RecvBufLength, 0);
-		if (Result > 0)
+		// try to receive some data, this is a blocking call
+		if ((Recvlen = recvfrom(Socket, Buf, DEFAULT_BUFFER_LENGTH, 0, (struct sockaddr*)&Si_other, &Slen)) == SOCKET_ERROR)
 		{
-			printf("Bytes received: %d\n", Result);
-
-			// Echo the buffer back to the sender
-			SendResult = send(ClientSocket, RecvBuf, Result, 0);
-			if (SendResult == SOCKET_ERROR)
-			{
-				printf("send failed with error: %d\n", WSAGetLastError());
-				closesocket(ClientSocket);
-				WSACleanup();
-				return -1;
-			}
-			printf("Bytes sent: %d\n", SendResult);
+			printf("recvfrom failed with error: %d", WSAGetLastError());
+			return -1;
 		}
-		else if (Result == 0)
+
+		// print details of the client/peer and the data received
+		printf("Received packet from %s:%d\n", inet_ntoa(Si_other.sin_addr), ntohs(Si_other.sin_port));
+		printf("Data: %s\n", Buf);
+
+		// now reply the client with the same data
+		if (sendto(Socket, Buf, Recvlen, 0, (struct sockaddr*)&Si_other, Slen) == SOCKET_ERROR)
 		{
-			printf("Connection closing...\n");
-		}
-		else
-		{
-			printf("recv failed with error: %d\n", WSAGetLastError());
-			closesocket(ClientSocket);
-			WSACleanup();
+			printf("sendto failed with error: %d", WSAGetLastError());
 			return -1;
 		}
 	}
-	while (Result > 0);
 
-	// shutdown the connection since we're done
-	Result = shutdown(ClientSocket, SD_SEND);
-	if (Result == SOCKET_ERROR)
-	{
-		printf("shutdown failed with error: %d\n", WSAGetLastError());
-		closesocket(ClientSocket);
-		WSACleanup();
-		return -1;
-	}
-
-	// cleanup
-	closesocket(ClientSocket);
+	closesocket(Socket);
 	WSACleanup();
-
 	return 0;
 }
