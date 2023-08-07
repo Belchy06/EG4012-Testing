@@ -9,7 +9,9 @@
                 "/EHsc",
                 "/nologo",
                 "/I${workspaceFolder}\\common",
+                "/Fd${workspaceFolder}\\bin\\sender.pdb",
                 "/Fe${workspaceFolder}\\bin\\sender.exe",
+                "/Fo\"${workspaceFolder}\\intermediate\"\\",
                 "${workspaceFolder}\\sender\\y4m_reader.cpp",
                 "${workspaceFolder}\\sender\\sender.cpp",
                 "${workspaceFolder}\\sender\\main.cpp"

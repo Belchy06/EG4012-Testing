@@ -1,3 +1,2 @@
 bin
-*.pdb
-*.obj
+intermediate
