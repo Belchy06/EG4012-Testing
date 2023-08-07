@@ -1,8 +1,13 @@
 #pragma once
 
-class Config
+#include "common.h"
+
+class EncoderConfig
 {
-	int	   Width;
-	int	   Height;
-	double Framerate;
+public:
+	int			  Width;
+	int			  Height;
+	double		  Framerate;
+	int			  BitDepth;
+	EChromaFormat Format;
 };

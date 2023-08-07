@@ -12,6 +12,7 @@
 
 #include "sender.h"
 #include "encoder.h"
+#include "encoders/config.h"
 #include "y4m_reader.h"
 
 Sender::Sender()
@@ -40,20 +41,20 @@ void Sender::ParseArgs(int argc, const char* argv[])
 			// TODO (belchy06): Print help
 			std::exit(-1);
 		} else if(arg == "-port") {
-            Config.Port = atoi(argv[++i]);
+            Settings.Port = atoi(argv[++i]);
         } else if(arg == "-codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "H265") {
-                Config.Codec = ECodec::CODEC_H265;
+                Settings.Codec = ECodec::CODEC_H265;
             } else if(CodecStr == "AV1") {
-                Config.Codec = ECodec::CODEC_AV1;
+                Settings.Codec = ECodec::CODEC_AV1;
             } else if(CodecStr == "XVC") {
-                Config.Codec = ECodec::CODEC_XVC;
+                Settings.Codec = ECodec::CODEC_XVC;
             } else {
-                Config.Codec = ECodec::CODEC_UNDEFINED;
+                Settings.Codec = ECodec::CODEC_UNDEFINED;
             }
         } else if(arg == "-file") {
-            Config.File = std::string(argv[++i]);
+            Settings.File = std::string(argv[++i]);
         }
 		// clang-format on
 	}
@@ -133,16 +134,16 @@ void Sender::ParseArgs(int argc, const char* argv[])
 
 void Sender::ValidateArgs()
 {
-	if (Config.File.empty())
+	if (Settings.File.empty())
 	{
 		std::cerr << "Error: Missing input file argument" << std::endl;
 		std::exit(-1);
 	}
 
-	FileStream.open(Config.File, std::ios_base::binary);
+	FileStream.open(Settings.File, std::ios_base::binary);
 	if (!FileStream)
 	{
-		std::cerr << "Error: Failed to open file" << Config.File << std::endl;
+		std::cerr << "Error: Failed to open file" << Settings.File << std::endl;
 		std::exit(-1);
 	}
 	InputStream = &FileStream;
@@ -157,7 +158,7 @@ void Sender::ValidateArgs()
 		std::exit(-1);
 	}
 
-	if (Config.Codec == ECodec::CODEC_UNDEFINED)
+	if (Settings.Codec == ECodec::CODEC_UNDEFINED)
 	{
 		std::cerr << "Error: Invalid codec" << std::endl;
 		std::exit(-1);
@@ -166,5 +167,21 @@ void Sender::ValidateArgs()
 
 void Sender::Test()
 {
-	WrappedEncoder = EncoderFactory::Create(Config.Codec);
+	WrappedEncoder = EncoderFactory::Create(Settings.Codec);
+
+	EncoderConfig Config;
+	Config.Format = PictureFormat.Format;
+	Config.Framerate = PictureFormat.Framerate;
+	Config.Width = PictureFormat.Width;
+	Config.Height = PictureFormat.Height;
+	Config.BitDepth = PictureFormat.BitDepth;
+
+	EncodeResult Res = WrappedEncoder->Init(Config);
+	if (!Res.IsSuccess())
+	{
+		std::cerr << "Error: Initializing config" << std::endl;
+		std::exit(-1);
+	}
+
+	// WrappedEncoder->Encode();
 }

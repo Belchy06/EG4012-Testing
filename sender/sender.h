@@ -34,7 +34,7 @@ private:
 		std::string File;
 
 		int MTUSize;
-	} Config;
+	} Settings;
 
 private:
 	std::istream*	InputStream;
@@ -44,5 +44,5 @@ private:
 	std::streamoff	PictureSkip;
 	PictureFormat	PictureFormat;
 
-	Encoder WrappedEncoder;
+	Encoder* WrappedEncoder;
 };

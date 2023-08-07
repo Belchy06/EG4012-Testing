@@ -5,5 +5,6 @@
 
 class EncoderFactory
 {
+public:
 	static Encoder* Create(ECodec InCodec);
-}
+};

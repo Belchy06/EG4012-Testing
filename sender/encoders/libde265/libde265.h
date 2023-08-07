@@ -4,9 +4,10 @@
 
 class Libde265Encoder : public Encoder
 {
+public:
 	Libde265Encoder();
 	~Libde265Encoder();
 
-	virtual void Init(Config& InConfig) override;
-	virtual void Encode() override;
+	virtual EncodeResult Init(EncoderConfig& InConfig) override;
+	virtual EncodeResult Encode() override;
 };

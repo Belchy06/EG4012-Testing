@@ -4,15 +4,17 @@
 
 #include "xvc_enc_lib/xvcenc.h"
 
-class XVCEncoder : public Encoder
+class XvcEncoder : public Encoder
 {
-	XVCEncoder();
-	~XVCEncoder();
+public:
+	XvcEncoder();
+	~XvcEncoder();
 
-	virtual void Init(Config& InConfig) override;
-	virtual void Encode() override;
+	virtual EncodeResult Init(EncoderConfig& InConfig) override;
+	virtual EncodeResult Encode() override;
 
 private:
 	const xvc_encoder_api*	Api;
 	xvc_encoder_parameters* Params;
+	xvc_encoder*			Encoder;
 };

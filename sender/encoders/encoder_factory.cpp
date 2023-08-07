@@ -11,6 +11,7 @@ Encoder* EncoderFactory::Create(ECodec InCodec)
 	}
 	else if (InCodec == ECodec::CODEC_XVC)
 	{
-		return new XVCEncoder();
+		return new XvcEncoder();
 	}
+	return nullptr;
 }
