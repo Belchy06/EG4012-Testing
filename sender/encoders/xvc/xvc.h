@@ -10,8 +10,8 @@ public:
 	XvcEncoder();
 	~XvcEncoder();
 
-	virtual EncodeResult Init(EncoderConfig& InConfig) override;
-	virtual EncodeResult Encode() override;
+	virtual EncodeResult* Init(EncoderConfig& InConfig) override;
+	virtual EncodeResult* Encode() override;
 
 private:
 	const xvc_encoder_api*	Api;

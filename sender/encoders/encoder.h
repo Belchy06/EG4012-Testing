@@ -8,18 +8,16 @@
 class Encoder
 {
 public:
-	virtual EncodeResult Init(EncoderConfig& InConfig)
+	virtual EncodeResult* Init(EncoderConfig& InConfig)
 	{
 		unimplemented();
-		EncodeResult Res;
-		return Res;
+		return new EncodeResult();
 	}
 
-	virtual EncodeResult Encode()
+	virtual EncodeResult* Encode()
 	{
 		unimplemented();
-		EncodeResult Res;
-		return Res;
+		return new EncodeResult();
 	}
 
 private:

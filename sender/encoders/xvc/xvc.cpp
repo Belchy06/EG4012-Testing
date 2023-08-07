@@ -24,7 +24,7 @@ XvcEncoder::~XvcEncoder()
 	}
 }
 
-EncodeResult XvcEncoder::Init(EncoderConfig& InConfig)
+EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 {
 	Api->parameters_set_default(Params);
 
@@ -63,12 +63,10 @@ EncodeResult XvcEncoder::Init(EncoderConfig& InConfig)
 		// clang-format on
 	}
 
-	XvcResult Res(Api->parameters_check(Params));
-	return Res;
+	return new XvcResult(Api->parameters_check(Params));
 }
 
-EncodeResult XvcEncoder::Encode()
+EncodeResult* XvcEncoder::Encode()
 {
-	EncodeResult Res;
-	return Res;
+	return new EncodeResult();
 }

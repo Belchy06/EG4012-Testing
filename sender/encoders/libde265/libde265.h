@@ -8,6 +8,6 @@ public:
 	Libde265Encoder();
 	~Libde265Encoder();
 
-	virtual EncodeResult Init(EncoderConfig& InConfig) override;
-	virtual EncodeResult Encode() override;
+	virtual EncodeResult* Init(EncoderConfig& InConfig) override;
+	virtual EncodeResult* Encode() override;
 };

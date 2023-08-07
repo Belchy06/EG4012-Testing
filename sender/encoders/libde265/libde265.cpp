@@ -8,14 +8,12 @@ Libde265Encoder::~Libde265Encoder()
 {
 }
 
-EncodeResult Libde265Encoder::Init(EncoderConfig& InConfig)
+EncodeResult* Libde265Encoder::Init(EncoderConfig& InConfig)
 {
-	EncodeResult Res;
-	return Res;
+	return new EncodeResult();
 }
 
-EncodeResult Libde265Encoder::Encode()
+EncodeResult* Libde265Encoder::Encode()
 {
-	EncodeResult Res;
-	return Res;
+	return new EncodeResult();
 }

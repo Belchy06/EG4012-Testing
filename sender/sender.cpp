@@ -176,8 +176,8 @@ void Sender::Test()
 	Config.Height = PictureFormat.Height;
 	Config.BitDepth = PictureFormat.BitDepth;
 
-	EncodeResult Res = WrappedEncoder->Init(Config);
-	if (!Res.IsSuccess())
+	EncodeResult* Res = WrappedEncoder->Init(Config);
+	if (!Res->IsSuccess())
 	{
 		std::cerr << "Error: Initializing config" << std::endl;
 		std::exit(-1);
