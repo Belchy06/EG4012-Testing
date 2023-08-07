@@ -4,7 +4,7 @@
 
 #include "common.h"
 
-struct SPictureFormat
+struct PictureFormat
 {
 	int			  Width = 0;
 	int			  Height = 0;
@@ -13,11 +13,11 @@ struct SPictureFormat
 	EChromaFormat Format = EChromaFormat::CHROMA_FORMAT_UNDEFINED;
 };
 
-class CY4mReader
+class Y4mReader
 {
 public:
-	CY4mReader(std::istream* InStream);
-	bool Read(SPictureFormat& OutFormat, std::streamoff& OutStartSkip, std::streamoff& OutPictureSkip);
+	Y4mReader(std::istream* InStream);
+	bool Read(PictureFormat& OutFormat, std::streamoff& OutStartSkip, std::streamoff& OutPictureSkip);
 
 private:
 	std::istream* Stream;

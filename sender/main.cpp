@@ -2,7 +2,7 @@
 
 int main(int argc, const char* argv[])
 {
-	CSender Sender;
+	Sender Sender;
 
 	Sender.ParseArgs(argc, argv);
 	Sender.ValidateArgs();

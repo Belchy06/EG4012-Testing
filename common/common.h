@@ -1,5 +1,11 @@
 #pragma once
 
+#include <assert.h>
+
+#ifndef unimplemented
+	#define unimplemented() assert(!true)
+#endif
+
 typedef enum
 {
 	CHROMA_FORMAT_MONOCHROME,

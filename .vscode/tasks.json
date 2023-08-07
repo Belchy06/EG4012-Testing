@@ -9,12 +9,24 @@
                 "/EHsc",
                 "/nologo",
                 "/I${workspaceFolder}\\common",
+                "/I${workspaceFolder}\\sender\\encoders",
+                "/I${workspaceFolder}\\sender\\encoders\\xvc",
+                "/I${workspaceFolder}\\sender\\encoders\\libde265",
+
+                "/I${workspaceFolder}\\third_party\\xvc\\src",
                 "/Fd${workspaceFolder}\\bin\\sender.pdb",
                 "/Fe${workspaceFolder}\\bin\\sender.exe",
                 "/Fo\"${workspaceFolder}\\intermediate\"\\",
+                "${workspaceFolder}\\sender\\encoders\\encoder.cpp",
+                "${workspaceFolder}\\sender\\encoders\\libde265\\libde265.cpp",
+                "${workspaceFolder}\\sender\\encoders\\xvc\\xvc.cpp",
+
                 "${workspaceFolder}\\sender\\y4m_reader.cpp",
                 "${workspaceFolder}\\sender\\sender.cpp",
-                "${workspaceFolder}\\sender\\main.cpp"
+                "${workspaceFolder}\\sender\\main.cpp",
+                // TODO (belchy06): These should probably be DLLs that we load at runtime depending on the chosen coder
+                "${workspaceFolder}\\third_party\\libde265\\bin_x64\\lib\\libde265.lib",
+                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcencd.lib"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

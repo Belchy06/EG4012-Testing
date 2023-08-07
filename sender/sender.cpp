@@ -11,18 +11,19 @@
 #include <iostream>
 
 #include "sender.h"
+#include "encoder.h"
 #include "y4m_reader.h"
 
-CSender::CSender()
+Sender::Sender()
 	: InputStream(nullptr)
 {
 }
 
-CSender::~CSender()
+Sender::~Sender()
 {
 }
 
-void CSender::ParseArgs(int argc, const char* argv[])
+void Sender::ParseArgs(int argc, const char* argv[])
 {
 	if (argc <= 1)
 	{
@@ -128,7 +129,7 @@ void CSender::ParseArgs(int argc, const char* argv[])
 	// return 0;
 }
 
-void CSender::ValidateArgs()
+void Sender::ValidateArgs()
 {
 	if (Config.File.empty())
 	{
@@ -147,7 +148,7 @@ void CSender::ValidateArgs()
 	FileSize = InputStream->tellg();
 	InputStream->seekg(0, std::ifstream::beg);
 
-	CY4mReader Reader(InputStream);
+	Y4mReader Reader(InputStream);
 	if (!Reader.Read(PictureFormat, StartSkip, PictureSkip))
 	{
 		std::cout << "Reading unsuccessful" << std::endl;

@@ -4,15 +4,15 @@
 #include <iostream>
 #include <string>
 
-CY4mReader::CY4mReader(std::istream* InStream)
+Y4mReader::Y4mReader(std::istream* InStream)
 	: Stream(InStream)
 {
 }
 
-bool CY4mReader::Read(SPictureFormat& OutFormat, std::streamoff& OutStartSkip, std::streamoff& OutPictureSkip)
+bool Y4mReader::Read(PictureFormat& OutFormat, std::streamoff& OutStartSkip, std::streamoff& OutPictureSkip)
 {
-	SPictureFormat Picture;
-	char		   Buf[80];
+	PictureFormat Picture;
+	char		  Buf[80];
 
 	std::streamsize Len;
 	for (Len = 0; Len < sizeof(Buf) - 1; Len++)

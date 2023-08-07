@@ -2,6 +2,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #include "common.h"
+#include "encoder.h"
 #include "y4m_reader.h"
 
 #include <fstream>
@@ -14,11 +15,11 @@
 #define DEFAULT_PORT 27015
 
 // Sender should own the socket and the encoder
-class CSender
+class Sender
 {
 public:
-	CSender();
-	~CSender();
+	Sender();
+	~Sender();
 
 	void ParseArgs(int argc, const char* argv[]);
 	void ValidateArgs();
@@ -39,5 +40,7 @@ private:
 	std::streamsize FileSize;
 	std::streamoff	StartSkip;
 	std::streamoff	PictureSkip;
-	SPictureFormat	PictureFormat;
+	PictureFormat	PictureFormat;
+
+	Encoder WrappedEncoder;
 };
