@@ -2,14 +2,14 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "Build Server",
+            "label": "Build Sender",
             "command": "cl.exe",
             "args": [
                 "/Zi",
                 "/EHsc",
                 "/nologo",
-                "/Fe${workspaceFolder}\\bin\\server.exe",
-                "${workspaceFolder}\\server.cpp"
+                "/Fe${workspaceFolder}\\bin\\sender.exe",
+                "${workspaceFolder}\\sender\\sender.cpp"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -24,14 +24,14 @@
         },
         {
             "type": "cppbuild",
-            "label": "Build Client",
+            "label": "Build Receiver",
             "command": "cl.exe",
             "args": [
                 "/Zi",
                 "/EHsc",
                 "/nologo",
-                "/Fe${workspaceFolder}\\bin\\client.exe",
-                "${workspaceFolder}\\client.cpp"
+                "/Fe${workspaceFolder}\\bin\\receiver.exe",
+                "${workspaceFolder}\\receiver\\receiver.cpp"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

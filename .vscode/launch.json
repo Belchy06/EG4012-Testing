@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Server",
+            "name": "Launch Sender",
             "request": "launch",
-            "program": "${workspaceFolder}\\bin\\server.exe",
-            "preLaunchTask": "Build Server",
+            "program": "${workspaceFolder}\\bin\\sender.exe",
+            "preLaunchTask": "Build Sender",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -16,10 +16,10 @@
             "type": "cppvsdbg",
         },
         {
-            "name": "Launch Client",
+            "name": "Launch Receiver",
             "request": "launch",
-            "program": "${workspaceFolder}\\bin\\client.exe",
-            "preLaunchTask": "Build Client",
+            "program": "${workspaceFolder}\\bin\\receiver.exe",
+            "preLaunchTask": "Build Receiver",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
