@@ -8,9 +8,11 @@
                 "/Zi",
                 "/EHsc",
                 "/nologo",
+                "/I${workspaceFolder}\\common",
                 "/Fe${workspaceFolder}\\bin\\sender.exe",
                 "${workspaceFolder}\\sender\\y4m_reader.cpp",
-                "${workspaceFolder}\\sender\\sender.cpp"
+                "${workspaceFolder}\\sender\\sender.cpp",
+                "${workspaceFolder}\\sender\\main.cpp"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
