@@ -10,10 +10,10 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#define DEFAULT_BUFFER_LENGTH 512
+#define DEFAULT_BUFFER_LENGTH 2048
 #define DEFAULT_PORT 27015
 
-int main()
+int main(int argc, char* argv[])
 {
 	SOCKET			   Socket;
 	struct sockaddr_in Server, Si_other;

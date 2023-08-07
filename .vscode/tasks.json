@@ -21,6 +21,28 @@
                 "kind": "build",
                 "isDefault": true
             },
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build Client",
+            "command": "cl.exe",
+            "args": [
+                "/Zi",
+                "/EHsc",
+                "/nologo",
+                "/Fe${workspaceFolder}\\bin\\client.exe",
+                "${workspaceFolder}\\client.cpp"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
         }
     ],
     "version": "2.0.0"
