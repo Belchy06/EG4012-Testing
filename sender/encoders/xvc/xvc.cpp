@@ -71,6 +71,13 @@ EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 		// clang-format on
 	}
 
+	// low delay
+	Params->low_delay = 1;
+	// SpeedMode::kFast
+	Params->speed_mode = 2;
+	Params->num_ref_pics = 1;
+	Params->max_keypic_distance = 0;
+
 	xvc_enc_return_code Result = Api->parameters_check(Params);
 	if (Result != XVC_ENC_OK)
 	{
@@ -185,7 +192,7 @@ EncodeResult* XvcEncoder::Encode(std::istream* InStream)
 		bContinue = Result == XVC_ENC_OK;
 	}
 
-	return new XvcResult(Result);
+	return new XvcResult(XVC_ENC_OK);
 }
 
 bool XvcEncoder::ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes)

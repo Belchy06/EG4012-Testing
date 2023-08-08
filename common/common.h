@@ -22,3 +22,10 @@ typedef enum
 	CODEC_XVC,
 	CODEC_UNDEFINED = 255
 } ECodec;
+
+typedef enum
+{
+	Y,
+	U,
+	V
+} EYuvComponent;

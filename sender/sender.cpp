@@ -178,8 +178,8 @@ void Sender::Test()
 	Config.StartSkip = StartSkip;
 	Config.PictureSkip = PictureSkip;
 
-	EncodeResult* Res = WrappedEncoder->Init(Config);
-	if (!Res->IsSuccess())
+	EncodeResult* Result = WrappedEncoder->Init(Config);
+	if (!Result->IsSuccess())
 	{
 		std::cerr << "Error: Initializing config" << std::endl;
 		std::exit(-1);
@@ -187,9 +187,18 @@ void Sender::Test()
 
 	WrappedEncoder->RegisterEncodeCompleteCallback(this);
 
-	WrappedEncoder->Encode(InputStream);
+	Result = WrappedEncoder->Encode(InputStream);
+	if (!Result->IsSuccess())
+	{
+		std::cerr << "Error: Encoding \"" << Result->Error() << "\"" << std::endl;
+		std::exit(-1);
+	}
 }
 
-void Sender::OnEncodeComplete(uint8_t* Data, size_t Size)
+void Sender::OnEncodeComplete(const uint8_t* Data, size_t Size)
 {
+	std::cout << "====================" << std::endl;
+	std::cout << "  OnEncodeComplete  " << std::endl;
+	std::cout << "====================" << std::endl;
+	std::cout << "Size: " << Size << std::endl;
 }

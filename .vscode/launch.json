@@ -11,7 +11,8 @@
             "preLaunchTask": "Build Sender",
             "args": [
                 "-file", "${workspaceFolder}\\resources\\foreman_cif.y4m",
-                "-codec", "XVC"
+                "-codec", "H265",
+                // "-codec", "XVC",
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

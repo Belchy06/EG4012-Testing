@@ -9,4 +9,9 @@ public:
 	{
 		return false;
 	}
+
+	virtual std::string Error()
+	{
+		return "";
+	}
 };

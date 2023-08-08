@@ -26,7 +26,7 @@ public:
 	void Test();
 
 	// EncodeCompleteCallback interface
-	virtual void OnEncodeComplete(uint8_t* Data, size_t Size) override;
+	virtual void OnEncodeComplete(const uint8_t* Data, size_t Size) override;
 
 private:
 	struct

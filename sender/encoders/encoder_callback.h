@@ -3,5 +3,5 @@
 class IEncodeCompleteCallback
 {
 public:
-	virtual void OnEncodeComplete(uint8_t* Data, size_t Size) = 0;
+	virtual void OnEncodeComplete(const uint8_t* Data, size_t Size) = 0;
 };
