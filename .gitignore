@@ -1,2 +1,2 @@
-bin
-intermediate
+bin/*
+intermediate/*
