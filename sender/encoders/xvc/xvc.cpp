@@ -197,6 +197,10 @@ EncodeResult* XvcEncoder::Encode(std::istream* InStream)
 
 bool XvcEncoder::ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes)
 {
+	if (Config.PictureSkip > 0)
+	{
+		InStream->seekg(Config.PictureSkip, std::ifstream::cur);
+	}
 	InStream->read(reinterpret_cast<char*>(&(OutPictureBytes)[0]), OutPictureBytes.size());
 	return InStream->gcount() == static_cast<int>(OutPictureBytes.size());
 }

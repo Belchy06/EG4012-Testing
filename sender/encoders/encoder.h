@@ -1,6 +1,7 @@
 #pragma once
 
 #include <istream>
+#include <fstream>
 
 #include "common.h"
 #include "config.h"

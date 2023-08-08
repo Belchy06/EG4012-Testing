@@ -75,6 +75,16 @@ EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 
 	PictureBytes.resize(Config.BitDepth == 8 ? PictureSamples : (PictureSamples << 1));
 
+	// Skip input pictures (if supported by stream)
+	// std::streamoff StartPos = Config.StartSkip + (Config.PictureSkip + PictureBytes.size()) * 0;
+	// if (StartPos >= input_file_size_)
+	// {
+	// 	std::cerr << "Error: The value of skip-pictures is larger than the "
+	// 			  << "number of pictures in the input file.";
+	// 	std::exit(1);
+	// }
+	// InStream->seekg(StartPos, std::ifstream::beg);
+
 	de265_error Result;
 	bool		bContinue = true;
 	while (bContinue)
@@ -177,6 +187,10 @@ EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 
 bool Libde265Encoder::ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes)
 {
+	if (Config.PictureSkip > 0)
+	{
+		InStream->seekg(Config.PictureSkip, std::ifstream::cur);
+	}
 	InStream->read(reinterpret_cast<char*>(&(OutPictureBytes)[0]), OutPictureBytes.size());
 	return InStream->gcount() == static_cast<int>(OutPictureBytes.size());
 }
