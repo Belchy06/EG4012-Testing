@@ -6,7 +6,7 @@ EncodeResult* Encoder::Init(EncoderConfig& InConfig)
 	return new EncodeResult();
 }
 
-EncodeResult* Encoder::Encode()
+EncodeResult* Encoder::Encode(std::istream* InStream)
 {
 	unimplemented();
 	return new EncodeResult();

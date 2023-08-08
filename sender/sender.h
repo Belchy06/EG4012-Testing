@@ -44,5 +44,5 @@ private:
 	std::streamoff	PictureSkip;
 	PictureFormat	PictureFormat;
 
-	Encoder* WrappedEncoder;
+	std::shared_ptr<Encoder> WrappedEncoder;
 };

@@ -2,6 +2,11 @@
 #include "xvc_result.h"
 #include "common.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <iostream>
+
 XvcEncoder::XvcEncoder()
 	: Api(xvc_encoder_api_get())
 	, Params(Api->parameters_create())
@@ -63,10 +68,23 @@ EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 		// clang-format on
 	}
 
-	return new XvcResult(Api->parameters_check(Params));
+	xvc_enc_return_code Result = Api->parameters_check(Params);
+	if (Result != XVC_ENC_OK)
+	{
+		return new XvcResult(Result);
+	}
+
+	Encoder = Api->encoder_create(Params);
+	if (!Encoder)
+	{
+		std::cerr << "Error: Failed to allocate encoder" << std::endl;
+		std::exit(-1);
+	}
+
+	return new XvcResult(Result);
 }
 
-EncodeResult* XvcEncoder::Encode()
+EncodeResult* XvcEncoder::Encode(std::istream* InStream)
 {
 	return new EncodeResult();
 }

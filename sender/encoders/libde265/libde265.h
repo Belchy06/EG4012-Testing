@@ -9,5 +9,5 @@ public:
 	~Libde265Encoder();
 
 	virtual EncodeResult* Init(EncoderConfig& InConfig) override;
-	virtual EncodeResult* Encode() override;
+	virtual EncodeResult* Encode(std::istream* InStream) override;
 };

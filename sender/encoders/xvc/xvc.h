@@ -11,7 +11,7 @@ public:
 	~XvcEncoder();
 
 	virtual EncodeResult* Init(EncoderConfig& InConfig) override;
-	virtual EncodeResult* Encode() override;
+	virtual EncodeResult* Encode(std::istream* InStream) override;
 
 private:
 	const xvc_encoder_api*	Api;

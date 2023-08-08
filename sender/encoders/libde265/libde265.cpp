@@ -13,7 +13,7 @@ EncodeResult* Libde265Encoder::Init(EncoderConfig& InConfig)
 	return new EncodeResult();
 }
 
-EncodeResult* Libde265Encoder::Encode()
+EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 {
 	return new EncodeResult();
 }

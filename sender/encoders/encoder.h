@@ -9,7 +9,7 @@ class Encoder
 {
 public:
 	virtual EncodeResult* Init(EncoderConfig& InConfig);
-	virtual EncodeResult* Encode();
+	virtual EncodeResult* Encode(std::istream* InStream);
 
 private:
 	EncoderConfig Config;

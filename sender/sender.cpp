@@ -14,6 +14,7 @@
 #include "encoder.h"
 #include "encoders/config.h"
 #include "y4m_reader.h"
+#include "common.h"
 
 Sender::Sender()
 	: InputStream(nullptr)
@@ -181,6 +182,24 @@ void Sender::Test()
 	{
 		std::cerr << "Error: Initializing config" << std::endl;
 		std::exit(-1);
+	}
+
+	int PictureSamples = 0;
+	if (Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME)
+	{
+		PictureSamples = Config.Width * Config.Height;
+	}
+	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_420)
+	{
+		PictureSamples = (3 * (Config.Width * Config.Height)) >> 1;
+	}
+	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_422)
+	{
+		PictureSamples = 2 * Config.Width * Config.Height;
+	}
+	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_444)
+	{
+		PictureSamples = 3 * Config.Width * Config.Height;
 	}
 
 	// WrappedEncoder->Encode();
