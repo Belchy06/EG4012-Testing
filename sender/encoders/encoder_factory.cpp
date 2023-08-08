@@ -1,7 +1,6 @@
 #include "encoder_factory.h"
-
-#include "xvc.h"
 #include "libde265.h"
+#include "xvc.h"
 
 std::shared_ptr<Encoder> EncoderFactory::Create(ECodec InCodec)
 {

@@ -10,4 +10,7 @@ public:
 	double		  Framerate;
 	int			  BitDepth;
 	EChromaFormat Format;
+
+	std::streamoff StartSkip;
+	std::streamoff PictureSkip;
 };

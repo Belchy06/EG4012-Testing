@@ -1,8 +1,8 @@
-#include "y4m_reader.h"
-
 #include <assert.h>
 #include <iostream>
 #include <string>
+
+#include "y4m_reader.h"
 
 Y4mReader::Y4mReader(std::istream* InStream)
 	: Stream(InStream)

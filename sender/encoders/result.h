@@ -7,7 +7,6 @@ class EncodeResult
 public:
 	virtual bool IsSuccess()
 	{
-		unimplemented();
 		return false;
 	}
 };

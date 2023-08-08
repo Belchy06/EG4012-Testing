@@ -1,12 +1,11 @@
 #pragma once
 #pragma comment(lib, "Ws2_32.lib")
 
-#include "common.h"
-#include "encoder.h"
-#include "encoder_factory.h"
-
-#include "y4m_reader.h"
 #include <fstream>
+
+#include "encoder_factory.h"
+#include "encoder_callback.h"
+#include "y4m_reader.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 	#define WIN32_LEAN_AND_MEAN
@@ -16,7 +15,7 @@
 #define DEFAULT_PORT 27015
 
 // Sender should own the socket and the encoder
-class Sender
+class Sender : public IEncodeCompleteCallback
 {
 public:
 	Sender();
@@ -25,6 +24,9 @@ public:
 	void ParseArgs(int argc, const char* argv[]);
 	void ValidateArgs();
 	void Test();
+
+	// EncodeCompleteCallback interface
+	virtual void OnEncodeComplete(uint8_t* Data, size_t Size) override;
 
 private:
 	struct
@@ -42,7 +44,7 @@ private:
 	std::streamsize FileSize;
 	std::streamoff	StartSkip;
 	std::streamoff	PictureSkip;
-	PictureFormat	PictureFormat;
+	PictureFormat	PicFormat;
 
 	std::shared_ptr<Encoder> WrappedEncoder;
 };

@@ -12,8 +12,7 @@
 
 #include "sender.h"
 #include "encoder.h"
-#include "encoders/config.h"
-#include "y4m_reader.h"
+#include "config.h"
 #include "common.h"
 
 Sender::Sender()
@@ -153,7 +152,7 @@ void Sender::ValidateArgs()
 	InputStream->seekg(0, std::ifstream::beg);
 
 	Y4mReader Reader(InputStream);
-	if (!Reader.Read(PictureFormat, StartSkip, PictureSkip))
+	if (!Reader.Read(PicFormat, StartSkip, PictureSkip))
 	{
 		std::cout << "Reading unsuccessful" << std::endl;
 		std::exit(-1);
@@ -171,11 +170,13 @@ void Sender::Test()
 	WrappedEncoder = EncoderFactory::Create(Settings.Codec);
 
 	EncoderConfig Config;
-	Config.Format = PictureFormat.Format;
-	Config.Framerate = PictureFormat.Framerate;
-	Config.Width = PictureFormat.Width;
-	Config.Height = PictureFormat.Height;
-	Config.BitDepth = PictureFormat.BitDepth;
+	Config.Format = PicFormat.Format;
+	Config.Framerate = PicFormat.Framerate;
+	Config.Width = PicFormat.Width;
+	Config.Height = PicFormat.Height;
+	Config.BitDepth = PicFormat.BitDepth;
+	Config.StartSkip = StartSkip;
+	Config.PictureSkip = PictureSkip;
 
 	EncodeResult* Res = WrappedEncoder->Init(Config);
 	if (!Res->IsSuccess())
@@ -184,23 +185,11 @@ void Sender::Test()
 		std::exit(-1);
 	}
 
-	int PictureSamples = 0;
-	if (Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME)
-	{
-		PictureSamples = Config.Width * Config.Height;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_420)
-	{
-		PictureSamples = (3 * (Config.Width * Config.Height)) >> 1;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_422)
-	{
-		PictureSamples = 2 * Config.Width * Config.Height;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_444)
-	{
-		PictureSamples = 3 * Config.Width * Config.Height;
-	}
+	WrappedEncoder->RegisterEncodeCompleteCallback(this);
 
-	// WrappedEncoder->Encode();
+	WrappedEncoder->Encode(InputStream);
+}
+
+void Sender::OnEncodeComplete(uint8_t* Data, size_t Size)
+{
 }

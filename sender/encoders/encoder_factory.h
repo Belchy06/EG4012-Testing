@@ -1,9 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include "common.h"
 #include "encoder.h"
-
-#include <memory>
 
 class EncoderFactory
 {
