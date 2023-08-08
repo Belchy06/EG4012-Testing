@@ -41,7 +41,7 @@ void Sender::ParseArgs(int argc, const char* argv[])
 			// TODO (belchy06): Print help
 			std::exit(-1);
 		} else if(arg == "-port") {
-            Settings.Port = atoi(argv[++i]);
+            // Settings.Port = atoi(argv[++i]);
         } else if(arg == "-codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "H265") {
@@ -55,6 +55,17 @@ void Sender::ParseArgs(int argc, const char* argv[])
             }
         } else if(arg == "-file") {
             Settings.File = std::string(argv[++i]);
+        } else if(arg == "-loglevel") {
+            std::string LevelStr(argv[++i]);
+            if(LevelStr == "log") {
+                Settings.LogLevel = ELogSeverity::SEVERITY_LOG;
+            } else if(LevelStr == "verbose") {
+                Settings.LogLevel = ELogSeverity::SEVERITY_VERBOSE;
+            } else if(LevelStr == "veryverbose") {
+                Settings.LogLevel = ELogSeverity::SEVERITY_VERY_VERBOSE;
+            } else {
+                Settings.LogLevel = ELogSeverity::SEVERITY_NONE;
+            }
         }
 		// clang-format on
 	}
@@ -177,6 +188,7 @@ void Sender::Test()
 	Config.BitDepth = PicFormat.BitDepth;
 	Config.StartSkip = StartSkip;
 	Config.PictureSkip = PictureSkip;
+	Config.LogLevel = Settings.LogLevel;
 
 	EncodeResult* Result = WrappedEncoder->Init(Config);
 	if (!Result->IsSuccess())

@@ -13,4 +13,6 @@ public:
 
 	std::streamoff StartSkip;
 	std::streamoff PictureSkip;
+
+	ELogSeverity LogLevel;
 };

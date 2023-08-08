@@ -31,11 +31,9 @@ public:
 private:
 	struct
 	{
-		int			Port;
-		ECodec		Codec;
-		std::string File;
-
-		int MTUSize;
+		ECodec		 Codec;
+		std::string	 File;
+		ELogSeverity LogLevel = ELogSeverity::SEVERITY_VERBOSE;
 	} Settings;
 
 private:

@@ -10,7 +10,7 @@
             "program": "${workspaceFolder}\\bin\\sender.exe",
             "preLaunchTask": "Build Sender",
             "args": [
-                "-file", "${workspaceFolder}\\resources\\foreman_cif.y4m",
+                "-file", "${workspaceFolder}\\resources\\carphone_qcif.y4m",
                 "-codec", "H265",
                 // "-codec", "XVC",
             ],

@@ -21,6 +21,8 @@ Libde265Encoder::~Libde265Encoder()
 
 EncodeResult* Libde265Encoder::Init(EncoderConfig& InConfig)
 {
+	Config = InConfig;
+
 	de265_error Result = de265_init();
 	if (Result != DE265_OK)
 	{
@@ -29,7 +31,7 @@ EncodeResult* Libde265Encoder::Init(EncoderConfig& InConfig)
 
 	Encoder = en265_new_encoder();
 
-	de265_set_verbosity(3);
+	de265_set_verbosity(static_cast<int>(Config.LogLevel));
 
 	Result = en265_start_encoder(Encoder, 0);
 	return new Libde265Result(Result);
@@ -64,6 +66,7 @@ EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 		if (!ReadNextPicture(InStream, PictureBytes))
 		{
 			en265_push_eof(Encoder);
+			bContinue = false;
 		}
 		else
 		{
@@ -76,6 +79,7 @@ EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 
 			int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
 			uint8_t* SrcBytes = PictureBytes.data();
+			int		 FrameSize = Config.Width * Config.Height;
 			for (int c = 0; c < NumComponents; c++)
 			{
 				const EYuvComponent Component = static_cast<EYuvComponent>(c);
@@ -83,20 +87,20 @@ EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 				int					Stride = Input->get_image_stride(c);
 				if (Component == EYuvComponent::Y)
 				{
-					memcpy(Plane, SrcBytes, Config.Width * Config.Height);
+					memcpy(Plane, SrcBytes, FrameSize);
 				}
 				else if (Component == EYuvComponent::U)
 				{
 					switch (Config.Format)
 					{
 						case EChromaFormat::CHROMA_FORMAT_420:
-							memcpy(Plane, SrcBytes + Config.Width * Config.Height, (Config.Width * Config.Height) / 2);
+							memcpy(Plane, SrcBytes + FrameSize, (FrameSize) / 4);
 							break;
 						case EChromaFormat::CHROMA_FORMAT_422:
-							memcpy(Plane, SrcBytes + Config.Width * Config.Height, (Config.Width / 2) * Config.Height);
+							memcpy(Plane, SrcBytes + FrameSize, (Config.Width / 2) * Config.Height);
 							break;
 						case EChromaFormat::CHROMA_FORMAT_444:
-							memcpy(Plane, SrcBytes + Config.Width * Config.Height, Config.Width * Config.Height);
+							memcpy(Plane, SrcBytes + FrameSize, FrameSize);
 							break;
 						case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
 						case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
@@ -109,13 +113,13 @@ EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 					switch (Config.Format)
 					{
 						case EChromaFormat::CHROMA_FORMAT_420:
-							memcpy(Plane, SrcBytes + (3 / 2) * (Config.Width * Config.Height), (Config.Width * Config.Height) / 2);
+							memcpy(Plane, SrcBytes + (5 / 4) * FrameSize, (FrameSize) / 4);
 							break;
 						case EChromaFormat::CHROMA_FORMAT_422:
 							memcpy(Plane, SrcBytes + (Config.Width * Config.Width) + (3 * Config.Width * Config.Height) + (2 * Config.Height * Config.Height), (Config.Width / 2) * Config.Height);
 							break;
 						case EChromaFormat::CHROMA_FORMAT_444:
-							memcpy(Plane, SrcBytes + 2 * Config.Width * Config.Height, Config.Width * Config.Height);
+							memcpy(Plane, SrcBytes + 2 * FrameSize, FrameSize);
 							break;
 						case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
 						case EChromaFormat::CHROMA_FORMAT_UNDEFINED:

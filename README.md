@@ -10,6 +10,10 @@ cmake -G "Visual Studio 17 2022" -A Win32 ..
 ```
 
 ### 2. Build Libde265
+##### Modify libde265/Makefile.cv7
+Remove /DNDEBUG
+Add /DDE265_LOG_INFO /DDE265_LOG_DEBUG /DDE265_LOG_ERROR
+
 ```cmd
 cd ./third_party/libde265
 ./build.bat

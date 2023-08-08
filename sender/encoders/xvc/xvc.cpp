@@ -184,7 +184,7 @@ EncodeResult* XvcEncoder::Encode(std::istream* InStream)
 
 			// Conditionally print information for each Nal Unit that is written
 			// to the file.
-			if (true)
+			if (Config.LogLevel >= ELogSeverity::SEVERITY_VERBOSE)
 			{
 				PrintNalInfo(NalUnits[i]);
 			}

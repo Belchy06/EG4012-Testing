@@ -29,3 +29,11 @@ typedef enum
 	U,
 	V
 } EYuvComponent;
+
+typedef enum
+{
+	SEVERITY_NONE,
+	SEVERITY_LOG,
+	SEVERITY_VERBOSE,
+	SEVERITY_VERY_VERBOSE
+} ELogSeverity;
