@@ -10,8 +10,8 @@
             "program": "${workspaceFolder}\\bin\\sender.exe",
             "preLaunchTask": "Build Sender",
             "args": [
-                "-file", "${workspaceFolder}\\resources\\cosmos1650_yuv444_10bpc_p3pq.y4m",
-                "-codec", "H265"
+                "-file", "${workspaceFolder}\\resources\\foreman_cif.y4m",
+                "-codec", "XVC"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
