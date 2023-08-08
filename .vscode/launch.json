@@ -11,7 +11,7 @@
             "preLaunchTask": "Build Sender",
             "args": [
                 "-file", "${workspaceFolder}\\resources\\cosmos1650_yuv444_10bpc_p3pq.y4m",
-                "-codec", "XVC"
+                "-codec", "H265"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

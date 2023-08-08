@@ -14,6 +14,9 @@
                 "/I${workspaceFolder}\\sender\\encoders\\libde265",
 
                 "/I${workspaceFolder}\\third_party\\xvc\\src",
+                "/I${workspaceFolder}\\third_party\\libde265",
+                "/I${workspaceFolder}\\third_party\\libde265\\extra",
+                "/I${workspaceFolder}\\third_party\\libde265\\extra\\libde265",
                 "/Fd${workspaceFolder}\\bin\\sender.pdb",
                 "/Fe${workspaceFolder}\\bin\\sender.exe",
                 "/Fo\"${workspaceFolder}\\intermediate\"\\",
