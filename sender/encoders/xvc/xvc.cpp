@@ -213,27 +213,27 @@ void XvcEncoder::PrintNalInfo(xvc_enc_nal_unit NalUnit)
 	std::cout << "  Bytes: " << std::setw(10) << NalUnit.size;
 	if (NalUnit.stats.nal_unit_type < 16)
 	{
-		double			  bpp = (8 * static_cast<double>(NalUnit.size) / (Config.Width * Config.Height));
-		std::stringstream bpp_str;
-		bpp_str << std::fixed << std::setprecision(5) << bpp;
-		std::cout << "  Bpp: " << std::setw(10) << bpp_str.str();
-		std::stringstream psnr_str_y;
-		psnr_str_y << std::fixed << std::setprecision(3) << NalUnit.stats.psnr_y;
-		std::cout << "  PSNR-Y: " << std::setw(6) << psnr_str_y.str();
+		double			  BPP = (8 * static_cast<double>(NalUnit.size) / (Config.Width * Config.Height));
+		std::stringstream BPPStr;
+		BPPStr << std::fixed << std::setprecision(5) << BPP;
+		std::cout << "  Bpp: " << std::setw(10) << BPPStr.str();
+		std::stringstream PsnrStrY;
+		PsnrStrY << std::fixed << std::setprecision(3) << NalUnit.stats.psnr_y;
+		std::cout << "  PSNR-Y: " << std::setw(6) << PsnrStrY.str();
 		if (Params->chroma_format != XVC_ENC_CHROMA_FORMAT_MONOCHROME)
 		{
-			std::stringstream psnr_str_u;
-			psnr_str_u << std::fixed << std::setprecision(3) << NalUnit.stats.psnr_u;
-			std::cout << "  PSNR-U: " << std::setw(6) << psnr_str_u.str();
-			std::stringstream psnr_str_v;
-			psnr_str_v << std::fixed << std::setprecision(3) << NalUnit.stats.psnr_v;
-			std::cout << "  PSNR-V: " << std::setw(6) << psnr_str_v.str();
+			std::stringstream PsnrStrU;
+			PsnrStrU << std::fixed << std::setprecision(3) << NalUnit.stats.psnr_u;
+			std::cout << "  PSNR-U: " << std::setw(6) << PsnrStrU.str();
+			std::stringstream PsnrStrV;
+			PsnrStrV << std::fixed << std::setprecision(3) << NalUnit.stats.psnr_v;
+			std::cout << "  PSNR-V: " << std::setw(6) << PsnrStrV.str();
 		}
 		if (NalUnit.stats.l0[0] >= 0 || NalUnit.stats.l1[0] >= 0)
 		{
 			std::cout << "  RefPics: L0: { ";
-			int length_l0 = sizeof(NalUnit.stats.l0) / sizeof(NalUnit.stats.l0[0]);
-			for (int i = 0; i < length_l0; i++)
+			int LengthL0 = sizeof(NalUnit.stats.l0) / sizeof(NalUnit.stats.l0[0]);
+			for (int i = 0; i < LengthL0; i++)
 			{
 				if (NalUnit.stats.l0[i] > -1)
 				{
@@ -245,8 +245,8 @@ void XvcEncoder::PrintNalInfo(xvc_enc_nal_unit NalUnit)
 				}
 			}
 			std::cout << " } L1: { ";
-			int length_l1 = sizeof(NalUnit.stats.l1) / sizeof(NalUnit.stats.l1[0]);
-			for (int i = 0; i < length_l1; i++)
+			int LengthL1 = sizeof(NalUnit.stats.l1) / sizeof(NalUnit.stats.l1[0]);
+			for (int i = 0; i < LengthL1; i++)
 			{
 				if (NalUnit.stats.l1[i] > -1)
 				{
