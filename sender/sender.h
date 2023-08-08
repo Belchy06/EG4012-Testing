@@ -33,7 +33,7 @@ private:
 	{
 		ECodec		 Codec;
 		std::string	 File;
-		ELogSeverity LogLevel = ELogSeverity::SEVERITY_VERY_VERBOSE;
+		ELogSeverity LogLevel = ELogSeverity::SEVERITY_LOG;
 	} Settings;
 
 private:

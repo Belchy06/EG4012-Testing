@@ -5,8 +5,6 @@
 #include "libde265/de265.h"
 #include "libde265/image.h"
 
-#pragma comment(lib, "libde265.lib")
-
 Libde265Encoder::Libde265Encoder()
 {
 }
@@ -44,7 +42,7 @@ EncodeResult* Libde265Encoder::Init(EncoderConfig& InConfig)
 		std::back_inserter(vec),
 		[](std::string& s) { s.push_back(0); return &s[0]; });
 	vec.push_back(nullptr);
-	int temp = vec.size();
+	int temp = vec.size() - 1;
 	Result = en265_parse_command_line_parameters(Encoder, &temp, vec.data());
 	if (Result != DE265_OK)
 	{
@@ -88,7 +86,7 @@ EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 		}
 		else
 		{
-			de265_image* Input = new de265_image;
+			de265_image* Input = new de265_image();
 			Result = Input->alloc_image(Config.Width, Config.Height, GetChroma(Config.Format), NULL, false, NULL, 0, NULL, false);
 			if (Result != DE265_OK)
 			{

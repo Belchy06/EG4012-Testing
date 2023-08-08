@@ -5,13 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Sender",
+            "name": "Launch Sender (Release)",
             "request": "launch",
             "program": "${workspaceFolder}\\bin\\sender.exe",
-            "preLaunchTask": "Build Sender",
+            "preLaunchTask": "Build Sender (Release)",
             "args": [
-                "-file", "${workspaceFolder}\\resources\\carphone_qcif.y4m",
-                "-codec", "H265",
+                "-file",
+                "${workspaceFolder}\\resources\\carphone_qcif.y4m",
+                "-codec",
+                "H265",
+                // "-codec", "XVC",
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "type": "cppvsdbg",
+        },
+        {
+            "name": "Launch Sender (Debug)",
+            "request": "launch",
+            "program": "${workspaceFolder}\\bin\\sender.exe",
+            "preLaunchTask": "Build Sender (Debug)",
+            "args": [
+                "-file",
+                "${workspaceFolder}\\resources\\carphone_qcif.y4m",
+                "-codec",
+                "H265",
                 // "-codec", "XVC",
             ],
             "cwd": "${workspaceFolder}",
@@ -32,6 +51,5 @@
             "console": "integratedTerminal",
             "type": "cppvsdbg",
         }
-
     ]
 }
