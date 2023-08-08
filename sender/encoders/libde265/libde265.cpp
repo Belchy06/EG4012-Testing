@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "libde265.h"
 #include "libde265_result.h"
 #include "libde265/de265.h"
@@ -32,6 +34,22 @@ EncodeResult* Libde265Encoder::Init(EncoderConfig& InConfig)
 	Encoder = en265_new_encoder();
 
 	de265_set_verbosity(static_cast<int>(Config.LogLevel));
+
+	std::string array[] = {
+		"-sop-structure",
+		"intra"
+	};
+	std::vector<char*> vec;
+	std::transform(std::begin(array), std::end(array),
+		std::back_inserter(vec),
+		[](std::string& s) { s.push_back(0); return &s[0]; });
+	vec.push_back(nullptr);
+	int temp = vec.size();
+	Result = en265_parse_command_line_parameters(Encoder, &temp, vec.data());
+	if (Result != DE265_OK)
+	{
+		return new Libde265Result(Result);
+	}
 
 	Result = en265_start_encoder(Encoder, 0);
 	return new Libde265Result(Result);
