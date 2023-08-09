@@ -1,3 +1,4 @@
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -11,7 +12,7 @@
 Sender::Sender()
 	: InputStream(nullptr)
 	, Packetizer(Packetizer::Create())
-	, RTPSender(RTPSender::Create())
+	, RtpSender(RTPSender::Create())
 {
 }
 
@@ -26,6 +27,7 @@ void Sender::ParseArgs(int argc, const char* argv[])
 		// TODO (belchy06): Print help
 	}
 
+	SocketConfig Config;
 	// Parse command line
 	for (int i = 1; i < argc; i++)
 	{
@@ -35,56 +37,53 @@ void Sender::ParseArgs(int argc, const char* argv[])
 		if (arg == "-h") {
 			// TODO (belchy06): Print help
 			std::exit(-1);
-		} else if(arg == "-port") {
-            // Settings.Port = atoi(argv[++i]);
+		} else if(arg == "-ip") {
+            std::stringstream(argv[++i]) >> Config.IP;
+        } else if(arg == "-port") {
+            Config.Port = atoi(argv[++i]);
         } else if(arg == "-codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "H265") {
-                Settings.Codec = ECodec::CODEC_H265;
+                Options.Codec = ECodec::CODEC_H265;
             } else if(CodecStr == "AV1") {
-                Settings.Codec = ECodec::CODEC_AV1;
+                Options.Codec = ECodec::CODEC_AV1;
             } else if(CodecStr == "XVC") {
-                Settings.Codec = ECodec::CODEC_XVC;
+                Options.Codec = ECodec::CODEC_XVC;
             } else {
-                Settings.Codec = ECodec::CODEC_UNDEFINED;
+                Options.Codec = ECodec::CODEC_UNDEFINED;
             }
         } else if(arg == "-file") {
-            Settings.File = std::string(argv[++i]);
+            Options.File = std::string(argv[++i]);
         } else if(arg == "-loglevel") {
             std::string LevelStr(argv[++i]);
             if(LevelStr == "log") {
-                Settings.LogLevel = ELogSeverity::SEVERITY_LOG;
+                Options.LogLevel = ELogSeverity::SEVERITY_LOG;
             } else if(LevelStr == "verbose") {
-                Settings.LogLevel = ELogSeverity::SEVERITY_VERBOSE;
+                Options.LogLevel = ELogSeverity::SEVERITY_VERBOSE;
             } else if(LevelStr == "veryverbose") {
-                Settings.LogLevel = ELogSeverity::SEVERITY_VERY_VERBOSE;
+                Options.LogLevel = ELogSeverity::SEVERITY_VERY_VERBOSE;
             } else {
-                Settings.LogLevel = ELogSeverity::SEVERITY_NONE;
+                Options.LogLevel = ELogSeverity::SEVERITY_NONE;
             }
         }
 		// clang-format on
 	}
 
-	SocketConfig Config;
-	Config.IP = "127.0.0.1";
-	Config.Port = 8888;
-	RTPSender->Init(Config);
-
-	return;
+	RtpSender->Init(Config);
 }
 
 void Sender::ValidateArgs()
 {
-	if (Settings.File.empty())
+	if (Options.File.empty())
 	{
 		std::cerr << "Error: Missing input file argument" << std::endl;
 		std::exit(-1);
 	}
 
-	FileStream.open(Settings.File, std::ios_base::binary);
+	FileStream.open(Options.File, std::ios_base::binary);
 	if (!FileStream)
 	{
-		std::cerr << "Error: Failed to open file" << Settings.File << std::endl;
+		std::cerr << "Error: Failed to open file" << Options.File << std::endl;
 		std::exit(-1);
 	}
 	InputStream = &FileStream;
@@ -99,16 +98,16 @@ void Sender::ValidateArgs()
 		std::exit(-1);
 	}
 
-	if (Settings.Codec == ECodec::CODEC_UNDEFINED)
+	if (Options.Codec == ECodec::CODEC_UNDEFINED)
 	{
 		std::cerr << "Error: Invalid codec" << std::endl;
 		std::exit(-1);
 	}
 }
 
-void Sender::Test()
+void Sender::Run()
 {
-	WrappedEncoder = EncoderFactory::Create(Settings.Codec);
+	WrappedEncoder = EncoderFactory::Create(Options.Codec);
 
 	EncoderConfig Config;
 	Config.Format = PicFormat.Format;
@@ -118,7 +117,7 @@ void Sender::Test()
 	Config.BitDepth = PicFormat.BitDepth;
 	Config.StartSkip = StartSkip;
 	Config.PictureSkip = PictureSkip;
-	Config.LogLevel = Settings.LogLevel;
+	Config.LogLevel = Options.LogLevel;
 
 	EncodeResult* Result = WrappedEncoder->Init(Config);
 	if (!Result->IsSuccess())
@@ -146,5 +145,5 @@ void Sender::OnEncodeComplete(const uint8_t* InData, size_t InSize)
 
 	std::vector<RTPPacket> Packets = Packetizer->Packetize(InData, InSize);
 
-	RTPSender->Send(Packets);
+	RtpSender->Send(Packets);
 }

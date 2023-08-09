@@ -177,7 +177,11 @@ EncodeResult* XvcEncoder::Encode(std::istream* InStream)
 			CurrentSegmentBytes += NalUnits[i].size;
 			CurrentSegmentPics++;
 			TotalBytes += NalUnits[i].size;
-			OnEncodedImageCallback->OnEncodeComplete(NalUnits[i].bytes, NalUnits[i].size);
+
+			if (OnEncodedImageCallback != nullptr)
+			{
+				OnEncodedImageCallback->OnEncodeComplete(NalUnits[i].bytes, NalUnits[i].size);
+			}
 			// file_output_stream_.write(nal_size, 4);
 			// file_output_stream_.write(reinterpret_cast<char*>(NalUnits[i].bytes),
 			// 	NalUnits[i].size);

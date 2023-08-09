@@ -7,6 +7,7 @@
 #include "encoder_callback.h"
 #include "packetizer.h"
 #include "rtp_sender.h"
+#include "settings.h"
 #include "y4m_reader.h"
 
 // Sender should own the socket and the encoder
@@ -18,18 +19,11 @@ public:
 
 	void ParseArgs(int argc, const char* argv[]);
 	void ValidateArgs();
-	void Test();
-
-	// EncodeCompleteCallback interface
-	virtual void OnEncodeComplete(const uint8_t* InData, size_t InSize) override;
+	void Run();
 
 private:
-	struct
-	{
-		ECodec		 Codec;
-		std::string	 File;
-		ELogSeverity LogLevel = ELogSeverity::SEVERITY_LOG;
-	} Settings;
+	// EncodeCompleteCallback interface
+	virtual void OnEncodeComplete(const uint8_t* InData, size_t InSize) override;
 
 private:
 	std::istream*	InputStream;
@@ -38,8 +32,9 @@ private:
 	std::streamoff	StartSkip;
 	std::streamoff	PictureSkip;
 	PictureFormat	PicFormat;
+	Settings		Options;
 
 	std::shared_ptr<Encoder>	WrappedEncoder;
 	std::shared_ptr<Packetizer> Packetizer;
-	std::shared_ptr<RTPSender>	RTPSender;
+	std::shared_ptr<RTPSender>	RtpSender;
 };

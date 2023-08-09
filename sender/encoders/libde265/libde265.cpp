@@ -176,7 +176,10 @@ EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
 				break;
 			}
 
-			OnEncodedImageCallback->OnEncodeComplete(Packet->data, Packet->length);
+			if (OnEncodedImageCallback != nullptr)
+			{
+				OnEncodedImageCallback->OnEncodeComplete(Packet->data, Packet->length);
+			}
 
 			en265_free_packet(Encoder, Packet);
 		}

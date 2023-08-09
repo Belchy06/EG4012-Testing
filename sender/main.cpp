@@ -6,7 +6,7 @@ int main(int argc, const char* argv[])
 
 	Sender.ParseArgs(argc, argv);
 	Sender.ValidateArgs();
-	Sender.Test();
+	Sender.Run();
 	// main_app.PrintEncoderSettings();
 	// main_app.MainEncoderLoop();
 	// main_app.PrintStatistics();

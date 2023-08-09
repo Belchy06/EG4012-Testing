@@ -12,7 +12,7 @@
 class Encoder
 {
 public:
-	virtual void RegisterEncodeCompleteCallback(IEncodeCompleteCallback* InEncoderCompleteCallback);
+	void RegisterEncodeCompleteCallback(IEncodeCompleteCallback* InEncoderCompleteCallback);
 
 	virtual EncodeResult* Init(EncoderConfig& InConfig);
 	virtual EncodeResult* Encode(std::istream* InStream);

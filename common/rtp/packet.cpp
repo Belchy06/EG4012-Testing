@@ -36,7 +36,7 @@ RTPPacket::RTPPacket(int InPType, int InFrameNB, int InTime, const uint8_t* InDa
 	}
 }
 
-RTPPacket::RTPPacket(uint8_t* InData, int InDataLength)
+RTPPacket::RTPPacket(const uint8_t* InData, int InDataLength)
 {
 	// fill default fields:
 	Version = 2;

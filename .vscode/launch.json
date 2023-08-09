@@ -32,6 +32,10 @@
                 "-codec",
                 // "H265",
                 "XVC",
+                "-ip",
+                "127.0.0.1",
+                "-port",
+                "8888"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -39,12 +43,15 @@
             "type": "cppvsdbg",
         },
         {
-            "name": "Launch Receiver",
+            "name": "Launch Receiver (Debug)",
             "request": "launch",
             "program": "${workspaceFolder}\\bin\\receiver.exe",
-            "preLaunchTask": "Build Receiver",
+            "preLaunchTask": "Build Receiver (Debug)",
             "args": [
-                "",
+                "-codec",
+                "XVC",
+                "-port",
+                "8888"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
