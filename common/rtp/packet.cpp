@@ -1,13 +1,13 @@
 #include "packet.h"
 
-RTPPacket::RTPPacket(int InPType, int InFrameNB, int InTime, const uint8_t* InData, int InDataLength)
+RTPPacket::RTPPacket(int InPType, int InFrameNB, int InTime, const uint8_t* InData, int InDataLength, bool InbIsLast)
 {
 	// Constant header fields:
 	Version = 2;
 	Padding = 0;
 	Extension = 0;
 	CC = 0;
-	Marker = 0;
+	Marker = InbIsLast ? 1 : 0;
 	Ssrc = 0;
 	// Variable header fields:
 	SequenceNumber = InFrameNB;

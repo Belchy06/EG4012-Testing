@@ -5,7 +5,7 @@
 class RTPPacket
 {
 public:
-	RTPPacket(int InPType, int InFrameNB, int InTime, const uint8_t* InData, int InDataLength);
+	RTPPacket(int InPType, int InFrameNB, int InTime, const uint8_t* InData, int InDataLength, bool InbIsLast);
 	RTPPacket(const uint8_t* InData, int InDataLength);
 
 	uint8_t* GetHeader();
