@@ -5,7 +5,8 @@
 
 #include "encoder_factory.h"
 #include "encoder_callback.h"
-#include "packetizer/packetizer.h"
+#include "packetizer.h"
+#include "rtp_sender.h"
 #include "y4m_reader.h"
 
 // Sender should own the socket and the encoder
@@ -40,4 +41,5 @@ private:
 
 	std::shared_ptr<Encoder>	WrappedEncoder;
 	std::shared_ptr<Packetizer> Packetizer;
+	std::shared_ptr<RTPSender>	RTPSender;
 };

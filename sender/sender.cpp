@@ -11,6 +11,7 @@
 Sender::Sender()
 	: InputStream(nullptr)
 	, Packetizer(Packetizer::Create())
+	, RTPSender(RTPSender::Create())
 {
 }
 
@@ -63,6 +64,11 @@ void Sender::ParseArgs(int argc, const char* argv[])
         }
 		// clang-format on
 	}
+
+	SocketConfig Config;
+	Config.IP = "127.0.0.1";
+	Config.Port = 8888;
+	RTPSender->Init(Config);
 
 	return;
 }
@@ -139,4 +145,6 @@ void Sender::OnEncodeComplete(const uint8_t* Data, size_t Size)
 	std::cout << "Size: " << Size << std::endl;
 
 	std::vector<RTPPacket> Packets = Packetizer->Packetize(Data, Size);
+
+	RTPSender->Send(Packets);
 }

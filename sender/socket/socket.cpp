@@ -2,6 +2,18 @@
 
 #include "socket.h"
 
+std::shared_ptr<Socket> Socket::Self = nullptr;
+
+std::shared_ptr<Socket> Socket::Create()
+{
+	if (Self == nullptr)
+	{
+		std::shared_ptr<Socket> Temp(new Socket());
+		Self = Temp;
+	}
+	return Self;
+}
+
 Socket::Socket()
 {
 }

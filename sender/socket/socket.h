@@ -4,6 +4,7 @@
 	#define WIN32_LEAN_AND_MEAN
 #endif
 
+#include <memory>
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -15,14 +16,18 @@
 class Socket
 {
 public:
-	Socket();
+	static std::shared_ptr<Socket> Create();
 	~Socket();
 
 	bool Init(SocketConfig InConfig);
 	bool Send(RTPPacket* Packet);
 
 private:
-	SocketConfig	   Config;
-	SOCKET			   Sock;
-	struct sockaddr_in Other;
+	Socket();
+
+private:
+	static std::shared_ptr<Socket> Self;
+	SocketConfig				   Config;
+	SOCKET						   Sock;
+	struct sockaddr_in			   Other;
 };
