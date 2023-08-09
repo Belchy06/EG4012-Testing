@@ -123,4 +123,5 @@ void Receiver::OnDecodeComplete(DecodedImage InImage)
 	std::cout << "====================" << std::endl;
 
 	Writer.WriteImageHeader(InImage);
+	Writer.WriteImage(InImage);
 }

@@ -16,6 +16,11 @@ void Y4mWriter::WriteImageHeader(DecodedImage& InImage)
 	(*Stream) << "FRAME\n";
 }
 
+void Y4mWriter::WriteImage(DecodedImage& InImage)
+{
+	Stream->write((char*)InImage.Bytes.data(), InImage.Size);
+}
+
 void Y4mWriter::WriteFileHeader(DecodedImage& InImage)
 {
 	std::string ChromaStr;

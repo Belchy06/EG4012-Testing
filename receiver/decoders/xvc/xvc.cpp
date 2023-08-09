@@ -65,6 +65,7 @@ DecodeResult* XvcDecoder::Decode(const uint8_t* InNalBytes, size_t InNalSize)
 			DecodedImage Image;
 			Image.Bytes.resize(DecodedPicture.size);
 			memcpy(Image.Bytes.data(), DecodedPicture.bytes, DecodedPicture.size);
+			Image.Size = DecodedPicture.size;
 			Image.Config.BitDepth = DecodedPicture.stats.bitdepth;
 			Image.Config.Width = DecodedPicture.stats.width;
 			Image.Config.Height = DecodedPicture.stats.height;

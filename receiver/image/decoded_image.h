@@ -9,5 +9,6 @@ class DecodedImage
 {
 public:
 	std::vector<uint8_t> Bytes;
+	size_t				 Size;
 	DecoderConfig		 Config;
 };

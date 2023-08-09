@@ -9,6 +9,7 @@ class Y4mWriter
 public:
 	Y4mWriter(std::ostream* InStream);
 	void WriteImageHeader(DecodedImage& InImage);
+	void WriteImage(DecodedImage& InImage);
 
 private:
 	void WriteFileHeader(DecodedImage& InImage);
