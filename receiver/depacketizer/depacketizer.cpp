@@ -26,18 +26,39 @@ void Depacketizer::HandlePacket(RTPPacket InPacket)
 	 * On receiving a packet with Mark = 1 => Call listener
 	 *
 	 */
-	uint8_t* Header = InPacket.GetHeader();
-    
+	Packets.push_back(InPacket);
 
-	int		 Size = 9999;
-	uint8_t* Data = new uint8_t[Size];
-	if (DepacketizerListener != nullptr)
+	bool bFullNal = false;
+	if (InPacket.GetMarker())
 	{
-		DepacketizerListener->OnNALReceived(Data, Size);
+		bFullNal = true;
 	}
+
+	if (bFullNal && DepacketizerListener != nullptr)
+	{
+		// Combine all the RTP packets in the Packets vector into a single packet
+		int TotalSize = 0;
+		for (RTPPacket Packet : Packets)
+		{
+			TotalSize += Packet.GetPayloadSize();
+		}
+
+		uint8_t* TotalData = new uint8_t[TotalSize];
+		int		 CopiedSize = 0;
+		for (RTPPacket Packet : Packets)
+		{
+			memcpy(TotalData + CopiedSize, Packet.GetPayload(), Packet.GetPayloadSize());
+			CopiedSize += Packet.GetPayloadSize();
+		}
+
+		DepacketizerListener->OnNALReceived(TotalData, TotalSize);
+		Packets.clear();
+	}
+
+	prevMarkerVal = InPacket.GetMarker();
 }
 
-void Depacketizer::RegisterRTPPacketListener(IDepacketizerListener* InDepacketizerListener)
+void Depacketizer::RegiseterDepacketizerListener(IDepacketizerListener* InDepacketizerListener)
 {
 	DepacketizerListener = InDepacketizerListener;
 }

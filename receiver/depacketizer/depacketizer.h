@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "packet.h"
 #include "depacketizer_listener.h"
@@ -11,13 +12,14 @@ public:
 	static std::shared_ptr<Depacketizer> Create();
 
 	void HandlePacket(RTPPacket InPacket);
-	void RegisterRTPPacketListener(IDepacketizerListener* InDepacketizerListener);
+	void RegiseterDepacketizerListener(IDepacketizerListener* InDepacketizerListener);
 
 private:
 	Depacketizer();
 
 private:
-	int prevMarkerVal;
+	int					   prevMarkerVal;
+	std::vector<RTPPacket> Packets;
 
 	static std::shared_ptr<Depacketizer> Self;
 	IDepacketizerListener*				 DepacketizerListener;

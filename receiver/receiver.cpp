@@ -9,6 +9,7 @@
 
 Receiver::Receiver()
 	: RtpReceiver(RTPReceiver::Create())
+	, Depacketizer(Depacketizer::Create())
 	, Writer(nullptr)
 {
 }
@@ -62,6 +63,7 @@ void Receiver::ParseArgs(int argc, const char* argv[])
 
 	RtpReceiver->Init(Config);
 	RtpReceiver->RegisterRTPPacketListener(this);
+	Depacketizer->RegiseterDepacketizerListener(this);
 }
 
 void Receiver::ValidateArgs()
@@ -101,12 +103,12 @@ void Receiver::Run()
 
 void Receiver::OnPacketReceived(RTPPacket InPacket)
 {
-	Depacketizer->Receive(InPacket);
+	Depacketizer->HandlePacket(InPacket);
 }
 
 void Receiver::OnNALReceived(const uint8_t* InData, size_t InSize)
 {
-	DecodeResult* Result = WrappedDecoder->Decode(InPacket.GetPayload(), InPacket.GetPayloadSize());
+	DecodeResult* Result = WrappedDecoder->Decode(InData, InSize);
 	if (!Result->IsSuccess())
 	{
 		std::cerr << "Error: Decoding \"" << Result->Error() << "\"" << std::endl;
