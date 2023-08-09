@@ -137,14 +137,14 @@ void Sender::Test()
 	}
 }
 
-void Sender::OnEncodeComplete(const uint8_t* Data, size_t Size)
+void Sender::OnEncodeComplete(const uint8_t* InData, size_t InSize)
 {
 	std::cout << "====================" << std::endl;
 	std::cout << "  OnEncodeComplete  " << std::endl;
 	std::cout << "====================" << std::endl;
-	std::cout << "Size: " << Size << std::endl;
+	std::cout << "Size: " << InSize << std::endl;
 
-	std::vector<RTPPacket> Packets = Packetizer->Packetize(Data, Size);
+	std::vector<RTPPacket> Packets = Packetizer->Packetize(InData, InSize);
 
 	RTPSender->Send(Packets);
 }
