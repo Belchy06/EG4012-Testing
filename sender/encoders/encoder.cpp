@@ -11,7 +11,7 @@ EncodeResult* Encoder::Init(EncoderConfig& InConfig)
 	return new EncodeResult();
 }
 
-EncodeResult* Encoder::Encode(std::istream* InStream)
+EncodeResult* Encoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture)
 {
 	unimplemented();
 	return new EncodeResult();

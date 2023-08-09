@@ -53,149 +53,105 @@ EncodeResult* Libde265Encoder::Init(EncoderConfig& InConfig)
 	return new Libde265Result(Result);
 }
 
-EncodeResult* Libde265Encoder::Encode(std::istream* InStream)
+EncodeResult* Libde265Encoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture)
 {
-	int PictureSamples = 0;
-	if (Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME)
-	{
-		PictureSamples = Config.Width * Config.Height;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_420)
-	{
-		PictureSamples = (3 * (Config.Width * Config.Height)) >> 1;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_422)
-	{
-		PictureSamples = 2 * Config.Width * Config.Height;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_444)
-	{
-		PictureSamples = 3 * Config.Width * Config.Height;
-	}
-
-	PictureBytes.resize(Config.BitDepth == 8 ? PictureSamples : (PictureSamples << 1));
-
-	// Skip input pictures (if supported by stream)
-	// std::streamoff StartPos = Config.StartSkip + (Config.PictureSkip + PictureBytes.size()) * 0;
-	// if (StartPos >= input_file_size_)
-	// {
-	// 	std::cerr << "Error: The value of skip-pictures is larger than the "
-	// 			  << "number of pictures in the input file.";
-	// 	std::exit(1);
-	// }
-	// InStream->seekg(StartPos, std::ifstream::beg);
-
 	de265_error Result;
-	bool		bContinue = true;
-	while (bContinue)
+
+	if (bInLastPicture)
 	{
-		if (!ReadNextPicture(InStream, PictureBytes))
-		{
-			en265_push_eof(Encoder);
-			bContinue = false;
-		}
-		else
-		{
-			de265_image* Input = new de265_image();
-			Result = Input->alloc_image(Config.Width, Config.Height, GetChroma(Config.Format), NULL, false, NULL, 0, NULL, false);
-			if (Result != DE265_OK)
-			{
-				return new Libde265Result(Result);
-			}
-
-			int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
-			uint8_t* SrcBytes = PictureBytes.data();
-			int		 FrameSize = Config.Width * Config.Height;
-			for (int c = 0; c < NumComponents; c++)
-			{
-				const EYuvComponent Component = static_cast<EYuvComponent>(c);
-				uint8_t*			Plane = Input->get_image_plane(c);
-				int					Stride = Input->get_image_stride(c);
-				if (Component == EYuvComponent::Y)
-				{
-					memcpy(Plane, SrcBytes, FrameSize);
-				}
-				else if (Component == EYuvComponent::U)
-				{
-					switch (Config.Format)
-					{
-						case EChromaFormat::CHROMA_FORMAT_420:
-							memcpy(Plane, SrcBytes + FrameSize, (FrameSize) / 4);
-							break;
-						case EChromaFormat::CHROMA_FORMAT_422:
-							memcpy(Plane, SrcBytes + FrameSize, (Config.Width / 2) * Config.Height);
-							break;
-						case EChromaFormat::CHROMA_FORMAT_444:
-							memcpy(Plane, SrcBytes + FrameSize, FrameSize);
-							break;
-						case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-						case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
-						default:
-							break;
-					}
-				}
-				else if (Component == EYuvComponent::V)
-				{
-					switch (Config.Format)
-					{
-						case EChromaFormat::CHROMA_FORMAT_420:
-							memcpy(Plane, SrcBytes + (5 / 4) * FrameSize, (FrameSize) / 4);
-							break;
-						case EChromaFormat::CHROMA_FORMAT_422:
-							memcpy(Plane, SrcBytes + (Config.Width * Config.Width) + (3 * Config.Width * Config.Height) + (2 * Config.Height * Config.Height), (Config.Width / 2) * Config.Height);
-							break;
-						case EChromaFormat::CHROMA_FORMAT_444:
-							memcpy(Plane, SrcBytes + 2 * FrameSize, FrameSize);
-							break;
-						case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-						case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
-						default:
-							break;
-					}
-				}
-			}
-
-			Result = en265_push_image(Encoder, Input);
-			if (Result != DE265_OK)
-			{
-				return new Libde265Result(Result);
-			}
-		}
-
-		Result = en265_encode(Encoder);
+		en265_push_eof(Encoder);
+	}
+	else
+	{
+		de265_image* Input = new de265_image();
+		Result = Input->alloc_image(Config.Width, Config.Height, GetChroma(Config.Format), NULL, false, NULL, 0, NULL, false);
 		if (Result != DE265_OK)
 		{
 			return new Libde265Result(Result);
 		}
 
-		for (;;)
+		int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
+		uint8_t* SrcBytes = InPictureBytes.data();
+		int		 FrameSize = Config.Width * Config.Height;
+		for (int c = 0; c < NumComponents; c++)
 		{
-			en265_packet* Packet = en265_get_packet(Encoder, 0);
-			if (Packet == nullptr)
+			const EYuvComponent Component = static_cast<EYuvComponent>(c);
+			uint8_t*			Plane = Input->get_image_plane(c);
+			int					Stride = Input->get_image_stride(c);
+			if (Component == EYuvComponent::Y)
 			{
-				break;
+				memcpy(Plane, SrcBytes, FrameSize);
 			}
-
-			if (OnEncodedImageCallback != nullptr)
+			else if (Component == EYuvComponent::U)
 			{
-				OnEncodedImageCallback->OnEncodeComplete(Packet->data, Packet->length);
+				switch (Config.Format)
+				{
+					case EChromaFormat::CHROMA_FORMAT_420:
+						memcpy(Plane, SrcBytes + FrameSize, (FrameSize) / 4);
+						break;
+					case EChromaFormat::CHROMA_FORMAT_422:
+						memcpy(Plane, SrcBytes + FrameSize, (Config.Width / 2) * Config.Height);
+						break;
+					case EChromaFormat::CHROMA_FORMAT_444:
+						memcpy(Plane, SrcBytes + FrameSize, FrameSize);
+						break;
+					case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+					case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
+					default:
+						break;
+				}
 			}
+			else if (Component == EYuvComponent::V)
+			{
+				switch (Config.Format)
+				{
+					case EChromaFormat::CHROMA_FORMAT_420:
+						memcpy(Plane, SrcBytes + (5 / 4) * FrameSize, (FrameSize) / 4);
+						break;
+					case EChromaFormat::CHROMA_FORMAT_422:
+						memcpy(Plane, SrcBytes + (Config.Width * Config.Width) + (3 * Config.Width * Config.Height) + (2 * Config.Height * Config.Height), (Config.Width / 2) * Config.Height);
+						break;
+					case EChromaFormat::CHROMA_FORMAT_444:
+						memcpy(Plane, SrcBytes + 2 * FrameSize, FrameSize);
+						break;
+					case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+					case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
+					default:
+						break;
+				}
+			}
+		}
 
-			en265_free_packet(Encoder, Packet);
+		Result = en265_push_image(Encoder, Input);
+		if (Result != DE265_OK)
+		{
+			return new Libde265Result(Result);
 		}
 	}
 
-	return new Libde265Result(DE265_OK);
-}
-
-bool Libde265Encoder::ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes)
-{
-	if (Config.PictureSkip > 0)
+	Result = en265_encode(Encoder);
+	if (Result != DE265_OK)
 	{
-		InStream->seekg(Config.PictureSkip, std::ifstream::cur);
+		return new Libde265Result(Result);
 	}
-	InStream->read(reinterpret_cast<char*>(&(OutPictureBytes)[0]), OutPictureBytes.size());
-	return InStream->gcount() == static_cast<int>(OutPictureBytes.size());
+
+	for (;;)
+	{
+		en265_packet* Packet = en265_get_packet(Encoder, 0);
+		if (Packet == nullptr)
+		{
+			break;
+		}
+
+		if (OnEncodedImageCallback != nullptr)
+		{
+			OnEncodedImageCallback->OnEncodeComplete(Packet->data, Packet->length);
+		}
+
+		en265_free_packet(Encoder, Packet);
+	}
+
+	return new Libde265Result(Result);
 }
 
 de265_chroma Libde265Encoder::GetChroma(EChromaFormat InFormat)

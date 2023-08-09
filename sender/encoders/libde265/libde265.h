@@ -13,14 +13,12 @@ public:
 	~Libde265Encoder();
 
 	virtual EncodeResult* Init(EncoderConfig& InConfig) override;
-	virtual EncodeResult* Encode(std::istream* InStream) override;
+	virtual EncodeResult* Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture) override;
 
 private:
-	bool		 ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes);
 	de265_chroma GetChroma(EChromaFormat InFormat);
 	int			 ScaleChroma(int InSize, EChromaFormat InFormat);
 
 private:
 	en265_encoder_context* Encoder;
-	std::vector<uint8_t>   PictureBytes;
 };

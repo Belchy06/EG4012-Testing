@@ -1,7 +1,6 @@
 #pragma once
 
-#include <istream>
-#include <fstream>
+#include <vector>
 
 #include "common.h"
 #include "encoder_callback.h"
@@ -15,7 +14,7 @@ public:
 	void RegisterEncodeCompleteCallback(IEncodeCompleteCallback* InEncoderCompleteCallback);
 
 	virtual EncodeResult* Init(EncoderConfig& InConfig);
-	virtual EncodeResult* Encode(std::istream* InStream);
+	virtual EncodeResult* Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture);
 
 protected:
 	EncoderConfig			 Config;

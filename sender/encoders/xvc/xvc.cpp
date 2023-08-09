@@ -94,119 +94,86 @@ EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 	return new XvcResult(Result);
 }
 
-EncodeResult* XvcEncoder::Encode(std::istream* InStream)
+EncodeResult* XvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture)
 {
-	int PictureSamples = 0;
-	if (Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME)
-	{
-		PictureSamples = Config.Width * Config.Height;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_420)
-	{
-		PictureSamples = (3 * (Config.Width * Config.Height)) >> 1;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_422)
-	{
-		PictureSamples = 2 * Config.Width * Config.Height;
-	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_444)
-	{
-		PictureSamples = 3 * Config.Width * Config.Height;
-	}
-
-	PictureBytes.resize(Config.BitDepth == 8 ? PictureSamples : (PictureSamples << 1));
-
 	xvc_enc_return_code Result;
 	xvc_enc_nal_unit*	NalUnits;
 	int					NumNalUnits;
-	bool				bContinue = true;
-	while (bContinue)
+
+	if (bInLastPicture)
 	{
-		if (!ReadNextPicture(InStream, PictureBytes))
+		// Flush the encoder for remaining NalUnits and reconstructed pictures.
+		Result = Api->encoder_flush(Encoder, &NalUnits, &NumNalUnits, nullptr);
+		// Continue will remain true as long as there are buffered pictures
+		// that should be reconstructed.
+	}
+	else
+	{
+		// Encode one picture and get 0 or 1 reconstructed picture back.
+		// Also get back 0 or more NalUnits depending on if pictures are being
+		// buffered in order to encode a full Sub Gop.
+		Result = Api->encoder_encode(Encoder, &InPictureBytes[0], &NalUnits, &NumNalUnits, nullptr);
+	}
+
+	// Loop through all Nal Units that were received and write to file
+	// the Nal Unit length followed by the actual Nal Unit.
+	size_t	 CurrentSegmentBytes = 0;
+	int		 CurrentSegmentPics = 0;
+	int		 HighestQP = std::numeric_limits<int>::min();
+	uint64_t TotalSSE = 0;
+	size_t	 TotalBytes = 0;
+	size_t	 MaxSegmentBytes = 0;
+	int		 MaxSegmentPics = 0;
+	double	 SumPsnrY = 0;
+	double	 SumPsnrU = 0;
+	double	 SumPsnrV = 0;
+	char	 NalSize[4];
+
+	for (int i = 0; i < NumNalUnits; i++)
+	{
+		NalSize[0] = NalUnits[i].size & 0xFF;
+		NalSize[1] = (NalUnits[i].size >> 8) & 0xFF;
+		NalSize[2] = (NalUnits[i].size >> 16) & 0xFF;
+		NalSize[3] = (NalUnits[i].size >> 24) & 0xFF;
+		if (NalUnits[i].stats.nal_unit_type == 16)
 		{
-			// Flush the encoder for remaining NalUnits and reconstructed pictures.
-			Result = Api->encoder_flush(Encoder, &NalUnits, &NumNalUnits, nullptr);
-			// Continue will remain true as long as there are buffered pictures
-			// that should be reconstructed.
+			if (CurrentSegmentBytes > MaxSegmentBytes)
+			{
+				MaxSegmentBytes = CurrentSegmentBytes;
+				MaxSegmentPics = CurrentSegmentPics;
+			}
+			CurrentSegmentBytes = 0;
+			CurrentSegmentPics = -1;
 		}
 		else
 		{
-			// Encode one picture and get 0 or 1 reconstructed picture back.
-			// Also get back 0 or more NalUnits depending on if pictures are being
-			// buffered in order to encode a full Sub Gop.
-			Result = Api->encoder_encode(Encoder, &PictureBytes[0], &NalUnits, &NumNalUnits, nullptr);
+			TotalSSE += NalUnits[i].stats.sse;
+			SumPsnrY += NalUnits[i].stats.psnr_y;
+			SumPsnrU += NalUnits[i].stats.psnr_u;
+			SumPsnrV += NalUnits[i].stats.psnr_v;
+			HighestQP = std::max(HighestQP, NalUnits[i].stats.qp);
 		}
+		CurrentSegmentBytes += NalUnits[i].size;
+		CurrentSegmentPics++;
+		TotalBytes += NalUnits[i].size;
 
-		// Loop through all Nal Units that were received and write to file
-		// the Nal Unit length followed by the actual Nal Unit.
-		size_t	 CurrentSegmentBytes = 0;
-		int		 CurrentSegmentPics = 0;
-		int		 HighestQP = std::numeric_limits<int>::min();
-		uint64_t TotalSSE = 0;
-		size_t	 TotalBytes = 0;
-		size_t	 MaxSegmentBytes = 0;
-		int		 MaxSegmentPics = 0;
-		double	 SumPsnrY = 0;
-		double	 SumPsnrU = 0;
-		double	 SumPsnrV = 0;
-		char	 NalSize[4];
-		for (int i = 0; i < NumNalUnits; i++)
+		if (OnEncodedImageCallback != nullptr)
 		{
-			NalSize[0] = NalUnits[i].size & 0xFF;
-			NalSize[1] = (NalUnits[i].size >> 8) & 0xFF;
-			NalSize[2] = (NalUnits[i].size >> 16) & 0xFF;
-			NalSize[3] = (NalUnits[i].size >> 24) & 0xFF;
-			if (NalUnits[i].stats.nal_unit_type == 16)
-			{
-				if (CurrentSegmentBytes > MaxSegmentBytes)
-				{
-					MaxSegmentBytes = CurrentSegmentBytes;
-					MaxSegmentPics = CurrentSegmentPics;
-				}
-				CurrentSegmentBytes = 0;
-				CurrentSegmentPics = -1;
-			}
-			else
-			{
-				TotalSSE += NalUnits[i].stats.sse;
-				SumPsnrY += NalUnits[i].stats.psnr_y;
-				SumPsnrU += NalUnits[i].stats.psnr_u;
-				SumPsnrV += NalUnits[i].stats.psnr_v;
-				HighestQP = std::max(HighestQP, NalUnits[i].stats.qp);
-			}
-			CurrentSegmentBytes += NalUnits[i].size;
-			CurrentSegmentPics++;
-			TotalBytes += NalUnits[i].size;
-
-			if (OnEncodedImageCallback != nullptr)
-			{
-				OnEncodedImageCallback->OnEncodeComplete(NalUnits[i].bytes, NalUnits[i].size);
-			}
-			// file_output_stream_.write(nal_size, 4);
-			// file_output_stream_.write(reinterpret_cast<char*>(NalUnits[i].bytes),
-			// 	NalUnits[i].size);
-
-			// Conditionally print information for each Nal Unit that is written
-			// to the file.
-			if (Config.LogLevel >= ELogSeverity::SEVERITY_VERBOSE)
-			{
-				PrintNalInfo(NalUnits[i]);
-			}
+			OnEncodedImageCallback->OnEncodeComplete(NalUnits[i].bytes, NalUnits[i].size);
 		}
-		bContinue = Result == XVC_ENC_OK;
+		// file_output_stream_.write(nal_size, 4);
+		// file_output_stream_.write(reinterpret_cast<char*>(NalUnits[i].bytes),
+		// 	NalUnits[i].size);
+
+		// Conditionally print information for each Nal Unit that is written
+		// to the file.
+		if (Config.LogLevel >= ELogSeverity::SEVERITY_VERBOSE)
+		{
+			PrintNalInfo(NalUnits[i]);
+		}
 	}
 
-	return new XvcResult(XVC_ENC_OK);
-}
-
-bool XvcEncoder::ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes)
-{
-	if (Config.PictureSkip > 0)
-	{
-		InStream->seekg(Config.PictureSkip, std::ifstream::cur);
-	}
-	InStream->read(reinterpret_cast<char*>(&(OutPictureBytes)[0]), OutPictureBytes.size());
-	return InStream->gcount() == static_cast<int>(OutPictureBytes.size());
+	return new XvcResult(Result);
 }
 
 void XvcEncoder::PrintNalInfo(xvc_enc_nal_unit NalUnit)

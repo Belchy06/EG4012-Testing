@@ -22,17 +22,20 @@ public:
 	void Run();
 
 private:
+	bool ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes);
+
 	// EncodeCompleteCallback interface
 	virtual void OnEncodeComplete(const uint8_t* InData, size_t InSize) override;
 
 private:
-	std::istream*	InputStream;
-	std::ifstream	FileStream;
-	std::streamsize FileSize;
-	std::streamoff	StartSkip;
-	std::streamoff	PictureSkip;
-	PictureFormat	PicFormat;
-	Settings		Options;
+	std::istream*		 InputStream;
+	std::ifstream		 FileStream;
+	std::streamsize		 FileSize;
+	std::streamoff		 StartSkip;
+	std::streamoff		 PictureSkip;
+	PictureFormat		 PicFormat;
+	Settings			 Options;
+	std::vector<uint8_t> PictureBytes;
 
 	std::shared_ptr<Encoder>	WrappedEncoder;
 	std::shared_ptr<Packetizer> Packetizer;

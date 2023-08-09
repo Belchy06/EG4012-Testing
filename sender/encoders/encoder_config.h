@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ios>
+
 #include "common.h"
 
 class EncoderConfig

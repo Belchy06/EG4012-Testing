@@ -128,11 +128,38 @@ void Sender::Run()
 
 	WrappedEncoder->RegisterEncodeCompleteCallback(this);
 
-	Result = WrappedEncoder->Encode(InputStream);
-	if (!Result->IsSuccess())
+	int PictureSamples = 0;
+	if (Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME)
 	{
-		std::cerr << "Error: Encoding \"" << Result->Error() << "\"" << std::endl;
-		std::exit(-1);
+		PictureSamples = Config.Width * Config.Height;
+	}
+	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_420)
+	{
+		PictureSamples = (3 * (Config.Width * Config.Height)) >> 1;
+	}
+	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_422)
+	{
+		PictureSamples = 2 * Config.Width * Config.Height;
+	}
+	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_444)
+	{
+		PictureSamples = 3 * Config.Width * Config.Height;
+	}
+
+	PictureBytes.resize(Config.BitDepth == 8 ? PictureSamples : (PictureSamples << 1));
+
+	bool bContinue = true;
+	while (bContinue)
+	{
+		bContinue = ReadNextPicture(InputStream, PictureBytes);
+		bool bLastPic = !bContinue;
+
+		Result = WrappedEncoder->Encode(PictureBytes, bLastPic);
+		if (!Result->IsSuccess())
+		{
+			std::cerr << "Error: Encoding \"" << Result->Error() << "\"" << std::endl;
+			std::exit(-1);
+		}
 	}
 }
 
@@ -146,4 +173,14 @@ void Sender::OnEncodeComplete(const uint8_t* InData, size_t InSize)
 	std::vector<RTPPacket> Packets = Packetizer->Packetize(InData, InSize);
 
 	RtpSender->Send(Packets);
+}
+
+bool Sender::ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes)
+{
+	if (PictureSkip > 0)
+	{
+		InStream->seekg(PictureSkip, std::ifstream::cur);
+	}
+	InStream->read(reinterpret_cast<char*>(&(OutPictureBytes)[0]), OutPictureBytes.size());
+	return InStream->gcount() == static_cast<int>(OutPictureBytes.size());
 }

@@ -12,15 +12,13 @@ public:
 	~XvcEncoder();
 
 	virtual EncodeResult* Init(EncoderConfig& InConfig) override;
-	virtual EncodeResult* Encode(std::istream* InStream) override;
+	virtual EncodeResult* Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture) override;
 
 private:
-	bool ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes);
 	void PrintNalInfo(xvc_enc_nal_unit NalUnit);
 
 private:
 	const xvc_encoder_api*	Api;
 	xvc_encoder_parameters* Params;
 	xvc_encoder*			Encoder;
-	std::vector<uint8_t>	PictureBytes;
 };
