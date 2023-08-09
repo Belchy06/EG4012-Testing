@@ -19,6 +19,7 @@ void Y4mWriter::WriteImageHeader(DecodedImage& InImage)
 void Y4mWriter::WriteImage(DecodedImage& InImage)
 {
 	Stream->write((char*)InImage.Bytes.data(), InImage.Size);
+	Stream->flush();
 }
 
 void Y4mWriter::WriteFileHeader(DecodedImage& InImage)
