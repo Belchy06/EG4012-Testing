@@ -5,14 +5,8 @@
 
 #include "encoder_factory.h"
 #include "encoder_callback.h"
+#include "packetizer/packetizer.h"
 #include "y4m_reader.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN
-#endif
-
-#define DEFAULT_BUFFER_LENGTH 2048
-#define DEFAULT_PORT 27015
 
 // Sender should own the socket and the encoder
 class Sender : public IEncodeCompleteCallback
@@ -44,5 +38,6 @@ private:
 	std::streamoff	PictureSkip;
 	PictureFormat	PicFormat;
 
-	std::shared_ptr<Encoder> WrappedEncoder;
+	std::shared_ptr<Encoder>	WrappedEncoder;
+	std::shared_ptr<Packetizer> Packetizer;
 };
