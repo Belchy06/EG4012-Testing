@@ -1,14 +1,18 @@
 #pragma once
 #pragma comment(lib, "Ws2_32.lib")
 
+#include <fstream>
 #include <memory>
 
+#include "decoded_image.h"
+#include "decoder.h"
 #include "packet.h"
 #include "rtp_receiver.h"
 #include "rtp_receiver_listener.h"
 #include "settings.h"
+#include "y4m_writer.h"
 
-class Receiver : public IRTPPacketListener
+class Receiver : public IRTPPacketListener, public IDecodeCompleteCallback
 {
 public:
 	Receiver();
@@ -21,11 +25,15 @@ private:
 	// IRTPPacketListener interface
 	virtual void OnPacketReceived(RTPPacket InPacket) override;
 
+	// IDecodeCompleteCallback interface
+	virtual void OnDecodeComplete(DecodedImage InImage) override;
+
 private:
 	std::ostream* OutputStream;
-	std::ifstream FileStream;
+	std::ofstream FileStream;
+	Settings	  Options;
+	Y4mWriter	  Writer;
 
-	Settings Options;
-
+	std::shared_ptr<Decoder>	 WrappedDecoder;
 	std::shared_ptr<RTPReceiver> RtpReceiver;
 };

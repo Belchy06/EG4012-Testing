@@ -112,9 +112,10 @@
                 "/I${workspaceFolder}\\receiver\\depacketizer",
                 "/I${workspaceFolder}\\receiver\\socket",
                 "/I${workspaceFolder}\\receiver\\rtp_receiver",
+                "/I${workspaceFolder}\\receiver\\image",
                 "/I${workspaceFolder}\\receiver\\decoders",
-                // "/I${workspaceFolder}\\receiver\\decoders\\xvc",
-                // "/I${workspaceFolder}\\receiver\\decoders\\libde265",
+                "/I${workspaceFolder}\\receiver\\decoders\\xvc",
+                "/I${workspaceFolder}\\receiver\\decoders\\libde265",
                 "/I${workspaceFolder}\\third_party\\xvc\\src",
                 "/I${workspaceFolder}\\third_party\\libde265",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra",
@@ -128,14 +129,14 @@
                 "${workspaceFolder}\\receiver\\rtp_receiver\\rtp_receiver.cpp",
                 "${workspaceFolder}\\receiver\\decoders\\decoder.cpp",
                 // "${workspaceFolder}\\receiver\\decoders\\libde265\\libde265.cpp",
-                // "${workspaceFolder}\\receiver\\decoders\\xvc\\xvc.cpp",
+                "${workspaceFolder}\\receiver\\decoders\\xvc\\xvc.cpp",
                 "${workspaceFolder}\\receiver\\decoders\\decoder_factory.cpp",
                 "${workspaceFolder}\\receiver\\y4m_writer.cpp",
                 "${workspaceFolder}\\receiver\\receiver.cpp",
                 "${workspaceFolder}\\receiver\\main.cpp",
                 // TODO (belchy06): These should probably be DLLs that we load at runtime depending on the chosen coder
                 // "${workspaceFolder}\\third_party\\libde265\\build\\libde265\\Debug\\de265.lib",
-                // "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcdec.lib"
+                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcdec.lib"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

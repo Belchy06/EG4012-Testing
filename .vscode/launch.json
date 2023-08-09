@@ -48,6 +48,8 @@
             "program": "${workspaceFolder}\\bin\\receiver.exe",
             "preLaunchTask": "Build Receiver (Debug)",
             "args": [
+                "-file",
+                "${workspaceFolder}\\resources\\out.y4m",
                 "-codec",
                 "XVC",
                 "-port",

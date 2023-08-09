@@ -11,7 +11,7 @@ DecodeResult* Decoder::Init(DecoderConfig& InConfig)
 	return new DecodeResult();
 }
 
-DecodeResult* Decoder::Decode(std::istream* InStream)
+DecodeResult* Decoder::Decode(const uint8_t* InNalBytes, size_t InNalSize)
 {
 	unimplemented();
 	return new DecodeResult();
