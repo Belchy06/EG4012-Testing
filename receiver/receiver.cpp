@@ -101,7 +101,11 @@ void Receiver::Run()
 
 void Receiver::OnPacketReceived(RTPPacket InPacket)
 {
-	// Single NAL Unit mode -> Each packet payload is a single nal unit
+	Depacketizer->Receive(InPacket);
+}
+
+void Receiver::OnNALReceived(const uint8_t* InData, size_t InSize)
+{
 	DecodeResult* Result = WrappedDecoder->Decode(InPacket.GetPayload(), InPacket.GetPayloadSize());
 	if (!Result->IsSuccess())
 	{

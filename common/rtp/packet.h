@@ -13,10 +13,18 @@ public:
 	uint8_t* GetPayload();
 	int		 GetPayloadSize();
 
-private:
-	// Size of the RTP header:
-	static const int HEADER_SIZE = 12;
+	// Fields that compose the RTP header
+	int GetVersion();
+	int GetPadding();
+	int GetExtension();
+	int GetCC();
+	int GetMarker();
+	int GetPayloadType();
+	int GetSequenceNumber();
+	int GetTimeStamp();
+	int GetSsrc();
 
+private:
 	// Fields that compose the RTP header
 	int Version;
 	int Padding;
@@ -30,10 +38,10 @@ private:
 
 	// Bitstream of the RTP header
 	uint8_t* Header;
-
+	// Size of the RTP header:
+	static const int HEADER_SIZE = 12;
 	// Size of the RTP payload
 	int PayloadSize;
-
 	// Bitstream of the RTP payload
 	uint8_t* Payload;
 };
