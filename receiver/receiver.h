@@ -22,6 +22,9 @@ private:
 	virtual void OnPacketReceived(RTPPacket InPacket) override;
 
 private:
+	std::ostream* OutputStream;
+	std::ifstream FileStream;
+
 	Settings Options;
 
 	std::shared_ptr<RTPReceiver> RtpReceiver;

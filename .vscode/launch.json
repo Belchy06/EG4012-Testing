@@ -18,7 +18,7 @@
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-            "console": "internalConsole",
+            "console": "integratedTerminal",
             "type": "cppvsdbg",
         },
         {
@@ -55,7 +55,7 @@
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-            "console": "internalConsole",
+            "console": "integratedTerminal",
             "type": "cppvsdbg",
         }
     ]

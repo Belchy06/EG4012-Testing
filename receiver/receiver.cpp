@@ -1,3 +1,9 @@
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <iostream>
+
 #include "receiver.h"
 
 Receiver::Receiver()
@@ -24,6 +30,8 @@ void Receiver::ParseArgs(int argc, const char* argv[])
 			std::exit(-1);
         } else if(arg == "-port") {
             Config.Port = atoi(argv[++i]);
+        } else if(arg == "-file") {
+            Options.File = std::string(argv[++i]);
         } else if(arg == "-loglevel") {
             std::string LevelStr(argv[++i]);
             if(LevelStr == "log") {
@@ -49,9 +57,13 @@ void Receiver::ValidateArgs()
 
 void Receiver::Run()
 {
+	WrappedDecoder = DecoderFactory::Create(Options.Codec);
+
 	RtpReceiver->Receive();
 }
 
 void Receiver::OnPacketReceived(RTPPacket InPacket)
 {
+	// Each RTP packet data is a nal
+	std::cout << InPacket.GetHeader() << std::endl;
 }
