@@ -4,9 +4,9 @@
 #include <fstream>
 
 #include "common.h"
-#include "config.h"
-#include "result.h"
 #include "encoder_callback.h"
+#include "encoder_config.h"
+#include "encoder_result.h"
 
 // Encoder wrapper that wraps all of the third_party codecs
 class Encoder

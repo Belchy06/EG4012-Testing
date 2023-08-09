@@ -9,6 +9,20 @@
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
 
+#include "packet.h"
+#include "socket_config.h"
+
 class Socket
 {
-}
+public:
+	Socket();
+	~Socket();
+
+	bool Init(SocketConfig InConfig);
+	bool Send(RTPPacket* Packet);
+
+private:
+	SocketConfig	   Config;
+	SOCKET			   Sock;
+	struct sockaddr_in Other;
+};

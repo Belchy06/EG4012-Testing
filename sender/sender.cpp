@@ -3,10 +3,10 @@
 #include <string>
 #include <iostream>
 
-#include "sender.h"
-#include "encoder.h"
-#include "config.h"
 #include "common.h"
+#include "encoder.h"
+#include "encoder_config.h"
+#include "sender.h"
 
 Sender::Sender()
 	: InputStream(nullptr)

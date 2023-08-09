@@ -1,6 +1,6 @@
 #pragma once
 
-#include "result.h"
+#include "encoder_result.h"
 #include "libde265/de265.h"
 
 class Libde265Result : public EncodeResult

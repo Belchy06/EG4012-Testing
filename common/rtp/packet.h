@@ -8,7 +8,11 @@ public:
 	RTPPacket(int InPType, int InFrameNB, int InTime, const uint8_t* InData, int InDataLength);
 	RTPPacket(uint8_t* InData, int InDataLength);
 
-private:
+	uint8_t* GetHeader();
+	int		 GetHeaderSize();
+	uint8_t* GetPayload();
+	int		 GetPayloadSize();
+
 private:
 	// Size of the RTP header:
 	static const int HEADER_SIZE = 12;

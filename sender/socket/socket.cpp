@@ -1,10 +1,4 @@
-#ifndef DEFAULT_BUFFER_LENGTH
-	#define DEFAULT_BUFFER_LENGTH 2048
-#endif
-
-#ifndef DEFAULT_PORT
-	#define DEFAULT_PORT 27015
-#endif
+#include <iostream>
 
 #include "socket.h"
 
@@ -14,79 +8,62 @@ Socket::Socket()
 
 Socket::~Socket()
 {
-	closesocket(Socket);
+	closesocket(Sock);
 	WSACleanup();
 }
 
-Socket::Init()
+bool Socket::Init(SocketConfig InConfig)
 {
-	SOCKET			   Socket;
-	struct sockaddr_in Server, Si_other;
-	int				   Slen, Recvlen;
-	char			   Buf[DEFAULT_BUFFER_LENGTH];
-	WSADATA			   WsaData;
-}
-
-Socket::Send()
-{
-	// Transmit
-
-	Slen = sizeof(Si_other);
+	Config = InConfig;
 
 	// Initialize Winsock
-	printf("Initializing Winsock\n");
+	WSADATA WsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &WsaData) != 0)
 	{
-		printf("Initialization failed with error: %d\n", WSAGetLastError());
-		return -1;
+		std::cerr << "WSAStartup failed with error" << WSAGetLastError() << std::endl;
+		return false;
 	}
 
 	// Create a socket
-	if ((Socket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
+	if ((Sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 	{
-		printf("socket failed with error: %d", WSAGetLastError());
-		return -1;
+		std::cerr << "socket failed with error" << WSAGetLastError() << std::endl;
+		return false;
 	}
 
-	// Prepare the sockaddr_in structure
-	Server.sin_family = AF_INET;
-	Server.sin_addr.s_addr = INADDR_ANY;
-	Server.sin_port = htons(DEFAULT_PORT);
+	// setup address structure
+	ZeroMemory(&Other, sizeof(Other));
+	Other.sin_family = AF_INET;
+	Other.sin_port = htons(Config.Port);
+	Other.sin_addr.S_un.S_addr = inet_addr(Config.IP.c_str());
 
-	// Bind
-	if (bind(Socket, (struct sockaddr*)&Server, sizeof(Server)) == SOCKET_ERROR)
+	return true;
+}
+
+bool Socket::Send(RTPPacket* Packet)
+{
+	// Transmit
+	const int TotalSize = Packet->GetHeaderSize() + Packet->GetPayloadSize();
+	char*	  Buf = new char[TotalSize];
+
+	uint8_t* HeaderData = Packet->GetHeader();
+	int		 HeaderSize = Packet->GetHeaderSize();
+	for (int i = 0; i < Packet->GetHeaderSize(); i++)
 	{
-		printf("Bind failed with error: %d", WSAGetLastError());
-		return -1;
+		Buf[i] = HeaderData[i];
 	}
 
-	// keep listening for data
-	while (true)
+	uint8_t* PayloadData = Packet->GetPayload();
+	for (int i = 0; i < Packet->GetPayloadSize(); i++)
 	{
-		printf("Waiting for data...");
-		fflush(stdout);
-
-		// clear the buffer by filling null, it might have previously received data
-		memset(Buf, '\0', DEFAULT_BUFFER_LENGTH);
-
-		// try to receive some data, this is a blocking call
-		if ((Recvlen = recvfrom(Socket, Buf, DEFAULT_BUFFER_LENGTH, 0, (struct sockaddr*)&Si_other, &Slen)) == SOCKET_ERROR)
-		{
-			printf("recvfrom failed with error: %d", WSAGetLastError());
-			return -1;
-		}
-
-		// print details of the client/peer and the data received
-		printf("Received packet from %s:%d\n", inet_ntoa(Si_other.sin_addr), ntohs(Si_other.sin_port));
-		printf("Data: %s\n", Buf);
-
-		// now reply the client with the same data
-		if (sendto(Socket, Buf, Recvlen, 0, (struct sockaddr*)&Si_other, Slen) == SOCKET_ERROR)
-		{
-			printf("sendto failed with error: %d", WSAGetLastError());
-			return -1;
-		}
+		Buf[i + HeaderSize] = PayloadData[i];
 	}
 
-	return 0;
+	if (sendto(Sock, Buf, TotalSize, 0, (struct sockaddr*)&Other, sizeof(Other)) == SOCKET_ERROR)
+	{
+		std::cerr << "sendto failed with error" << WSAGetLastError() << std::endl;
+		return false;
+	}
+
+	return true;
 }

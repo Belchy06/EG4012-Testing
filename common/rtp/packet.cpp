@@ -66,3 +66,23 @@ RTPPacket::RTPPacket(uint8_t* InData, int InDataLength)
 		TimeStamp = (uint32_t)Header[7] + 256 * (uint32_t)Header[6] + 65536 * (uint32_t)Header[5] + 16777216 * (uint32_t)Header[4];
 	}
 }
+
+uint8_t* RTPPacket::GetHeader()
+{
+	return Header;
+}
+
+int RTPPacket::GetHeaderSize()
+{
+	return HEADER_SIZE;
+}
+
+uint8_t* RTPPacket::GetPayload()
+{
+	return Payload;
+}
+
+int RTPPacket::GetPayloadSize()
+{
+	return PayloadSize;
+}

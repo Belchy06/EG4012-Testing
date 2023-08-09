@@ -1,6 +1,6 @@
 #pragma once
 
-#include "result.h"
+#include "encoder_result.h"
 #include "xvc_enc_lib/xvcenc.h"
 
 class XvcResult : public EncodeResult
