@@ -51,7 +51,6 @@ void Y4mWriter::WriteFileHeader(DecodedImage& InImage)
 		<< "W" << InImage.Config.Width << " H" << InImage.Config.Height << " "
 		<< "F" << InImage.Config.FramerateNum << ":" << InImage.Config.FramerateDenom << " "
 		<< "Ip "
-		<< "A128:117 " // TODO (belchy06) Remove this line
 		<< "C" << ChromaStr;
 
 	if (InImage.Config.BitDepth > 8)

@@ -76,6 +76,9 @@
         "xhash": "cpp",
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "codecvt": "cpp",
+        "filesystem": "cpp",
+        "random": "cpp"
     }
 }

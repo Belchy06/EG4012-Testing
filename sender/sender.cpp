@@ -24,7 +24,9 @@ void Sender::ParseArgs(int argc, const char* argv[])
 {
 	if (argc <= 1)
 	{
-		// TODO (belchy06): Print help
+		std::cerr << "Error: No args specified" << std::endl;
+		PrintHelp();
+		std::exit(1);
 	}
 
 	SocketConfig Config;
@@ -34,9 +36,13 @@ void Sender::ParseArgs(int argc, const char* argv[])
 		std::string arg(argv[i]);
 
 		// clang-format off
-		if (arg == "-h") {
-			// TODO (belchy06): Print help
-			std::exit(-1);
+		if(argc - 1 == i) {
+            std::cerr << "Error: Missing argument value: " << arg << std::endl;
+            PrintHelp();
+			std::exit(1);
+        } else if (arg == "-h") {
+			PrintHelp();
+			std::exit(1);
 		} else if(arg == "-ip") {
             std::stringstream(argv[++i]) >> Config.IP;
         } else if(arg == "-port") {
@@ -65,6 +71,10 @@ void Sender::ParseArgs(int argc, const char* argv[])
             } else {
                 Options.LogLevel = ELogSeverity::SEVERITY_NONE;
             }
+        } else {
+            std::cerr << "Error: Unknown argument: " << arg << std::endl;
+            PrintHelp();
+            std::exit(1);
         }
 		// clang-format on
 	}
@@ -183,4 +193,24 @@ bool Sender::ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPi
 	}
 	InStream->read(reinterpret_cast<char*>(&(OutPictureBytes)[0]), OutPictureBytes.size());
 	return InStream->gcount() == static_cast<int>(OutPictureBytes.size());
+}
+
+void Sender::PrintHelp()
+{
+	// clang-format off
+	std::cout << std::endl;
+    std::cout << "Usage:" << std::endl;
+	std::cout << "  -file <string> [Optional parameters]" << std::endl << std::endl;
+    std::cout << "Optional parameters:" << std::endl;
+    std::cout << "  -ip <string>       (default: \"127.0.0.1\")" << std::endl;
+    std::cout << "  -port <int>        (default: 8888)" << std::endl;
+    std::cout << "  -loglevel <string> " << std::endl;
+    std::cout << "      \"log\"        " << std::endl;
+    std::cout << "      \"verbose\"    " << std::endl;
+    std::cout << "      \"veryverbose\"" << std::endl;
+    std::cout << "  -codec <string>    " << std::endl;
+    std::cout << "      \"H265\"       " << std::endl;
+    std::cout << "      \"XVC\"        " << std::endl;
+    std::cout << "      \"BVC\"        " << std::endl;
+	// clang-format on
 }

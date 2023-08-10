@@ -24,6 +24,8 @@ public:
 	void Run();
 
 private:
+	void PrintHelp();
+
 	// IRTPPacketListener interface
 	virtual void OnPacketReceived(RTPPacket InPacket) override;
 

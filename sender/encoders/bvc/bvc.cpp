@@ -69,24 +69,10 @@ EncodeResult* BvcEncoder::Init(EncoderConfig& InConfig)
 
 EncodeResult* BvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture)
 {
-	bvc_enc_result Result;
-	bvc_enc_nal*   NalUnits;
-	int			   NumNalUnits;
+	bvc_enc_nal* NalUnits;
+	int			 NumNalUnits;
 
-	if (bInLastPicture)
-	{
-		// Flush the encoder for remaining NalUnits and reconstructed pictures.
-		Result = Encoder->encode(&InPictureBytes[0], &NalUnits, &NumNalUnits);
-		// Continue will remain true as long as there are buffered pictures
-		// that should be reconstructed.
-	}
-	else
-	{
-		// Encode one picture and get 0 or 1 reconstructed picture back.
-		// Also get back 0 or more NalUnits depending on if pictures are being
-		// buffered in order to encode a full Sub Gop.
-		Result = Encoder->encode(&InPictureBytes[0], &NalUnits, &NumNalUnits);
-	}
+	bvc_enc_result Result = Encoder->encode(&InPictureBytes[0], &NalUnits, &NumNalUnits);
 
 	// Loop through all Nal Units that were received and write to file
 	// the Nal Unit length followed by the actual Nal Unit.
