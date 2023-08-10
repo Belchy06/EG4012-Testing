@@ -18,7 +18,9 @@ private:
 	Depacketizer();
 
 private:
-	int					   prevMarkerVal;
+	int					   prevMarker;
+	uint32_t			   prevTimestamp;
+	uint16_t			   prevSequenceNumber;
 	std::vector<RTPPacket> Packets;
 
 	static std::shared_ptr<Depacketizer> Self;

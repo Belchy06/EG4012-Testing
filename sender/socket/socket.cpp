@@ -55,11 +55,11 @@ bool Socket::Init(SocketConfig InConfig)
 bool Socket::Send(RTPPacket* Packet)
 {
 	// Transmit
-	const int TotalSize = Packet->GetHeaderSize() + Packet->GetPayloadSize();
-	char*	  Buf = new char[TotalSize];
+	const size_t TotalSize = Packet->GetHeaderSize() + Packet->GetPayloadSize();
+	char*		 Buf = new char[TotalSize];
 
 	uint8_t* HeaderData = Packet->GetHeader();
-	int		 HeaderSize = Packet->GetHeaderSize();
+	size_t	 HeaderSize = Packet->GetHeaderSize();
 	for (int i = 0; i < Packet->GetHeaderSize(); i++)
 	{
 		Buf[i] = HeaderData[i];

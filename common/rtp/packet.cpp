@@ -1,6 +1,8 @@
+#include <iostream>
+
 #include "packet.h"
 
-RTPPacket::RTPPacket(int InPType, int InFrameNB, int InTime, const uint8_t* InData, int InDataLength, bool InbIsLast)
+RTPPacket::RTPPacket(uint8_t InPType, uint16_t InFrameNB, uint32_t InTime, const uint8_t* InData, size_t InDataLength, bool InbIsLast)
 {
 	// Constant header fields:
 	Version = 2;
@@ -42,37 +44,39 @@ RTPPacket::RTPPacket(int InPType, int InFrameNB, int InTime, const uint8_t* InDa
 
 RTPPacket::RTPPacket(const uint8_t* InData, int InDataLength)
 {
-	// check if total packet size is lower than the header size
-	if (InDataLength >= HEADER_SIZE)
+	if (InDataLength < 0 || InDataLength < HEADER_SIZE)
 	{
-		// get the header bitsream:
-		Header = new uint8_t[HEADER_SIZE];
-		for (int i = 0; i < HEADER_SIZE; i++)
-		{
-			Header[i] = InData[i];
-		}
-		Ssrc = 0;
-
-		// get the payload bitstream:
-		PayloadSize = InDataLength - HEADER_SIZE;
-		Payload = new uint8_t[PayloadSize];
-		for (int i = HEADER_SIZE; i < InDataLength; i++)
-		{
-
-			Payload[i - HEADER_SIZE] = InData[i];
-		}
-
-		// interpret the changing fields of the header:
-		Version = (Header[0] >> 6) & 0b11;
-		Padding = (Header[0] >> 5) & 0b1;
-		Extension = (Header[0] >> 4) & 0b1;
-		CC = Header[0] & 0b1111;
-		Marker = (Header[1] >> 7) & 0b1;
-		PayloadType = Header[1] & 0b1111111;
-		SequenceNumber = (uint32_t)Header[3] + 256 * (uint32_t)Header[2];
-		TimeStamp = (uint32_t)Header[7] + 256 * (uint32_t)Header[6] + 65536 * (uint32_t)Header[5] + 16777216 * (uint32_t)Header[4];
-		Ssrc = (uint32_t)Header[8] + 256 * (uint32_t)Header[9] + 65536 * (uint32_t)Header[10] + 16777216 * (uint32_t)Header[11];
+		std::cout << __FILE__ << ": Invalid data length (" << InDataLength << ")" << std::endl;
+		return;
 	}
+
+	// get the header bitsream:
+	Header = new uint8_t[HEADER_SIZE];
+	for (int i = 0; i < HEADER_SIZE; i++)
+	{
+		Header[i] = InData[i];
+	}
+	Ssrc = 0;
+
+	// get the payload bitstream:
+	PayloadSize = InDataLength - HEADER_SIZE;
+	Payload = new uint8_t[PayloadSize];
+	for (int i = HEADER_SIZE; i < InDataLength; i++)
+	{
+
+		Payload[i - HEADER_SIZE] = InData[i];
+	}
+
+	// interpret the changing fields of the header:
+	Version = (Header[0] >> 6) & 0b11;
+	Padding = (Header[0] >> 5) & 0b1;
+	Extension = (Header[0] >> 4) & 0b1;
+	CC = Header[0] & 0b1111;
+	Marker = (Header[1] >> 7) & 0b1;
+	PayloadType = Header[1] & 0b1111111;
+	SequenceNumber = (uint32_t)Header[3] + 256 * (uint32_t)Header[2];
+	TimeStamp = (uint32_t)Header[7] + 256 * (uint32_t)Header[6] + 65536 * (uint32_t)Header[5] + 16777216 * (uint32_t)Header[4];
+	Ssrc = (uint32_t)Header[8] + 256 * (uint32_t)Header[9] + 65536 * (uint32_t)Header[10] + 16777216 * (uint32_t)Header[11];
 }
 
 uint8_t* RTPPacket::GetHeader()
@@ -80,7 +84,7 @@ uint8_t* RTPPacket::GetHeader()
 	return Header;
 }
 
-int RTPPacket::GetHeaderSize()
+size_t RTPPacket::GetHeaderSize()
 {
 	return HEADER_SIZE;
 }
@@ -90,7 +94,7 @@ uint8_t* RTPPacket::GetPayload()
 	return Payload;
 }
 
-int RTPPacket::GetPayloadSize()
+size_t RTPPacket::GetPayloadSize()
 {
 	return PayloadSize;
 }
@@ -120,17 +124,17 @@ int RTPPacket::GetMarker()
 	return Marker;
 }
 
-int RTPPacket::GetPayloadType()
+uint8_t RTPPacket::GetPayloadType()
 {
 	return PayloadType;
 }
 
-int RTPPacket::GetSequenceNumber()
+uint16_t RTPPacket::GetSequenceNumber()
 {
 	return SequenceNumber;
 }
 
-int RTPPacket::GetTimeStamp()
+uint32_t RTPPacket::GetTimeStamp()
 {
 	return TimeStamp;
 }
