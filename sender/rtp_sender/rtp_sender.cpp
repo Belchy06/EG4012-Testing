@@ -1,3 +1,6 @@
+#include <thread> // std::this_thread::sleep_for
+#include <chrono> // std::chrono::seconds
+
 #include "rtp_sender.h"
 
 std::shared_ptr<RTPSender> RTPSender::Self = nullptr;
@@ -29,6 +32,7 @@ bool RTPSender::Send(std::vector<RTPPacket> InPackets)
 	for (RTPPacket Packet : InPackets)
 	{
 		bSuccess &= Sock->Send(&Packet);
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
 	return bSuccess;

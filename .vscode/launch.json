@@ -13,8 +13,7 @@
                 "-file",
                 "${workspaceFolder}\\resources\\carphone_qcif.y4m",
                 "-codec",
-                // "H265",
-                "XVC",
+                "BVC",
                 "-ip",
                 "127.0.0.1",
                 "-port",
@@ -34,7 +33,7 @@
                 "-file",
                 "${workspaceFolder}\\resources\\out.y4m",
                 "-codec",
-                "XVC",
+                "BVC",
                 "-port",
                 "8888"
             ],

@@ -11,7 +11,7 @@
 #include "bvc_result.h"
 
 BvcEncoder::BvcEncoder()
-	: Params(nullptr), Encoder(nullptr)
+	: Params(new bvc_enc_config()), Encoder(nullptr)
 {
 }
 
@@ -76,7 +76,7 @@ EncodeResult* BvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 	if (bInLastPicture)
 	{
 		// Flush the encoder for remaining NalUnits and reconstructed pictures.
-		// Result = Api->encoder_flush(Encoder, &NalUnits, &NumNalUnits, nullptr);
+		Result = Encoder->encode(&InPictureBytes[0], &NalUnits, &NumNalUnits);
 		// Continue will remain true as long as there are buffered pictures
 		// that should be reconstructed.
 	}

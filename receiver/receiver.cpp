@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,10 +38,10 @@ void Receiver::ParseArgs(int argc, const char* argv[])
             std::string CodecStr(argv[++i]);
             if(CodecStr == "H265") {
                 Options.Codec = ECodec::CODEC_H265;
-            } else if(CodecStr == "AV1") {
-                Options.Codec = ECodec::CODEC_AV1;
             } else if(CodecStr == "XVC") {
                 Options.Codec = ECodec::CODEC_XVC;
+            } else if(CodecStr == "BVC") {
+                Options.Codec = ECodec::CODEC_BVC;
             } else {
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }
@@ -74,6 +75,7 @@ void Receiver::ValidateArgs()
 		std::exit(-1);
 	}
 
+	std::filesystem::remove(Options.File);
 	FileStream.open(Options.File, std::ios_base::binary);
 	if (!FileStream)
 	{
@@ -121,6 +123,7 @@ void Receiver::OnDecodeComplete(DecodedImage InImage)
 	std::cout << "====================" << std::endl;
 	std::cout << "  OnDecodeComplete  " << std::endl;
 	std::cout << "====================" << std::endl;
+	std::cout << "Size: " << InImage.Size << std::endl;
 
 	Writer.WriteImageHeader(InImage);
 	Writer.WriteImage(InImage);

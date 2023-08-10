@@ -84,9 +84,6 @@ bool Socket::Receive()
 		{
 			SocketListener->OnPacketReceived((uint8_t*)Buf, RecvLen);
 		}
-
-		// print details of the client/peer and the data received
-		std::cout << "Received packet from " << inet_ntoa(Other.sin_addr) << ":" << ntohs(Other.sin_port) << std::endl;
 	}
 
 	return true;
