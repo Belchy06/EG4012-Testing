@@ -1,6 +1,7 @@
 #include "encoder_factory.h"
 #include "libde265.h"
 #include "xvc.h"
+#include "bvc.h"
 
 std::shared_ptr<Encoder> EncoderFactory::Create(ECodec InCodec)
 {
@@ -11,6 +12,10 @@ std::shared_ptr<Encoder> EncoderFactory::Create(ECodec InCodec)
 	else if (InCodec == ECodec::CODEC_XVC)
 	{
 		return std::make_shared<XvcEncoder>();
+	}
+	else if (InCodec == ECodec::CODEC_BVC)
+	{
+		return std::make_shared<BvcEncoder>();
 	}
 	return nullptr;
 }

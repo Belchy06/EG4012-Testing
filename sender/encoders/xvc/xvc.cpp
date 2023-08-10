@@ -161,12 +161,8 @@ EncodeResult* XvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 		{
 			OnEncodedImageCallback->OnEncodeComplete(NalUnits[i].bytes, NalUnits[i].size);
 		}
-		// file_output_stream_.write(nal_size, 4);
-		// file_output_stream_.write(reinterpret_cast<char*>(NalUnits[i].bytes),
-		// 	NalUnits[i].size);
 
-		// Conditionally print information for each Nal Unit that is written
-		// to the file.
+		// Conditionally print information for each Nal Unit
 		if (Config.LogLevel >= ELogSeverity::SEVERITY_VERBOSE)
 		{
 			PrintNalInfo(NalUnits[i]);

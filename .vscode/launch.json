@@ -5,23 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Sender (Release)",
-            "request": "launch",
-            "program": "${workspaceFolder}\\bin\\sender.exe",
-            "preLaunchTask": "Build Sender (Release)",
-            "args": [
-                "-file",
-                "${workspaceFolder}\\resources\\carphone_qcif.y4m",
-                "-codec",
-                // "H265",
-                "XVC",
-            ],
-            "cwd": "${workspaceFolder}",
-            "stopAtEntry": false,
-            "console": "integratedTerminal",
-            "type": "cppvsdbg",
-        },
-        {
             "name": "Launch Sender (Debug)",
             "request": "launch",
             "program": "${workspaceFolder}\\bin\\sender.exe",

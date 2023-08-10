@@ -1,15 +1,29 @@
 ## TODO: Update readme
 
+`git submodule update --remote .\third_party\bvc`
+
 ## Buildings steps
-### 1. Build XVC
+### 1. Build BVC
+```cmd
+cd ./third_party/bvc
+mkdir build
+cd build
+cmake -G "Visual Studio 16 2019" -A Win32 ..
+cmake --build . --target bvc_enc
+cmake --build . --target bvc_dec
+```
+
+### 2. Build XVC
 ```cmd
 cd ./third_party/xvc
 mkdir build
 cd build
 cmake -G "Visual Studio 16 2019" -A Win32 ..
+cmake --build . --target xvc_enc
+cmake --build . --target xvc_dec
 ```
 
-### 2. Build Libde265
+### 3. Build Libde265
 ##### Modify libde265/Makefile.cv7
 Add /DDE265_LOG_INFO /DDE265_LOG_DEBUG /DDE265_LOG_ERROR to DEFINES
 
@@ -22,6 +36,7 @@ cd ./third_party/libde265
 mkdir build
 cd build
 cmake -G "Visual Studio 16 2019" -A Win32 ..
+cmake --build . --target libde265
 ```
 
 

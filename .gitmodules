@@ -4,3 +4,6 @@
 [submodule "third_party/xvc"]
 	path = third_party/xvc
 	url = https://github.com/divideon/xvc
+[submodule "third_party/bvc"]
+	path = third_party/bvc
+	url = https://github.com/Belchy06/EG4012-BVC

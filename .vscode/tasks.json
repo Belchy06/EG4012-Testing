@@ -2,52 +2,6 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "Build Sender (Release)",
-            "command": "cl.exe",
-            "args": [
-                "/Zi",
-                "/EHsc",
-                "/nologo",
-                "/std:c++17",
-                "/I${workspaceFolder}\\common",
-                "/I${workspaceFolder}\\common\\rtp",
-                "/I${workspaceFolder}\\common\\socket",
-                "/I${workspaceFolder}\\sender\\encoders",
-                "/I${workspaceFolder}\\sender\\encoders\\xvc",
-                "/I${workspaceFolder}\\sender\\encoders\\libde265",
-                "/I${workspaceFolder}\\third_party\\xvc\\src",
-                "/I${workspaceFolder}\\third_party\\libde265",
-                "/I${workspaceFolder}\\third_party\\libde265\\extra",
-                "/I${workspaceFolder}\\third_party\\libde265\\extra\\libde265",
-                "/Fd${workspaceFolder}\\bin\\sender.pdb",
-                "/Fe${workspaceFolder}\\bin\\sender.exe",
-                "/Fo\"${workspaceFolder}\\intermediate\"\\",
-                "${workspaceFolder}\\common\\rtp\\packet.cpp",
-                "${workspaceFolder}\\sender\\packetizer\\packetizer.cpp",
-                "${workspaceFolder}\\sender\\encoders\\encoder.cpp",
-                "${workspaceFolder}\\sender\\encoders\\libde265\\libde265.cpp",
-                "${workspaceFolder}\\sender\\encoders\\xvc\\xvc.cpp",
-                "${workspaceFolder}\\sender\\encoders\\encoder_factory.cpp",
-                "${workspaceFolder}\\sender\\y4m_reader.cpp",
-                "${workspaceFolder}\\sender\\sender.cpp",
-                "${workspaceFolder}\\sender\\main.cpp",
-                // TODO (belchy06): These should probably be DLLs that we load at runtime depending on the chosen coder
-                "${workspaceFolder}\\third_party\\libde265\\build\\libde265\\Release\\de265.lib",
-                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Release\\xvcenc.lib",
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$msCompile"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-        },
-        {
-            "type": "cppbuild",
             "label": "Build Sender (Debug)",
             "command": "cl.exe",
             "args": [
@@ -65,6 +19,7 @@
                 "/I${workspaceFolder}\\sender\\encoders\\xvc",
                 "/I${workspaceFolder}\\sender\\encoders\\libde265",
                 "/I${workspaceFolder}\\third_party\\xvc\\src",
+                "/I${workspaceFolder}\\third_party\\bvc\\src",
                 "/I${workspaceFolder}\\third_party\\libde265",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra\\libde265",
@@ -78,13 +33,15 @@
                 "${workspaceFolder}\\sender\\encoders\\encoder.cpp",
                 "${workspaceFolder}\\sender\\encoders\\libde265\\libde265.cpp",
                 "${workspaceFolder}\\sender\\encoders\\xvc\\xvc.cpp",
+                "${workspaceFolder}\\sender\\encoders\\bvc\\bvc.cpp",
                 "${workspaceFolder}\\sender\\encoders\\encoder_factory.cpp",
                 "${workspaceFolder}\\sender\\y4m_reader.cpp",
                 "${workspaceFolder}\\sender\\sender.cpp",
                 "${workspaceFolder}\\sender\\main.cpp",
                 // TODO (belchy06): These should probably be DLLs that we load at runtime depending on the chosen coder
                 "${workspaceFolder}\\third_party\\libde265\\build\\libde265\\Debug\\de265.lib",
-                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcenc.lib"
+                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcenc.lib",
+                "${workspaceFolder}\\third_party\\bvc\\build\\src\\Debug\\bvcenc.lib"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -117,6 +74,7 @@
                 "/I${workspaceFolder}\\receiver\\decoders\\xvc",
                 "/I${workspaceFolder}\\receiver\\decoders\\libde265",
                 "/I${workspaceFolder}\\third_party\\xvc\\src",
+                "/I${workspaceFolder}\\third_party\\bvc\\src",
                 "/I${workspaceFolder}\\third_party\\libde265",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra\\libde265",
@@ -130,13 +88,15 @@
                 "${workspaceFolder}\\receiver\\decoders\\decoder.cpp",
                 // "${workspaceFolder}\\receiver\\decoders\\libde265\\libde265.cpp",
                 "${workspaceFolder}\\receiver\\decoders\\xvc\\xvc.cpp",
+                "${workspaceFolder}\\receiver\\decoders\\bvc\\bvc.cpp",
                 "${workspaceFolder}\\receiver\\decoders\\decoder_factory.cpp",
                 "${workspaceFolder}\\receiver\\y4m_writer.cpp",
                 "${workspaceFolder}\\receiver\\receiver.cpp",
                 "${workspaceFolder}\\receiver\\main.cpp",
                 // TODO (belchy06): These should probably be DLLs that we load at runtime depending on the chosen coder
                 // "${workspaceFolder}\\third_party\\libde265\\build\\libde265\\Debug\\de265.lib",
-                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcdec.lib"
+                "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcdec.lib",
+                "${workspaceFolder}\\third_party\\bvc\\build\\src\\Debug\\bvcdec.lib"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
