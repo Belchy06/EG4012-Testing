@@ -5,6 +5,7 @@
 #include "bvc_result.h"
 
 #include "bvc_common/format.h"
+#include "bvc_common/entropy.h"
 #include "bvc_dec/picture.h"
 #include "bvc_dec/nal.h"
 

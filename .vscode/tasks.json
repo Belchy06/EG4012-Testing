@@ -39,7 +39,6 @@
                 "${workspaceFolder}\\sender\\y4m_reader.cpp",
                 "${workspaceFolder}\\sender\\sender.cpp",
                 "${workspaceFolder}\\sender\\main.cpp",
-                // TODO (belchy06): These should probably be DLLs that we load at runtime depending on the chosen coder
                 "${workspaceFolder}\\third_party\\libde265\\build\\libde265\\Debug\\de265.lib",
                 "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcenc.lib",
                 "${workspaceFolder}\\third_party\\bvc\\build\\src\\Debug\\bvcenc.lib"
@@ -95,7 +94,6 @@
                 "${workspaceFolder}\\receiver\\y4m_writer.cpp",
                 "${workspaceFolder}\\receiver\\receiver.cpp",
                 "${workspaceFolder}\\receiver\\main.cpp",
-                // TODO (belchy06): These should probably be DLLs that we load at runtime depending on the chosen coder
                 // "${workspaceFolder}\\third_party\\libde265\\build\\libde265\\Debug\\de265.lib",
                 "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcdec.lib",
                 "${workspaceFolder}\\third_party\\bvc\\build\\src\\Debug\\bvcdec.lib"

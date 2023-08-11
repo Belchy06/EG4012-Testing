@@ -8,6 +8,7 @@
 #include "common.h"
 #include "bvc.h"
 #include "bvc_common/format.h"
+#include "bvc_common/entropy.h"
 #include "bvc_result.h"
 
 BvcEncoder::BvcEncoder()
@@ -56,6 +57,8 @@ EncodeResult* BvcEncoder::Init(EncoderConfig& InConfig)
         }
 		// clang-format on
 	}
+
+	Params->entropy_coder = bvc_entropy::BVC_ENTROPY_CODER_CABAC;
 
 	Encoder = new bvc_encoder();
 	if (!Encoder)

@@ -22,6 +22,7 @@ public:
 	void Run();
 
 private:
+	void PrintHelp();
 	bool ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes);
 
 	// EncodeCompleteCallback interface
