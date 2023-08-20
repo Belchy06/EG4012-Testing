@@ -48,8 +48,8 @@ void Receiver::ParseArgs(int argc, const char* argv[])
                 Options.Codec = ECodec::CODEC_H265;
             } else if(CodecStr == "XVC") {
                 Options.Codec = ECodec::CODEC_XVC;
-            } else if(CodecStr == "BVC") {
-                Options.Codec = ECodec::CODEC_BVC;
+            } else if(CodecStr == "OVC") {
+                Options.Codec = ECodec::CODEC_OVC;
             } else {
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }
@@ -154,6 +154,6 @@ void Receiver::PrintHelp()
     std::cout << "  -codec <string>    " << std::endl;
     std::cout << "      \"H265\"       " << std::endl;
     std::cout << "      \"XVC\"        " << std::endl;
-    std::cout << "      \"BVC\"        " << std::endl;
+    std::cout << "      \"OVC\"        " << std::endl;
 	// clang-format on
 }

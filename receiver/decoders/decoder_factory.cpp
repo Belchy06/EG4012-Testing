@@ -1,4 +1,4 @@
-#include "bvc.h"
+#include "ovc.h"
 #include "decoder_factory.h"
 #include "libde265.h"
 #include "xvc.h"
@@ -14,9 +14,9 @@ std::shared_ptr<Decoder> DecoderFactory::Create(ECodec InCodec)
 	{
 		return std::make_shared<XvcDecoder>();
 	}
-	else if (InCodec == ECodec::CODEC_BVC)
+	else if (InCodec == ECodec::CODEC_OVC)
 	{
-		return std::make_shared<BvcDecoder>();
+		return std::make_shared<OvcDecoder>();
 	}
 	return nullptr;
 }

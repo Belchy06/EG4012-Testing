@@ -2,19 +2,19 @@
 
 #include "decoder.h"
 
-#include "bvc_dec/bvc_dec.h"
-#include "bvc_dec/config.h"
+#include "ovc_dec/ovc_dec.h"
+#include "ovc_dec/config.h"
 
-class BvcDecoder : public Decoder
+class OvcDecoder : public Decoder
 {
 public:
-	BvcDecoder();
-	~BvcDecoder();
+	OvcDecoder();
+	~OvcDecoder();
 
 	virtual DecodeResult* Init(DecoderConfig& InConfig) override;
 	virtual DecodeResult* Decode(const uint8_t* InNalBytes, size_t InNalSize) override;
 
 private:
-	bvc_dec_config* Params;
-	bvc_decoder*	Decoder;
+	ovc_dec_config* Params;
+	ovc_decoder*	Decoder;
 };

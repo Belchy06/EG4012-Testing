@@ -13,7 +13,7 @@
                 "-file",
                 "${workspaceFolder}\\resources\\carphone_qcif.y4m",
                 "-codec",
-                "BVC",
+                "OVC",
                 "-ip",
                 "127.0.0.1",
                 "-port",
@@ -33,7 +33,7 @@
                 "-file",
                 "${workspaceFolder}\\resources\\out.y4m",
                 "-codec",
-                "BVC",
+                "OVC",
                 "-port",
                 "8888"
             ],

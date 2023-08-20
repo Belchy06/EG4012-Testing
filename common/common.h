@@ -19,7 +19,7 @@ typedef enum
 {
 	CODEC_H265,
 	CODEC_XVC,
-    CODEC_BVC,
+    CODEC_OVC,
 	CODEC_UNDEFINED = 255
 } ECodec;
 

@@ -6,17 +6,17 @@
 #include <sstream>
 
 #include "common.h"
-#include "bvc.h"
-#include "bvc_common/format.h"
-#include "bvc_common/entropy.h"
-#include "bvc_result.h"
+#include "ovc.h"
+#include "ovc_common/format.h"
+#include "ovc_common/entropy.h"
+#include "ovc_result.h"
 
-BvcEncoder::BvcEncoder()
-	: Params(new bvc_enc_config()), Encoder(nullptr)
+OvcEncoder::OvcEncoder()
+	: Params(new ovc_enc_config()), Encoder(nullptr)
 {
 }
 
-BvcEncoder::~BvcEncoder()
+OvcEncoder::~OvcEncoder()
 {
 	if (Encoder)
 	{
@@ -29,7 +29,7 @@ BvcEncoder::~BvcEncoder()
 	}
 }
 
-EncodeResult* BvcEncoder::Init(EncoderConfig& InConfig)
+EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 {
 	Config = InConfig;
 
@@ -47,35 +47,35 @@ EncodeResult* BvcEncoder::Init(EncoderConfig& InConfig)
 	{
 		// clang-format off
         if(Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME) {
-            Params->format = bvc_chroma_format::BVC_CHROMA_FORMAT_MONOCHROME;
+            Params->format = ovc_chroma_format::OVC_CHROMA_FORMAT_MONOCHROME;
         } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_420) {
-            Params->format = bvc_chroma_format::BVC_CHROMA_FORMAT_420;
+            Params->format = ovc_chroma_format::OVC_CHROMA_FORMAT_420;
         } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_422) {
-            Params->format = bvc_chroma_format::BVC_CHROMA_FORMAT_422;
+            Params->format = ovc_chroma_format::OVC_CHROMA_FORMAT_422;
         } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_444) {
-            Params->format = bvc_chroma_format::BVC_CHROMA_FORMAT_444;
+            Params->format = ovc_chroma_format::OVC_CHROMA_FORMAT_444;
         }
 		// clang-format on
 	}
 
-	Params->entropy_coder = bvc_entropy::BVC_ENTROPY_CODER_CABAC;
+	Params->entropy_coder = ovc_entropy::OVC_ENTROPY_CODER_CABAC;
 
-	Encoder = new bvc_encoder();
+	Encoder = new ovc_encoder();
 	if (!Encoder)
 	{
 		std::cerr << "Error: Failed to allocate encoder" << std::endl;
 		std::exit(-1);
 	}
 
-	return new BvcResult(Encoder->init(Params));
+	return new OvcResult(Encoder->init(Params));
 }
 
-EncodeResult* BvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture)
+EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture)
 {
-	bvc_enc_nal* NalUnits;
+	ovc_enc_nal* NalUnits;
 	int			 NumNalUnits;
 
-	bvc_enc_result Result = Encoder->encode(&InPictureBytes[0], &NalUnits, &NumNalUnits);
+	ovc_enc_result Result = Encoder->encode(&InPictureBytes[0], &NalUnits, &NumNalUnits);
 
 	// Loop through all Nal Units that were received and write to file
 	// the Nal Unit length followed by the actual Nal Unit.
@@ -87,5 +87,5 @@ EncodeResult* BvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 		}
 	}
 
-	return new BvcResult(Result);
+	return new OvcResult(Result);
 }

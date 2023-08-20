@@ -3,24 +3,24 @@
 #include "decoder_result.h"
 #include "xvc_dec_lib/xvcdec.h"
 
-class BvcResult : public DecodeResult
+class OvcResult : public DecodeResult
 {
 public:
-	BvcResult(bvc_dec_result InBvcReturn)
-		: BvcReturn(InBvcReturn) {}
+	OvcResult(ovc_dec_result InOvcReturn)
+		: OvcReturn(InOvcReturn) {}
 
-	virtual bool		IsSuccess() override { return BvcReturn == BVC_DEC_OK; }
+	virtual bool		IsSuccess() override { return OvcReturn == OVC_DEC_OK; }
 	virtual std::string Error() override
 	{
-		switch (BvcReturn)
+		switch (OvcReturn)
 		{
-			case BVC_DEC_OK:
-				return "BVC_DEC_OK";
+			case OVC_DEC_OK:
+				return "OVC_DEC_OK";
 			default:
 				return "";
 		}
 	}
 
 private:
-	bvc_dec_result BvcReturn;
+	ovc_dec_result OvcReturn;
 };

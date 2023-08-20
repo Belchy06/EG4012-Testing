@@ -1,20 +1,20 @@
 #include <iostream>
 
 #include "decoded_image.h"
-#include "bvc.h"
-#include "bvc_result.h"
+#include "ovc.h"
+#include "ovc_result.h"
 
-#include "bvc_common/format.h"
-#include "bvc_common/entropy.h"
-#include "bvc_dec/picture.h"
-#include "bvc_dec/nal.h"
+#include "ovc_common/format.h"
+#include "ovc_common/entropy.h"
+#include "ovc_dec/picture.h"
+#include "ovc_dec/nal.h"
 
-BvcDecoder::BvcDecoder()
+OvcDecoder::OvcDecoder()
 	: Params(nullptr), Decoder(nullptr)
 {
 }
 
-BvcDecoder::~BvcDecoder()
+OvcDecoder::~OvcDecoder()
 {
 	if (Decoder)
 	{
@@ -27,37 +27,37 @@ BvcDecoder::~BvcDecoder()
 	}
 }
 
-DecodeResult* BvcDecoder::Init(DecoderConfig& InConfig)
+DecodeResult* OvcDecoder::Init(DecoderConfig& InConfig)
 {
 	Config = InConfig;
 
-	Decoder = new bvc_decoder();
+	Decoder = new ovc_decoder();
 	if (!Decoder)
 	{
 		std::cerr << "Error: Failed to allocate decoder" << std::endl;
 		std::exit(-1);
 	}
 
-	return new BvcResult(Decoder->init());
+	return new OvcResult(Decoder->init());
 }
 
-DecodeResult* BvcDecoder::Decode(const uint8_t* InNalBytes, size_t InNalSize)
+DecodeResult* OvcDecoder::Decode(const uint8_t* InNalBytes, size_t InNalSize)
 {
-	bvc_dec_result Result;
-	bvc_dec_nal	   Nal;
+	ovc_dec_result Result;
+	ovc_dec_nal	   Nal;
 	Nal.size = InNalSize;
 	Nal.bytes = new uint8_t[InNalSize];
 	memcpy(Nal.bytes, InNalBytes, InNalSize);
 
 	Result = Decoder->decode_nal(&Nal);
-	if (Result != BVC_DEC_OK)
+	if (Result != OVC_DEC_OK)
 	{
-		return new BvcResult(Result);
+		return new OvcResult(Result);
 	}
 
 	// Check if there is a decoded picture ready to be output.
-	bvc_decoded_picture DecodedPicture;
-	if (Decoder->get_picture(&DecodedPicture) == BVC_DEC_OK)
+	ovc_decoded_picture DecodedPicture;
+	if (Decoder->get_picture(&DecodedPicture) == OVC_DEC_OK)
 	{
 		if (OnDecodedImageCallback != nullptr)
 		{
@@ -80,16 +80,16 @@ DecodeResult* BvcDecoder::Decode(const uint8_t* InNalBytes, size_t InNalSize)
 				Image.Config.FramerateDenom = 1000;
 			}
 
-			if (DecodedPicture.info.format != bvc_chroma_format::BVC_CHROMA_FORMAT_UNDEFINED)
+			if (DecodedPicture.info.format != ovc_chroma_format::OVC_CHROMA_FORMAT_UNDEFINED)
 			{
 				// clang-format off
-				if       (DecodedPicture.info.format == bvc_chroma_format::BVC_CHROMA_FORMAT_MONOCHROME) {
+				if       (DecodedPicture.info.format == ovc_chroma_format::OVC_CHROMA_FORMAT_MONOCHROME) {
 					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_MONOCHROME;
-				} else if(DecodedPicture.info.format == bvc_chroma_format::BVC_CHROMA_FORMAT_420) {
+				} else if(DecodedPicture.info.format == ovc_chroma_format::OVC_CHROMA_FORMAT_420) {
 					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_420;
-				} else if(DecodedPicture.info.format == bvc_chroma_format::BVC_CHROMA_FORMAT_422) {
+				} else if(DecodedPicture.info.format == ovc_chroma_format::OVC_CHROMA_FORMAT_422) {
 					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_422;
-				} else if(DecodedPicture.info.format == bvc_chroma_format::BVC_CHROMA_FORMAT_444) {
+				} else if(DecodedPicture.info.format == ovc_chroma_format::OVC_CHROMA_FORMAT_444) {
 					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_444;
 				}
 				// clang-format on
@@ -99,5 +99,5 @@ DecodeResult* BvcDecoder::Decode(const uint8_t* InNalBytes, size_t InNalSize)
 		}
 	}
 
-	return new BvcResult(BVC_DEC_OK);
+	return new OvcResult(OVC_DEC_OK);
 }

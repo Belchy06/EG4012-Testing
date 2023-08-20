@@ -17,10 +17,10 @@
                 "/I${workspaceFolder}\\sender\\rtp_sender",
                 "/I${workspaceFolder}\\sender\\encoders",
                 "/I${workspaceFolder}\\sender\\encoders\\xvc",
-                "/I${workspaceFolder}\\sender\\encoders\\bvc",
+                "/I${workspaceFolder}\\sender\\encoders\\ovc",
                 "/I${workspaceFolder}\\sender\\encoders\\libde265",
                 "/I${workspaceFolder}\\third_party\\xvc\\src",
-                "/I${workspaceFolder}\\third_party\\bvc\\src",
+                "/I${workspaceFolder}\\third_party\\ovc\\src",
                 "/I${workspaceFolder}\\third_party\\libde265",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra\\libde265",
@@ -34,14 +34,14 @@
                 "${workspaceFolder}\\sender\\encoders\\encoder.cpp",
                 "${workspaceFolder}\\sender\\encoders\\libde265\\libde265.cpp",
                 "${workspaceFolder}\\sender\\encoders\\xvc\\xvc.cpp",
-                "${workspaceFolder}\\sender\\encoders\\bvc\\bvc.cpp",
+                "${workspaceFolder}\\sender\\encoders\\ovc\\ovc.cpp",
                 "${workspaceFolder}\\sender\\encoders\\encoder_factory.cpp",
                 "${workspaceFolder}\\sender\\y4m_reader.cpp",
                 "${workspaceFolder}\\sender\\sender.cpp",
                 "${workspaceFolder}\\sender\\main.cpp",
                 "${workspaceFolder}\\third_party\\libde265\\build\\libde265\\Debug\\de265.lib",
                 "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcenc.lib",
-                "${workspaceFolder}\\third_party\\bvc\\build\\src\\Debug\\bvcenc.lib"
+                "${workspaceFolder}\\third_party\\ovc\\build\\src\\Debug\\ovcenc.lib"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -72,10 +72,10 @@
                 "/I${workspaceFolder}\\receiver\\image",
                 "/I${workspaceFolder}\\receiver\\decoders",
                 "/I${workspaceFolder}\\receiver\\decoders\\xvc",
-                "/I${workspaceFolder}\\receiver\\decoders\\bvc",
+                "/I${workspaceFolder}\\receiver\\decoders\\ovc",
                 "/I${workspaceFolder}\\receiver\\decoders\\libde265",
                 "/I${workspaceFolder}\\third_party\\xvc\\src",
-                "/I${workspaceFolder}\\third_party\\bvc\\src",
+                "/I${workspaceFolder}\\third_party\\ovc\\src",
                 "/I${workspaceFolder}\\third_party\\libde265",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra",
                 "/I${workspaceFolder}\\third_party\\libde265\\extra\\libde265",
@@ -89,14 +89,14 @@
                 "${workspaceFolder}\\receiver\\decoders\\decoder.cpp",
                 // "${workspaceFolder}\\receiver\\decoders\\libde265\\libde265.cpp",
                 "${workspaceFolder}\\receiver\\decoders\\xvc\\xvc.cpp",
-                "${workspaceFolder}\\receiver\\decoders\\bvc\\bvc.cpp",
+                "${workspaceFolder}\\receiver\\decoders\\ovc\\ovc.cpp",
                 "${workspaceFolder}\\receiver\\decoders\\decoder_factory.cpp",
                 "${workspaceFolder}\\receiver\\y4m_writer.cpp",
                 "${workspaceFolder}\\receiver\\receiver.cpp",
                 "${workspaceFolder}\\receiver\\main.cpp",
                 // "${workspaceFolder}\\third_party\\libde265\\build\\libde265\\Debug\\de265.lib",
                 "${workspaceFolder}\\third_party\\xvc\\build\\src\\Debug\\xvcdec.lib",
-                "${workspaceFolder}\\third_party\\bvc\\build\\src\\Debug\\bvcdec.lib"
+                "${workspaceFolder}\\third_party\\ovc\\build\\src\\Debug\\ovcdec.lib"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

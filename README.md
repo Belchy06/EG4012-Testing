@@ -1,16 +1,16 @@
 ## TODO: Update readme
 
-`git submodule update --remote .\third_party\bvc`
+`git submodule update --remote .\third_party\ovc`
 
 ## Buildings steps
-### 1. Build BVC
+### 1. Build OVC
 ```cmd
-cd ./third_party/bvc
+cd ./third_party/ovc
 mkdir build
 cd build
 cmake -G "Visual Studio 16 2019" -A Win32 ..
-cmake --build . --target bvc_enc
-cmake --build . --target bvc_dec
+cmake --build . --target ovc_enc
+cmake --build . --target ovc_dec
 ```
 
 ### 2. Build XVC

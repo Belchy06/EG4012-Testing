@@ -1,30 +1,30 @@
 #pragma once
 
 #include "encoder_result.h"
-#include "bvc_enc/result.h"
+#include "ovc_enc/result.h"
 
-class BvcResult : public EncodeResult
+class OvcResult : public EncodeResult
 {
 public:
-	BvcResult(bvc_enc_result InBvcReturn)
-		: BvcReturn(InBvcReturn) {}
+	OvcResult(ovc_enc_result InOvcReturn)
+		: OvcReturn(InOvcReturn) {}
 
-	virtual bool		IsSuccess() override { return BvcReturn == BVC_ENC_OK; }
+	virtual bool		IsSuccess() override { return OvcReturn == OVC_ENC_OK; }
 	virtual std::string Error() override
 	{
-		switch (BvcReturn)
+		switch (OvcReturn)
 		{
-			case BVC_ENC_OK:
-				return "BVC_ENC_OK";
-			case BVC_ENC_INVALID_DIMENSIONS:
-				return "BVC_ENC_INVALID_DIMENSIONS";
-			case BVC_ENC_INVALID_FORMAT:
-				return "BVC_ENC_INVALID_FORMAT";
+			case OVC_ENC_OK:
+				return "OVC_ENC_OK";
+			case OVC_ENC_INVALID_DIMENSIONS:
+				return "OVC_ENC_INVALID_DIMENSIONS";
+			case OVC_ENC_INVALID_FORMAT:
+				return "OVC_ENC_INVALID_FORMAT";
 			default:
 				return "";
 		}
 	}
 
 private:
-	bvc_enc_result BvcReturn;
+	ovc_enc_result OvcReturn;
 };
