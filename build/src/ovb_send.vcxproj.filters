@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\encoders\xvc\xvc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\encoders\ovc\ovc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\encoders\encoder_factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\encoders\encoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\packetizer\packetizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\rtp_sender\rtp_sender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\socket\socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\sender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\y4m_reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\ovb_send\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="E:\Other computers\My Computer (1)\Year 5\SP2\EG4012\testing\build\src\ovb_common.dir\$(Configuration)\packet.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{48D40777-B043-3AC4-B03B-58D48F0C9BF5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9B22B6FE-1D4F-3529-B7DA-3F7DD68EFD6F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
