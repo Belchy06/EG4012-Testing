@@ -4,6 +4,3 @@
 [submodule "third_party/ovc"]
 	path = src/third_party/ovc
 	url = https://github.com/Belchy06/OpenVideoCoding
-[submodule "src/third_party/vvc"]
-	path = src/third_party/vvc
-	url = https://github.com/ChristianFeldmann/VTM
