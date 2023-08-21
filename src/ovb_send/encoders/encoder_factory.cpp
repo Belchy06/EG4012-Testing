@@ -1,13 +1,13 @@
-#include "ovb_send/encoders/ovc/ovc.h"
 #include "encoder_factory.h"
+#include "ovb_send/encoders/ovc/ovc.h"
+#include "ovb_send/encoders/vvc/vvc.h"
 #include "ovb_send/encoders/xvc/xvc.h"
 
 std::shared_ptr<Encoder> EncoderFactory::Create(ECodec InCodec)
 {
-	if (InCodec == ECodec::CODEC_H265)
+	if (InCodec == ECodec::CODEC_VVC)
 	{
-		// return std::make_shared<Libde265Encoder>();
-		return nullptr;
+		return std::make_shared<VvcEncoder>();
 	}
 	else if (InCodec == ECodec::CODEC_XVC)
 	{

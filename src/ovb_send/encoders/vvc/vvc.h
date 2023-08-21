@@ -3,10 +3,10 @@
 #include <vector>
 
 #include "ovb_send/encoders/encoder.h"
-#include "EncoderLib/EncLibCommon.h"
-#include "EncoderLib/EncLib.h"
+#include "vvenc/vvenc.h"
+#include "ovb_send/encoders/vvc/vvc_result.h"
 
-class VvcEncoder : public Encoder, public AUWriterIf
+class VvcEncoder : public Encoder
 {
 public:
 	VvcEncoder();
@@ -16,12 +16,12 @@ public:
 	virtual EncodeResult* Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture) override;
 
 private:
-	// AUWriteIf interface
-	virtual void outputAU(const AccessUnit& au) override;
+	int	   ScaleX(int InX, EChromaFormat InFormat);
+	int	   ScaleY(int InY, EChromaFormat InFormat);
 
 private:
-	EncLib* Encoder;
+	vvenc_config* Params;
+	vvencEncoder* Encoder;
 
-	std::list<PelUnitBuf*> RecBufList;
-	PelStorage*			   OrgPic;
+	int64_t SequenceNumber;
 };

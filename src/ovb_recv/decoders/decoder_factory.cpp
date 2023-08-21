@@ -4,7 +4,7 @@
 
 std::shared_ptr<Decoder> DecoderFactory::Create(ECodec InCodec)
 {
-	if (InCodec == ECodec::CODEC_H265)
+	if (InCodec == ECodec::CODEC_VVC)
 	{
 		// return std::make_shared<Libde265Decoder>();
 		return nullptr;

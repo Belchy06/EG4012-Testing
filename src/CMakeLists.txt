@@ -22,6 +22,7 @@ set(OVB_RECV_SOURCES
 set(OVB_SEND_SOURCES
     "ovb_send/encoders/xvc/xvc.cpp"
     "ovb_send/encoders/ovc/ovc.cpp"
+    "ovb_send/encoders/vvc/vvc.cpp"
     "ovb_send/encoders/encoder_factory.cpp"
     "ovb_send/encoders/encoder.cpp"
     "ovb_send/packetizer/packetizer.cpp"
@@ -29,8 +30,7 @@ set(OVB_SEND_SOURCES
     "ovb_send/socket/socket.cpp"
     "ovb_send/sender.cpp"
     "ovb_send/y4m_reader.cpp"
-    "ovb_send/main.cpp"
-    )
+    "ovb_send/main.cpp")
 
 if(MSVC)
   set(cxx_base_flags /GS /W4 /WX)
@@ -78,11 +78,13 @@ set(ovb_send_src_extra "")
 include_directories(
     "third_party/ovc/src" 
     "third_party/xvc/src"
-    "third_party/vvc/src")
+    "third_party/vvc/vvenc/include"
+    "third_party/vvc/vvdec/include")
 link_directories(
     "third_party/ovc/build/src/Debug"
     "third_party/xvc/build/src/Debug"
-    "third_party/vvc/lib/vs17/msvc-19.36/x86_64/debug")
+    "third_party/vvc/vvenc/lib/debug-static"
+    "third_party/vvc/vvdec/lib/debug-static")
 
 # ovb_common
 add_library (ovb_common OBJECT ${OVB_COMMON_SOURCES})
@@ -94,14 +96,14 @@ add_executable(ovb_recv ${OVB_RECV_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_r
 set_target_properties(ovb_recv PROPERTIES OUTPUT_NAME "ovbrecv")
 target_compile_options(ovb_recv PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_recv PUBLIC .)
-target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdec ovcdec)
+target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdec ovcdec vvdec)
 
 # ovb_send
 add_executable(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_send_src_extra})
 set_target_properties(ovb_send PROPERTIES OUTPUT_NAME "ovbsend")
 target_compile_options(ovb_send PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_send PUBLIC .)
-target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcenc ovcenc)
+target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcenc ovcenc vvenc)
 
 
 install(FILES

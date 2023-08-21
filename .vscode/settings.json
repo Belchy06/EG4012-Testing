@@ -80,6 +80,13 @@
         "codecvt": "cpp",
         "filesystem": "cpp",
         "random": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "complex": "cpp",
+        "cstdarg": "cpp",
+        "regex": "cpp",
+        "unordered_set": "cpp",
+        "valarray": "cpp"
     }
 }

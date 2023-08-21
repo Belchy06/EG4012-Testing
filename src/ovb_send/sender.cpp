@@ -49,8 +49,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
             Config.Port = atoi(argv[++i]);
         } else if(arg == "-codec") {
             std::string CodecStr(argv[++i]);
-            if(CodecStr == "H265") {
-                Options.Codec = ECodec::CODEC_H265;
+            if(CodecStr == "VVC") {
+                Options.Codec = ECodec::CODEC_VVC;
             } else if(CodecStr == "XVC") {
                 Options.Codec = ECodec::CODEC_XVC;
             } else if(CodecStr == "OVC") {
@@ -209,7 +209,7 @@ void Sender::PrintHelp()
     std::cout << "      \"verbose\"    " << std::endl;
     std::cout << "      \"veryverbose\"" << std::endl;
     std::cout << "  -codec <string>    " << std::endl;
-    std::cout << "      \"H265\"       " << std::endl;
+    std::cout << "      \"VVC\"        " << std::endl;
     std::cout << "      \"XVC\"        " << std::endl;
     std::cout << "      \"OVC\"        " << std::endl;
 	// clang-format on

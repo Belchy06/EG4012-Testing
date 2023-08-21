@@ -17,9 +17,9 @@ typedef enum
 
 typedef enum
 {
-	CODEC_H265,
 	CODEC_XVC,
-    CODEC_OVC,
+	CODEC_OVC,
+	CODEC_VVC,
 	CODEC_UNDEFINED = 255
 } ECodec;
 
