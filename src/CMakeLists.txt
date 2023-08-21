@@ -77,12 +77,10 @@ set(ovb_send_src_extra "")
 
 include_directories(
     "third_party/ovc/src" 
-    "third_party/xvc/src" 
-    "third_party/libde265")
+    "third_party/xvc/src")
 link_directories(
     "third_party/ovc/build/src/Debug"
-    "third_party/xvc/build/src/Debug"
-    "third_party/libde265/build/libde265/Debug")
+    "third_party/xvc/build/src/Debug")
 
 # ovb_common
 add_library (ovb_common OBJECT ${OVB_COMMON_SOURCES})
@@ -90,18 +88,18 @@ target_compile_options(ovb_common PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories(ovb_common PUBLIC .)
 
 # ovb_recv
-add_library(ovb_recv ${OVB_RECV_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_recv_src_extra})
+add_executable(ovb_recv ${OVB_RECV_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_recv_src_extra})
 set_target_properties(ovb_recv PROPERTIES OUTPUT_NAME "ovbrecv")
 target_compile_options(ovb_recv PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_recv PUBLIC .)
-target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH})
+target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdec ovcdec)
 
 # ovb_send
-add_library(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_send_src_extra})
+add_executable(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_send_src_extra})
 set_target_properties(ovb_send PROPERTIES OUTPUT_NAME "ovbsend")
 target_compile_options(ovb_send PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_send PUBLIC .)
-target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH})
+target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcenc ovcenc)
 
 
 install(FILES
