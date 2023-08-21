@@ -1,6 +1,0 @@
-[submodule "third_party/xvc"]
-	path = src/third_party/xvc
-	url = https://github.com/divideon/xvc
-[submodule "third_party/ovc"]
-	path = src/third_party/ovc
-	url = https://github.com/Belchy06/OpenVideoCoding
