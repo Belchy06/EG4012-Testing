@@ -36,13 +36,13 @@ RTPPacket::RTPPacket(uint8_t InPType, uint16_t InFrameNB, uint32_t InTime, const
 	PayloadSize = InDataLength;
 	Payload = new uint8_t[InDataLength];
 
-	for (int i = 0; i < InDataLength; i++)
+	for (int64_t i = 0; i < InDataLength; i++)
 	{
 		Payload[i] = InData[i];
 	}
 }
 
-RTPPacket::RTPPacket(const uint8_t* InData, int InDataLength)
+RTPPacket::RTPPacket(const uint8_t* InData, int64_t InDataLength)
 {
 	if (InDataLength < 0 || InDataLength < HEADER_SIZE)
 	{
@@ -52,7 +52,7 @@ RTPPacket::RTPPacket(const uint8_t* InData, int InDataLength)
 
 	// get the header bitsream:
 	Header = new uint8_t[HEADER_SIZE];
-	for (int i = 0; i < HEADER_SIZE; i++)
+	for (size_t i = 0; i < HEADER_SIZE; i++)
 	{
 		Header[i] = InData[i];
 	}
@@ -61,7 +61,7 @@ RTPPacket::RTPPacket(const uint8_t* InData, int InDataLength)
 	// get the payload bitstream:
 	PayloadSize = InDataLength - HEADER_SIZE;
 	Payload = new uint8_t[PayloadSize];
-	for (int i = HEADER_SIZE; i < InDataLength; i++)
+	for (size_t i = HEADER_SIZE; i < InDataLength; i++)
 	{
 
 		Payload[i - HEADER_SIZE] = InData[i];

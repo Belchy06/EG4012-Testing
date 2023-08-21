@@ -60,18 +60,18 @@ bool Socket::Send(RTPPacket* Packet)
 
 	uint8_t* HeaderData = Packet->GetHeader();
 	size_t	 HeaderSize = Packet->GetHeaderSize();
-	for (int i = 0; i < Packet->GetHeaderSize(); i++)
+	for (size_t i = 0; i < Packet->GetHeaderSize(); i++)
 	{
 		Buf[i] = HeaderData[i];
 	}
 
 	uint8_t* PayloadData = Packet->GetPayload();
-	for (int i = 0; i < Packet->GetPayloadSize(); i++)
+	for (size_t i = 0; i < Packet->GetPayloadSize(); i++)
 	{
 		Buf[i + HeaderSize] = PayloadData[i];
 	}
 
-	if (sendto(Sock, Buf, TotalSize, 0, (struct sockaddr*)&Other, sizeof(Other)) == SOCKET_ERROR)
+	if (sendto(Sock, Buf, (int)TotalSize, 0, (struct sockaddr*)&Other, sizeof(Other)) == SOCKET_ERROR)
 	{
 		std::cerr << "sendto failed with error" << WSAGetLastError() << std::endl;
 		return false;

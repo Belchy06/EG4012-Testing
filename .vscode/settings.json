@@ -79,6 +79,7 @@
         "xtree": "cpp",
         "codecvt": "cpp",
         "filesystem": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "bitset": "cpp"
     }
 }

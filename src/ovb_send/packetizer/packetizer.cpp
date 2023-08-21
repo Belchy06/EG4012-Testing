@@ -29,8 +29,8 @@ std::vector<RTPPacket> Packetizer::Packetize(const uint8_t* InData, size_t InSiz
 	size_t SizePacketized = 0;
 	while (SizePacketized < InSize)
 	{
-		int		  PacketSize = std::min((size_t)RTP_PAYLOAD_SIZE, InSize - SizePacketized);
-		RTPPacket Packet = RTPPacket(10, (int)SequenceNumber++, 0, InData + SizePacketized, PacketSize, PacketSize < (size_t)RTP_PAYLOAD_SIZE);
+		size_t	  PacketSize = std::min((size_t)RTP_PAYLOAD_SIZE, InSize - SizePacketized);
+		RTPPacket Packet = RTPPacket(10, (size_t)SequenceNumber++, 0, InData + SizePacketized, PacketSize, PacketSize < (size_t)RTP_PAYLOAD_SIZE);
 		// TODO (belchy06): RTP Timestamp
 		Packets.push_back(Packet);
 

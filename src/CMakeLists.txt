@@ -77,10 +77,12 @@ set(ovb_send_src_extra "")
 
 include_directories(
     "third_party/ovc/src" 
-    "third_party/xvc/src")
+    "third_party/xvc/src"
+    "third_party/vvc/src")
 link_directories(
     "third_party/ovc/build/src/Debug"
-    "third_party/xvc/build/src/Debug")
+    "third_party/xvc/build/src/Debug"
+    "third_party/vvc/lib/vs17/msvc-19.36/x86_64/debug")
 
 # ovb_common
 add_library (ovb_common OBJECT ${OVB_COMMON_SOURCES})

@@ -7,11 +7,11 @@
 class DecoderConfig
 {
 public:
-	int			  Width;
-	int			  Height;
-	int			  FramerateNum;
-	int			  FramerateDenom;
-	int			  BitDepth;
+	size_t		  Width;
+	size_t		  Height;
+	size_t		  FramerateNum;
+	size_t		  FramerateDenom;
+	size_t		  BitDepth;
 	EChromaFormat Format;
 
 	std::streamoff StartSkip;
