@@ -59,6 +59,16 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 		// clang-format on
 	}
 
+	Params->wavelet_family = OVC_WAVELET_FAMILY_BIORTHOGONAL;
+	Params->wavelet_config = { .biorthogonal_config = OVC_WAVELET_BIORTHOGONAL_3p9 };
+
+	Params->partition_type = OVC_PARTITION_OFFSET_ZEROTREE;
+	Params->num_levels = 3;
+	Params->num_streams_exp = 0;
+
+	Params->spiht = OVC_SPIHT_ENABLE;
+	Params->bits_per_pixel = 1.f;
+
 	Params->entropy_coder = ovc_entropy_coder::OVC_ENTROPY_CODER_ARITHMETIC;
 
 	Encoder = new ovc_encoder();
@@ -77,8 +87,6 @@ EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 	size_t	 NumNalUnits;
 
 	ovc_picture* Input = new ovc_picture();
-	Input->info.width = Config.Width;
-	Input->info.height = Config.Height;
 
 	int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
 	uint8_t* SrcBytes = InPictureBytes.data();
@@ -88,52 +96,59 @@ EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 		const EYuvComponent Component = static_cast<EYuvComponent>(c);
 		if (Component == EYuvComponent::Y)
 		{
-			Input->Y = new uint8_t[FrameSize]{ 0 };
-			memcpy(Input->Y, SrcBytes, FrameSize);
+			Input->planes[0].data = new uint8_t[FrameSize]{ 0 };
+			memcpy(Input->planes[0].data, SrcBytes, FrameSize);
+			Input->planes[0].width = Config.Width;
+			Input->planes[0].height = Config.Height;
 		}
 		else if (Component == EYuvComponent::U)
 		{
 			switch (Config.Format)
 			{
 				case EChromaFormat::CHROMA_FORMAT_420:
-					Input->U = new uint8_t[FrameSize / 4]{ 0 };
-					memcpy(Input->U, SrcBytes + FrameSize, (FrameSize) / 4);
+					Input->planes[1].data = new uint8_t[FrameSize / 4]{ 0 };
+					memcpy(Input->planes[1].data, SrcBytes + FrameSize, (FrameSize) / 4);
 					break;
 				case EChromaFormat::CHROMA_FORMAT_422:
-					Input->U = new uint8_t[(Config.Width / 2) * Config.Height]{ 0 };
-					memcpy(Input->U, SrcBytes + FrameSize, (Config.Width / 2) * Config.Height);
+					Input->planes[1].data = new uint8_t[(Config.Width / 2) * Config.Height]{ 0 };
+					memcpy(Input->planes[1].data, SrcBytes + FrameSize, (Config.Width / 2) * Config.Height);
 					break;
 				case EChromaFormat::CHROMA_FORMAT_444:
-					Input->U = new uint8_t[FrameSize]{ 0 };
-					memcpy(Input->U, SrcBytes + FrameSize, FrameSize);
+					Input->planes[1].data = new uint8_t[FrameSize]{ 0 };
+					memcpy(Input->planes[1].data, SrcBytes + FrameSize, FrameSize);
 					break;
 				case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
 				case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
 				default:
 					break;
 			}
+			Input->planes[1].width = ScaleX(Config.Width, Config.Format);
+			Input->planes[1].height = ScaleY(Config.Height, Config.Format);
 		}
 		else if (Component == EYuvComponent::V)
 		{
 			switch (Config.Format)
 			{
 				case EChromaFormat::CHROMA_FORMAT_420:
-					Input->V = new uint8_t[FrameSize / 4]{ 0 };
-					memcpy(Input->V, SrcBytes + (5 / 4) * FrameSize, (FrameSize) / 4);
+					Input->planes[2].data = new uint8_t[FrameSize / 4]{ 0 };
+					memcpy(Input->planes[2].data, SrcBytes + (5 / 4) * FrameSize, (FrameSize) / 4);
 					break;
 				case EChromaFormat::CHROMA_FORMAT_422:
-					Input->V = new uint8_t[(Config.Width / 2) * Config.Height]{ 0 };
-					memcpy(Input->V, SrcBytes + (Config.Width * Config.Width) + (3 * Config.Width * Config.Height) + (2 * Config.Height * Config.Height), (Config.Width / 2) * Config.Height);
+					Input->planes[2].data = new uint8_t[(Config.Width / 2) * Config.Height]{ 0 };
+					memcpy(Input->planes[2].data, SrcBytes + (Config.Width * Config.Width) + (3 * Config.Width * Config.Height) + (2 * Config.Height * Config.Height), (Config.Width / 2) * Config.Height);
 					break;
 				case EChromaFormat::CHROMA_FORMAT_444:
-					Input->V = new uint8_t[FrameSize]{ 0 };
-					memcpy(Input->V, SrcBytes + 2 * FrameSize, FrameSize);
+					Input->planes[2].data = new uint8_t[FrameSize]{ 0 };
+					memcpy(Input->planes[2].data, SrcBytes + 2 * FrameSize, FrameSize);
 					break;
 				case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
 				case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
 				default:
 					break;
 			}
+
+			Input->planes[2].width = ScaleX(Config.Width, Config.Format);
+			Input->planes[2].height = ScaleY(Config.Height, Config.Format);
 		}
 	}
 

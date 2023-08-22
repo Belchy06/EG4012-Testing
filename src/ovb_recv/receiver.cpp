@@ -118,7 +118,7 @@ void Receiver::OnPacketReceived(RTPPacket InPacket)
 	Depacketizer->HandlePacket(InPacket);
 }
 
-void Receiver::OnNALReceived(const uint8_t* InData, size_t InSize)
+void Receiver::OnNALReceived(uint8_t* InData, size_t InSize)
 {
 	DecodeResult* Result = WrappedDecoder->Decode(InData, InSize);
 	if (!Result->IsSuccess())

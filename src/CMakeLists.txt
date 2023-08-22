@@ -10,6 +10,7 @@ set(OVB_COMMON_SOURCES
 set(OVB_RECV_SOURCES
     "ovb_recv/decoders/xvc/xvc.cpp"
     "ovb_recv/decoders/ovc/ovc.cpp"
+    "ovb_recv/decoders/vvc/vvc.cpp"
     "ovb_recv/decoders/decoder_factory.cpp"
     "ovb_recv/decoders/decoder.cpp"
     "ovb_recv/depacketizer/depacketizer.cpp"

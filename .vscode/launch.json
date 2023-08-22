@@ -25,7 +25,7 @@
             "type": "cppvsdbg",
         },
         {
-            "name": "Launch Receier (Debug)",
+            "name": "Launch Receiver (Debug)",
             "request": "launch",
             "program": "${workspaceFolder}/build/src/Debug/ovbrecv.exe",
             "preLaunchTask": "",

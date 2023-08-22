@@ -1,13 +1,13 @@
 #include "ovb_recv/decoders/ovc/ovc.h"
 #include "decoder_factory.h"
+#include "ovb_recv/decoders/vvc/vvc.h"
 #include "ovb_recv/decoders/xvc/xvc.h"
 
 std::shared_ptr<Decoder> DecoderFactory::Create(ECodec InCodec)
 {
 	if (InCodec == ECodec::CODEC_VVC)
 	{
-		// return std::make_shared<Libde265Decoder>();
-		return nullptr;
+		return std::make_shared<VvcDecoder>();
 	}
 	else if (InCodec == ECodec::CODEC_XVC)
 	{

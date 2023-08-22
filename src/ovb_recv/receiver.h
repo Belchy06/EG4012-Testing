@@ -33,7 +33,7 @@ private:
 	virtual void OnDecodeComplete(DecodedImage InImage) override;
 
 	// IDepacketizerListener interface
-	virtual void OnNALReceived(const uint8_t* InData, size_t InSize) override;
+	virtual void OnNALReceived(uint8_t* InData, size_t InSize) override;
 
 private:
 	std::ostream* OutputStream;

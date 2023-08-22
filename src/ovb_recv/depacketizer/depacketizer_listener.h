@@ -5,5 +5,5 @@
 class IDepacketizerListener
 {
 public:
-	virtual void OnNALReceived(const uint8_t* InData, size_t InSize) = 0;
+	virtual void OnNALReceived(uint8_t* InData, size_t InSize) = 0;
 };

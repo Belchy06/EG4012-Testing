@@ -17,6 +17,10 @@ public:
 	virtual EncodeResult* Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture);
 
 protected:
+	int ScaleX(int InX, EChromaFormat InFormat);
+	int ScaleY(int InY, EChromaFormat InFormat);
+
+protected:
 	EncoderConfig			 Config;
 	IEncodeCompleteCallback* OnEncodedImageCallback;
 };

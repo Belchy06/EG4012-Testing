@@ -47,7 +47,7 @@ DecodeResult* XvcDecoder::Init(DecoderConfig& InConfig)
 	return new XvcResult(Result);
 }
 
-DecodeResult* XvcDecoder::Decode(const uint8_t* InNalBytes, size_t InNalSize)
+DecodeResult* XvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 {
 	xvc_dec_return_code Result;
 	Result = Api->decoder_decode_nal(Decoder, InNalBytes, InNalSize, 0);

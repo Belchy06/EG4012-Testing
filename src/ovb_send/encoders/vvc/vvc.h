@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+#include <sstream>
 #include <vector>
 
 #include "ovb_send/encoders/encoder.h"
@@ -16,8 +18,8 @@ public:
 	virtual EncodeResult* Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture) override;
 
 private:
-	int	   ScaleX(int InX, EChromaFormat InFormat);
-	int	   ScaleY(int InY, EChromaFormat InFormat);
+	int ReadNalFromStream(std::stringstream* InStream, vvencAccessUnit* OutAccessUnit);
+	int RetrieveNalStartCode(unsigned char* pB, int InZerosInStartcode);
 
 private:
 	vvenc_config* Params;

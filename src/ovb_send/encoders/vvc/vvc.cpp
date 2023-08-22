@@ -1,5 +1,14 @@
 #include "ovb_send/encoders/vvc/vvc.h"
 
+#define MAX_CODED_PICTURE_SIZE 800000
+
+vvencMsgLevel g_verbosity = VVENC_VERBOSE;
+
+void msgFnc(void*, int level, const char* fmt, va_list args)
+{
+	std::vfprintf(stdout, fmt, args);
+}
+
 VvcEncoder::VvcEncoder()
 	: Params(new vvenc_config())
 	, Encoder(nullptr)
@@ -30,6 +39,8 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 	Params->m_inputBitDepth[0] = 8;
 	Params->m_inputBitDepth[1] = 8;
 
+	Params->m_verbosity = VVENC_DETAILS;
+
 	vvencChromaFormat internalFormat = VVENC_NUM_CHROMA_FORMAT;
 	switch (InConfig.Format)
 	{
@@ -48,7 +59,14 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 	}
 	Params->m_internChromaFormat = internalFormat;
 
+	// All intra configuration
+	Params->m_GOPSize = 1;
+	Params->m_IntraPeriod = 1;
+
 	Encoder = vvenc_encoder_create();
+
+	vvenc_set_logging_callback(nullptr, msgFnc);		// register global log callback (deprecated, will be removed)
+	vvenc_set_msg_callback(Params, nullptr, &::msgFnc); // register local (thread safe) logger (global logger is overwritten)
 
 	int Result = vvenc_encoder_open(Encoder, Params);
 	if (Result != VVENC_OK)
@@ -58,6 +76,8 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 	}
 
 	vvenc_get_config(Encoder, Params);
+
+	std::cout << vvenc_get_config_as_string(Params, Params->m_verbosity) << std::endl;
 
 	return new VvcResult(VVENC_OK);
 }
@@ -106,7 +126,6 @@ EncodeResult* VvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 			case EChromaFormat::CHROMA_FORMAT_420:
 				for (size_t i = 0; i < FrameSize / 4; i++)
 				{
-					// (int16_t)SrcBytes[i + FrameSize] > 256 || (int16_t)SrcBytes[i + FrameSize] < 0
 					U.push_back((int16_t)SrcBytes[i + FrameSize]);
 				}
 				break;
@@ -189,40 +208,140 @@ EncodeResult* VvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 
 		if (AU.payloadUsedSize > 0 && OnEncodedImageCallback != nullptr)
 		{
-			OnEncodedImageCallback->OnEncodeComplete(AU.payload, AU.payloadUsedSize);
+			// TODO (belchy06): Convert access unit into individual NALs
+			std::stringstream Stream;
+
+			Stream.write((const char*)AU.payload, AU.payloadUsedSize);
+			bool Continue = true;
+			while (Continue)
+			{
+				vvencAccessUnit Nal;
+				vvenc_accessUnit_default(&Nal);
+				vvenc_accessUnit_alloc_payload(&Nal, MAX_CODED_PICTURE_SIZE);
+				int Res = ReadNalFromStream(&Stream, &Nal);
+				Continue = Res > 0;
+				if (Continue)
+				{
+
+					OnEncodedImageCallback->OnEncodeComplete(Nal.payload, Nal.payloadUsedSize);
+				}
+			}
 		}
 	}
 	return new VvcResult(VVENC_OK);
 }
 
-int VvcEncoder::ScaleX(int InX, EChromaFormat InFormat)
+int VvcEncoder::ReadNalFromStream(std::stringstream* InStream, vvencAccessUnit* OutAccessUnit)
 {
-	switch (InFormat)
+	int Info2 = 0;
+	int Info3 = 0;
+	int Pos = 0;
+
+	int			   StartCodeFound = 0;
+	int			   Rewind = 0;
+	uint32_t	   Len;
+	unsigned char* Buf = OutAccessUnit->payload;
+	OutAccessUnit->payloadUsedSize = 0;
+
+	auto CurFillPos = InStream->tellg();
+	if (CurFillPos < 0)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-			return 0;
-		case EChromaFormat::CHROMA_FORMAT_444:
-			return InX;
-		case EChromaFormat::CHROMA_FORMAT_420:
-		case EChromaFormat::CHROMA_FORMAT_422:
-			return InX >> 1;
-		default:
-			return 0;
+		return -1;
 	}
+
+	// jump over possible start code
+	InStream->read((char*)Buf, 5);
+	size_t Extracted = InStream->gcount();
+	if (Extracted < 4)
+	{
+
+		return -1;
+	}
+
+	Pos += 5;
+	Info2 = 0;
+	Info3 = 0;
+	StartCodeFound = 0;
+
+	while (!StartCodeFound)
+	{
+		if (InStream->eof())
+		{
+			if (Pos > 5)
+			{
+				Len = Pos - 1;
+				OutAccessUnit->payloadUsedSize = Len;
+				return Len;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+
+		unsigned char* P = Buf + Pos;
+		InStream->read((char*)P, 1);
+		Pos++;
+
+		Info3 = RetrieveNalStartCode(&Buf[Pos - 4], 3);
+		if (Info3 != 1)
+		{
+			Info2 = RetrieveNalStartCode(&Buf[Pos - 3], 2);
+		}
+		StartCodeFound = (Info2 == 1 || Info3 == 1);
+	}
+
+	// Here, we have found another start code (and read length of startcode bytes more than we should
+	// have.  Hence, go back in the file
+	Rewind = 0;
+	if (Info3 == 1)
+	{
+		Rewind = -4;
+	}
+	else if (Info2 == 1)
+	{
+		Rewind = -3;
+	}
+	else
+	{
+		std::cerr << "ERR: readBitstreamFromFile: Error in next start code search" << std::endl;
+	}
+
+	InStream->seekg(Rewind, InStream->cur);
+	if (InStream->bad() || InStream->fail())
+	{
+
+		std::cerr << "ERR: readBitstreamFromFile: Cannot seek " << Rewind << " in the bit stream file" << std::endl;
+		return -1;
+	}
+
+	// Here the Start code, the complete NALU, and the next start code is in the Buf.
+	// The size of Buf is Pos, Pos+rewind are the number of bytes excluding the next
+	// start code, and (Pos+rewind)-startcodeprefix_len is the size of the NALU
+
+	Len = (Pos + Rewind);
+	OutAccessUnit->payloadUsedSize = Len;
+	return Len;
 }
 
-int VvcEncoder::ScaleY(int InY, EChromaFormat InFormat)
+int VvcEncoder::RetrieveNalStartCode(unsigned char* pB, int InZerosInStartcode)
 {
-	switch (InFormat)
+	int info = 1;
+	int i = 0;
+	for (i = 0; i < InZerosInStartcode; i++)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-			return 0;
-		case EChromaFormat::CHROMA_FORMAT_444:
-		case EChromaFormat::CHROMA_FORMAT_422:
-			return InY;
-		case EChromaFormat::CHROMA_FORMAT_420:
-			return InY >> 1;
-		default:
-			return 0;
+		if (pB[i] != 0)
+		{
+			info = 0;
+		}
 	}
+
+	if (pB[i] != 1)
+	{
+		info = 0;
+	}
+
+	return info;
 }
+
+#undef MAX_CODED_PICTURE_SIZE

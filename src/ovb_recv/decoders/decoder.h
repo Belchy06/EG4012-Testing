@@ -12,7 +12,7 @@ public:
 	void RegisterDecodeCompleteCallback(IDecodeCompleteCallback* InDecoderCompleteCallback);
 
 	virtual DecodeResult* Init(DecoderConfig& InConfig);
-	virtual DecodeResult* Decode(const uint8_t* InNalBytes, size_t InNalSize);
+	virtual DecodeResult* Decode(uint8_t* InNalBytes, size_t InNalSize);
 
 protected:
 	DecoderConfig			 Config;

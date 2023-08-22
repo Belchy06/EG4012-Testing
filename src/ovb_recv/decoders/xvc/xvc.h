@@ -11,7 +11,7 @@ public:
 	~XvcDecoder();
 
 	virtual DecodeResult* Init(DecoderConfig& InConfig) override;
-	virtual DecodeResult* Decode(const uint8_t* InNalBytes, size_t InNalSize) override;
+	virtual DecodeResult* Decode(uint8_t* InNalBytes, size_t InNalSize) override;
 
 private:
 	const xvc_decoder_api*	Api;

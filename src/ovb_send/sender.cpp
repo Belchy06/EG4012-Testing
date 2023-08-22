@@ -117,6 +117,13 @@ void Sender::ValidateArgs()
 
 void Sender::Run()
 {
+	do
+	{
+		std::cout << '\n'
+				  << "Press a key to continue...";
+	}
+	while (std::cin.get() != '\n');
+
 	WrappedEncoder = EncoderFactory::Create(Options.Codec);
 
 	EncoderConfig Config;
@@ -175,10 +182,10 @@ void Sender::Run()
 
 void Sender::OnEncodeComplete(const uint8_t* InData, size_t InSize)
 {
-	std::cout << "====================" << std::endl;
-	std::cout << "  OnEncodeComplete  " << std::endl;
-	std::cout << "====================" << std::endl;
-	std::cout << "Size: " << InSize << std::endl;
+	// std::cout << "====================" << std::endl;
+	// std::cout << "  OnEncodeComplete  " << std::endl;
+	// std::cout << "====================" << std::endl;
+	// std::cout << "Size: " << InSize << std::endl;
 
 	std::vector<RTPPacket> Packets = Packetizer->Packetize(InData, InSize);
 
