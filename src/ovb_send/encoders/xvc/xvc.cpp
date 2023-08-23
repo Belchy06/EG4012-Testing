@@ -197,7 +197,7 @@ EncodeResult* XvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 		}
 
 		// Conditionally print information for each Nal Unit
-		if (Config.LogLevel >= ELogSeverity::SEVERITY_VERBOSE)
+		if (Config.LogLevel >= ELogSeverity::LOG_SEVERITY_DETAILS)
 		{
 			PrintNalInfo(NalUnits[i]);
 		}

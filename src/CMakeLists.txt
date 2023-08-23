@@ -33,6 +33,14 @@ set(OVB_SEND_SOURCES
     "ovb_send/y4m_reader.cpp"
     "ovb_send/main.cpp")
 
+set(OVB_RELAY_SOURCES
+    "ovb_relay/drop/dropper.cpp"
+    "ovb_relay/tamper/tamperer.cpp"
+    "ovb_relay/recv_socket/socket.cpp"
+    "ovb_relay/send_socket/socket.cpp"
+    "ovb_relay/relay.cpp"
+    "ovb_relay/main.cpp")
+
 if(MSVC)
   set(cxx_base_flags /GS /W4 /WX)
   set(cxx_exception_flags "-EHsc")
@@ -75,6 +83,7 @@ set(linker_flags "")
 
 set(ovb_recv_src_extra "")
 set(ovb_send_src_extra "")
+set(ovb_relay_src_extra "")
 
 include_directories(
     "third_party/ovc/src" 
@@ -106,6 +115,12 @@ target_compile_options(ovb_send PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_send PUBLIC .)
 target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcenc ovcenc vvenc)
 
+# ovb_relay
+add_executable(ovb_relay ${OVB_RELAY_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_relay_src_extra})
+set_target_properties(ovb_relay PROPERTIES OUTPUT_NAME "ovbrelay")
+target_compile_options(ovb_relay PRIVATE ${cxx_default} ${cxx_strict})
+target_include_directories (ovb_relay PUBLIC .)
+target_link_libraries(ovb_relay INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH})
 
 install(FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/ovb_send/sender.h"

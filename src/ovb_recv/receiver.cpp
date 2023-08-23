@@ -38,11 +38,11 @@ void Receiver::ParseArgs(int argc, const char* argv[])
         } else if(arg == "-h") {
 			PrintHelp();
 			std::exit(1);
-        } else if(arg == "-port") {
+        } else if(arg == "--port") {
             Config.Port = atoi(argv[++i]);
-        } else if(arg == "-file") {
+        } else if(arg == "--file") {
             Options.File = std::string(argv[++i]);
-        } else if(arg == "-codec") {
+        } else if(arg == "--codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "VVC") {
                 Options.Codec = ECodec::CODEC_VVC;
@@ -53,16 +53,25 @@ void Receiver::ParseArgs(int argc, const char* argv[])
             } else {
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }
-        } else if(arg == "-loglevel") {
+        } else if(arg == "--log-level") {
             std::string LevelStr(argv[++i]);
-            if(LevelStr == "log") {
-                Options.LogLevel = ELogSeverity::SEVERITY_LOG;
+            if(LevelStr == "silent") {
+                Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
+            } else if(LevelStr == "error") {
+                Options.LogLevel = ELogSeverity::LOG_SEVERITY_ERROR;
+            } else if(LevelStr == "warning") {
+                Options.LogLevel = ELogSeverity::LOG_SEVERITY_WARNING;
+            } else if(LevelStr == "info") {
+                Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
+            } else if(LevelStr == "notice") {
+                Options.LogLevel = ELogSeverity::LOG_SEVERITY_NOTICE;
             } else if(LevelStr == "verbose") {
-                Options.LogLevel = ELogSeverity::SEVERITY_VERBOSE;
-            } else if(LevelStr == "veryverbose") {
-                Options.LogLevel = ELogSeverity::SEVERITY_VERY_VERBOSE;
+                Options.LogLevel = ELogSeverity::LOG_SEVERITY_VERBOSE;
+            } else if(LevelStr == "details") {
+                Options.LogLevel = ELogSeverity::LOG_SEVERITY_DETAILS;
             } else {
-                Options.LogLevel = ELogSeverity::SEVERITY_NONE;
+                std::cerr << "Warning: Unknown log level " << LevelStr << "\n" << "Warning: Default to SEVERITY_INFO" << std::endl;
+                Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
             }
         } else {
             std::cerr << "Error: Unknown argument: " << arg << std::endl;
@@ -144,14 +153,14 @@ void Receiver::PrintHelp()
 	// clang-format off
 	std::cout << std::endl;
     std::cout << "Usage:" << std::endl;
-	std::cout << "  -file <string> [Optional parameters]" << std::endl << std::endl;
+	std::cout << "  --file <string> [Optional parameters]" << std::endl << std::endl;
     std::cout << "Optional parameters:" << std::endl;
-    std::cout << "  -port <int> (default: 8888)" << std::endl;
-    std::cout << "  -loglevel <string> " << std::endl;
+    std::cout << "  --port <int> (default: 8888)" << std::endl;
+    std::cout << "  --loglevel <string> " << std::endl;
     std::cout << "      \"log\"        " << std::endl;
     std::cout << "      \"verbose\"    " << std::endl;
     std::cout << "      \"veryverbose\"" << std::endl;
-    std::cout << "  -codec <string>    " << std::endl;
+    std::cout << "  --codec <string>    " << std::endl;
     std::cout << "      \"VVC\"        " << std::endl;
     std::cout << "      \"XVC\"        " << std::endl;
     std::cout << "      \"OVC\"        " << std::endl;
