@@ -4,6 +4,8 @@
 #include "ovb_relay/send_socket/socket.h"
 #include "ovb_relay/recv_socket/socket.h"
 #include "ovb_relay/recv_socket/socket_listener.h"
+#include "ovb_relay/drop/dropper.h"
+#include "ovb_relay/tamper/tamperer.h"
 
 class Relay : public ISocketListener
 {
@@ -27,4 +29,7 @@ private:
 
 	std::shared_ptr<RecvSocket> RecvSock;
 	std::shared_ptr<SendSocket> SendSock;
+
+	std::shared_ptr<Dropper>  Drop;
+	std::shared_ptr<Tamperer> Tamper;
 };

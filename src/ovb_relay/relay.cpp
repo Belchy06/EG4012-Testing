@@ -13,6 +13,7 @@ Relay::Relay()
 	Options.DropChance = 0.f;
 	Options.TamperChance = 0.f;
 	Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
+	Options.DropType = EDropType::LOSS_BURSTY;
 }
 
 Relay::~Relay()
@@ -71,6 +72,16 @@ void Relay::ParseArgs(int argc, const char* argv[])
                 std::cerr << "Warning: Unknown log level " << LevelStr << "\n" << "Warning: Default to SEVERITY_INFO" << std::endl;
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
             }
+        } else if(arg == "--drop-type") {
+            std::string LossStr(argv[++i]);
+            if(LossStr == "continuous") {
+                Options.DropType = EDropType::LOSS_CONTINUOUS;
+            } else if(LossStr == "bursty") {
+                Options.DropType = EDropType::LOSS_BURSTY;
+            } else {
+                std::cerr << "Warning: Unknown loss type " << LossStr << "\n" << "Warning: Default to LOSS_BURSTY" << std::endl;
+                Options.DropType = EDropType::LOSS_BURSTY;
+            }
         } else {
             std::cerr << "Error: Unknown argument: " << arg << std::endl;
             PrintHelp();
@@ -114,6 +125,17 @@ void Relay::ValidateArgs()
 	SendConfig.Port = Options.SendPort;
 	SendSock = SendSocket::Create();
 	SendSock->Init(SendConfig);
+
+	DropConfig DropperConfig;
+	DropperConfig.DropGood = 0.f;
+	DropperConfig.DropBad = 1.f;
+	DropperConfig.P = 0.09f;
+	DropperConfig.InvP = 1 - 0.09f;
+	DropperConfig.R = 0.4f;
+	DropperConfig.InvR = 1 - 0.4f;
+
+	Drop = Dropper::Create(Options.DropChance, Options.DropType, DropperConfig);
+	Tamper = Tamperer::Create(Options.TamperChance);
 }
 
 void Relay::PrintSettings()
@@ -125,7 +147,9 @@ void Relay::PrintSettings()
 	std::cout << "  --send-port: " << Options.SendPort << std::endl;
 	std::cout << "  --recv-port: " << Options.RecvPort << std::endl;
     std::cout << "  --drop-chance: " << Options.DropChance << std::endl;
+    std::cout << "  --drop-type: " << DropTypeToString(Options.DropType) << std::endl;
     std::cout << "  --tamper-chance: " << Options.TamperChance << std::endl;
+    std::cout << "  --log-level: " << SeverityToString(Options.LogLevel) << std::endl;
 	// clang-format on
 }
 
@@ -140,8 +164,11 @@ void Relay::PrintHelp()
     std::cout << "Usage:" << std::endl;
 	std::cout << "  --send-ip <string> --send-port <int> --recv-port <int> [Optional parameters]" << std::endl << std::endl;
     std::cout << "Optional parameters:"  << std::endl;
-    std::cout << "  --drop-chance   <float> " << std::endl;
     std::cout << "  --tamper-chance <float> " << std::endl;
+    std::cout << "  --drop-chance   <float> " << std::endl;
+    std::cout << "  --drop-type     <string>" << std::endl;
+    std::cout << "      \"continuous\"      " << std::endl;
+    std::cout << "      \"bursty\"          " << std::endl;
     std::cout << "  --log-level     <string>" << std::endl;
     std::cout << "      \"silent\"          " << std::endl;
     std::cout << "      \"error\"           " << std::endl;
@@ -155,8 +182,26 @@ void Relay::PrintHelp()
 
 void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 {
+	bool bDrop = false;
+	if (Drop)
+	{
+		bDrop = Drop->Drop();
+	}
+
+	if (bDrop)
+	{
+		// Drop this packet
+		return;
+	}
+
+	uint8_t* Data = new uint8_t[InSize];
+	if (Tamper)
+	{
+		Tamper->Tamper(const_cast<uint8_t*>(InData), InSize, &Data);
+	}
+
 	if (SendSock)
 	{
-		SendSock->Send(InData, InSize);
+		SendSock->Send(Data, InSize);
 	}
 }

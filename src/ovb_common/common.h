@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <string>
 
 #ifndef unimplemented
 	#define unimplemented() assert(!true)
@@ -15,6 +16,25 @@ typedef enum
 	CHROMA_FORMAT_UNDEFINED = 255
 } EChromaFormat;
 
+static inline std::string FormatToString(EChromaFormat InFormat)
+{
+	switch (InFormat)
+	{
+		case CHROMA_FORMAT_MONOCHROME:
+			return "CHROMA_FORMAT_MONOCHROME";
+		case CHROMA_FORMAT_420:
+			return "CHROMA_FORMAT_420";
+		case CHROMA_FORMAT_422:
+			return "CHROMA_FORMAT_422";
+		case CHROMA_FORMAT_444:
+			return "CHROMA_FORMAT_444";
+		case CHROMA_FORMAT_UNDEFINED:
+			return "CHROMA_FORMAT_UNDEFINED";
+		default:
+			return "UNKNOWN";
+	}
+}
+
 typedef enum
 {
 	CODEC_XVC,
@@ -22,6 +42,23 @@ typedef enum
 	CODEC_VVC,
 	CODEC_UNDEFINED = 255
 } ECodec;
+
+static inline std::string CodecToString(ECodec InCodec)
+{
+	switch (InCodec)
+	{
+		case CODEC_XVC:
+			return "CODEC_XVC";
+		case CODEC_OVC:
+			return "CODEC_OVC";
+		case CODEC_VVC:
+			return "CODEC_VVC";
+		case CODEC_UNDEFINED:
+			return "CODEC_UNDEFINED";
+		default:
+			return "UNKNOWN";
+	}
+}
 
 typedef enum
 {
@@ -40,3 +77,26 @@ typedef enum
 	LOG_SEVERITY_VERBOSE,
 	LOG_SEVERITY_DETAILS,
 } ELogSeverity;
+
+static inline std::string SeverityToString(ELogSeverity InSeverity)
+{
+	switch (InSeverity)
+	{
+		case LOG_SEVERITY_SILENT:
+			return "LOG_SEVERITY_SILENT";
+		case LOG_SEVERITY_ERROR:
+			return "LOG_SEVERITY_ERROR";
+		case LOG_SEVERITY_WARNING:
+			return "LOG_SEVERITY_WARNING";
+		case LOG_SEVERITY_INFO:
+			return "LOG_SEVERITY_INFO";
+		case LOG_SEVERITY_NOTICE:
+			return "LOG_SEVERITY_NOTICE";
+		case LOG_SEVERITY_VERBOSE:
+			return "LOG_SEVERITY_VERBOSE";
+		case LOG_SEVERITY_DETAILS:
+			return "LOG_SEVERITY_DETAILS";
+		default:
+			return "UNKNOWN";
+	}
+}

@@ -10,14 +10,36 @@
             "program": "${workspaceFolder}/build/src/Debug/ovbsend.exe",
             "preLaunchTask": "",
             "args": [
-                "-file",
+                "--file",
                 "${workspaceFolder}\\resources\\carphone_qcif.y4m",
-                "-codec",
+                "--codec",
                 "VVC",
-                "-ip",
+                "--ip",
                 "127.0.0.1",
-                "-port",
-                "8888"
+                "--port",
+                "4444"
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "type": "cppvsdbg",
+        },
+        {
+            "name": "Launch Relay (Debug)",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/Debug/ovbrelay.exe",
+            "preLaunchTask": "",
+            "args": [
+                "--recv-port",
+                "4444",
+                "--send-ip",
+                "127.0.0.1",
+                "--send-port",
+                "8888",
+                "--drop-chance",
+                "0.05", // 5%
+                "--tamper-chance",
+                "0",
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -30,11 +52,11 @@
             "program": "${workspaceFolder}/build/src/Debug/ovbrecv.exe",
             "preLaunchTask": "",
             "args": [
-                "-file",
+                "--file",
                 "${workspaceFolder}\\resources\\out.y4m",
-                "-codec",
+                "--codec",
                 "VVC",
-                "-port",
+                "--port",
                 "8888"
             ],
             "cwd": "${workspaceFolder}",
@@ -42,5 +64,6 @@
             "console": "integratedTerminal",
             "type": "cppvsdbg",
         },
+        
     ]
 }

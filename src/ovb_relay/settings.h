@@ -4,6 +4,25 @@
 
 #include "ovb_common/common.h"
 
+typedef enum
+{
+	LOSS_CONTINUOUS,
+	LOSS_BURSTY,
+} EDropType;
+
+static inline std::string DropTypeToString(EDropType InDropType)
+{
+	switch (InDropType)
+	{
+		case LOSS_CONTINUOUS:
+			return "LOSS_CONTINUOUS";
+		case LOSS_BURSTY:
+			return "LOSS_BURSTY";
+		default:
+			return "UNKNOWN";
+	}
+}
+
 class RelaySettings
 {
 public:
@@ -23,4 +42,7 @@ public:
 
 	// Tamper
 	float TamperChance;
+
+	// Drop Model
+	EDropType DropType;
 };
