@@ -75,8 +75,11 @@ EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 	Params->low_delay = 1;
 	// SpeedMode::kFast
 	Params->speed_mode = 2;
-	Params->num_ref_pics = 1;
+	// Intra only mode
+	Params->num_ref_pics = 0;
 	Params->max_keypic_distance = 0;
+	Params->input_bitdepth = 8;
+	Params->internal_bitdepth = 8;
 
 	xvc_enc_return_code Result = Api->parameters_check(Params);
 	if (Result != XVC_ENC_OK)
@@ -100,6 +103,37 @@ EncodeResult* XvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 	xvc_enc_nal_unit*	NalUnits;
 	int					NumNalUnits;
 
+	uint8_t* SrcBytes = InPictureBytes.data();
+
+	std::vector<uint8_t*> PlanesVec;
+
+	int NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
+	for (int c = 0; c < NumComponents; c++)
+	{
+		int Width = c == 0 ? Config.Width : ScaleX(Config.Width, Config.Format);
+		int Height = c == 0 ? Config.Height : ScaleX(Config.Height, Config.Format);
+
+		PlanesVec.push_back(new uint8_t[Width * Height]{ 0 });
+		uint8_t* Plane = PlanesVec[c];
+
+		for (int y = 0; y < Height; y++)
+		{
+			for (int x = 0; x < Width; x++)
+			{
+				Plane[x] = SrcBytes[x];
+			}
+			SrcBytes += Width;
+			Plane += Width;
+		}
+	}
+
+	const uint8_t* Planes[] = { PlanesVec[0], PlanesVec[1], PlanesVec[2] };
+
+	int PlanesStride[3];
+	PlanesStride[0] = Config.Width;
+	PlanesStride[1] = ScaleX(Config.Width, Config.Format);
+	PlanesStride[2] = ScaleX(Config.Width, Config.Format);
+
 	if (bInLastPicture)
 	{
 		// Flush the encoder for remaining NalUnits and reconstructed pictures.
@@ -112,7 +146,7 @@ EncodeResult* XvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 		// Encode one picture and get 0 or 1 reconstructed picture back.
 		// Also get back 0 or more NalUnits depending on if pictures are being
 		// buffered in order to encode a full Sub Gop.
-		Result = Api->encoder_encode(Encoder, &InPictureBytes[0], &NalUnits, &NumNalUnits, nullptr);
+		Result = Api->encoder_encode2(Encoder, Planes, PlanesStride, &NalUnits, &NumNalUnits, nullptr, 0);
 	}
 
 	// Loop through all Nal Units that were received and write to file

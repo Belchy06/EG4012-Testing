@@ -62,24 +62,6 @@ DecodeResult* OvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 		if (OnDecodedImageCallback != nullptr)
 		{
 			DecodedImage Image;
-			// TODO (belchy06): This will need to change if there's more than 1 plane
-			Image.Bytes.resize(DecodedPicture.planes[0].width * DecodedPicture.planes[0].height);
-			memcpy(Image.Bytes.data(), DecodedPicture.planes[0].data, DecodedPicture.planes[0].width * DecodedPicture.planes[0].height);
-			Image.Size = DecodedPicture.planes[0].width * DecodedPicture.planes[0].height;
-			Image.Config.BitDepth = DecodedPicture.planes[0].bit_depth;
-			Image.Config.Width = DecodedPicture.planes[0].width;
-			Image.Config.Height = DecodedPicture.planes[0].height;
-
-			if (static_cast<int>(DecodedPicture.framerate) == DecodedPicture.framerate)
-			{
-				Image.Config.FramerateNum = DecodedPicture.framerate;
-				Image.Config.FramerateDenom = 1;
-			}
-			else
-			{
-				Image.Config.FramerateNum = static_cast<int>(DecodedPicture.framerate * 1000);
-				Image.Config.FramerateDenom = 1000;
-			}
 
 			if (DecodedPicture.format != ovc_chroma_format::OVC_CHROMA_FORMAT_UNDEFINED)
 			{
@@ -94,6 +76,47 @@ DecodeResult* OvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_444;
 				}
 				// clang-format on
+			}
+
+			std::vector<uint8_t> ImageBytes;
+			//                                      Y
+			// clang-format off
+			size_t FrameSize = (DecodedPicture.planes[0].width * DecodedPicture.planes[0].height)  // Y
+                             + (DecodedPicture.planes[1].width * DecodedPicture.planes[1].height)  // U
+                             + (DecodedPicture.planes[2].width * DecodedPicture.planes[2].height); // V
+			// clang-format on
+			ImageBytes.reserve(FrameSize);
+
+			for (size_t c = 0; c < (size_t)(Image.Config.Format == CHROMA_FORMAT_MONOCHROME ? 1 : 3); c++)
+			{
+				ovc_plane			 Plane = DecodedPicture.planes[c];
+				std::vector<uint8_t> PlaneVec;
+				PlaneVec.reserve(Plane.width * Plane.height);
+				for (size_t y = 0; y < Plane.height; y++)
+				{
+					for (size_t x = 0; x < Plane.width; x++)
+					{
+						PlaneVec.push_back(Plane.data[x + y * Plane.width]);
+					}
+				}
+				ImageBytes.insert(ImageBytes.end(), PlaneVec.begin(), PlaneVec.end());
+			}
+
+			Image.Bytes = ImageBytes;
+			Image.Size = ImageBytes.size();
+			Image.Config.BitDepth = DecodedPicture.planes[0].bit_depth;
+			Image.Config.Width = DecodedPicture.planes[0].width;
+			Image.Config.Height = DecodedPicture.planes[0].height;
+
+			if (static_cast<int>(DecodedPicture.framerate) == DecodedPicture.framerate)
+			{
+				Image.Config.FramerateNum = DecodedPicture.framerate;
+				Image.Config.FramerateDenom = 1;
+			}
+			else
+			{
+				Image.Config.FramerateNum = static_cast<int>(DecodedPicture.framerate * 1000);
+				Image.Config.FramerateDenom = 1000;
 			}
 
 			OnDecodedImageCallback->OnDecodeComplete(Image);

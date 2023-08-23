@@ -39,6 +39,9 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 	Params->m_inputBitDepth[0] = 8;
 	Params->m_inputBitDepth[1] = 8;
 
+	Params->m_internalBitDepth[0] = 8;
+	Params->m_internalBitDepth[1] = 8;
+
 	Params->m_verbosity = VVENC_DETAILS;
 
 	vvencChromaFormat internalFormat = VVENC_NUM_CHROMA_FORMAT;
@@ -108,96 +111,46 @@ EncodeResult* VvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 			return new VvcResult(Result);
 		}
 
-		YUVInputBuffer.sequenceNumber = SequenceNumber;
-		YUVInputBuffer.cts = (Params->m_TicksPerSecond > 0);
-		YUVInputBuffer.ctsValid = true;
-
-		uint8_t*			 SrcBytes = InPictureBytes.data();
-		size_t				 FrameSize = Config.Width * Config.Height;
-		std::vector<int16_t> Y;
-		for (size_t i = 0; i < FrameSize; i++)
+		vvencYUVBuffer* YUVInputBufferPtr = nullptr;
+		if (!bInLastPicture)
 		{
-			Y.push_back((int16_t)SrcBytes[i]);
+			YUVInputBuffer.sequenceNumber = SequenceNumber;
+			YUVInputBuffer.cts = (Params->m_TicksPerSecond > 0);
+			YUVInputBuffer.ctsValid = true;
+			SequenceNumber++;
+
+			uint8_t* SrcBytes = InPictureBytes.data();
+			int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
+			for (int c = 0; c < NumComponents; c++)
+			{
+				int Width = c == 0 ? Config.Width : ScaleX(Config.Width, Config.Format);
+				int Height = c == 0 ? Config.Height : ScaleX(Config.Height, Config.Format);
+
+				int16_t* PlanePtr = new int16_t[Width * Height]{ 0 };
+
+				for (int y = 0; y < Height; y++)
+				{
+					for (int x = 0; x < Width; x++)
+					{
+						PlanePtr[x] = static_cast<int16_t>(SrcBytes[x]);
+					}
+					SrcBytes += Width;
+					PlanePtr += Width;
+				}
+
+				vvencYUVPlane Plane = vvencYUVPlane();
+				Plane.ptr = PlanePtr - Width * Height;
+				Plane.width = Width;
+				Plane.height = Height;
+				Plane.stride = Width;
+				YUVInputBuffer.planes[c] = std::move(Plane);
+			}
+
+			YUVInputBufferPtr = &YUVInputBuffer;
 		}
-
-		std::vector<int16_t> U;
-		switch (Config.Format)
-		{
-			case EChromaFormat::CHROMA_FORMAT_420:
-				for (size_t i = 0; i < FrameSize / 4; i++)
-				{
-					U.push_back((int16_t)SrcBytes[i + FrameSize]);
-				}
-				break;
-			case EChromaFormat::CHROMA_FORMAT_422:
-				for (size_t i = 0; i < (size_t)((Config.Width / 2) * Config.Height); i++)
-				{
-					U.push_back((int16_t)SrcBytes[i + FrameSize]);
-				}
-				break;
-			case EChromaFormat::CHROMA_FORMAT_444:
-				for (size_t i = 0; i < FrameSize; i++)
-				{
-					U.push_back((int16_t)SrcBytes[i + FrameSize]);
-				}
-				break;
-			case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-			case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
-			default:
-				break;
-		}
-
-		std::vector<int16_t> V;
-		switch (Config.Format)
-		{
-			case EChromaFormat::CHROMA_FORMAT_420:
-				for (size_t i = 0; i < FrameSize / 4; i++)
-				{
-					V.push_back((int16_t)SrcBytes[i + (5 / 4) * FrameSize]);
-				}
-				break;
-			case EChromaFormat::CHROMA_FORMAT_422:
-				for (size_t i = 0; i < (size_t)((Config.Width / 2) * Config.Height); i++)
-				{
-					V.push_back((int16_t)SrcBytes[i + (Config.Width * Config.Width) + (3 * Config.Width * Config.Height) + (2 * Config.Height * Config.Height)]);
-				}
-				break;
-			case EChromaFormat::CHROMA_FORMAT_444:
-				for (size_t i = 0; i < FrameSize; i++)
-				{
-					V.push_back((int16_t)SrcBytes[i + 2 * FrameSize]);
-				}
-				break;
-			case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-			case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
-			default:
-				break;
-		}
-
-		vvencYUVPlane YPlane = vvencYUVPlane();
-		YPlane.ptr = Y.data();
-		YPlane.width = Config.Width;
-		YPlane.height = Config.Height;
-		YPlane.stride = Config.Width;
-		YUVInputBuffer.planes[0] = YPlane;
-
-		vvencYUVPlane UPlane = vvencYUVPlane();
-		UPlane.ptr = U.data();
-		UPlane.width = ScaleX(Config.Width, Config.Format);
-		UPlane.height = ScaleY(Config.Height, Config.Format);
-		UPlane.stride = ScaleX(Config.Width, Config.Format);
-		YUVInputBuffer.planes[1] = UPlane;
-
-		vvencYUVPlane VPlane = vvencYUVPlane();
-		VPlane.ptr = V.data();
-		VPlane.width = ScaleX(Config.Width, Config.Format);
-		VPlane.height = ScaleY(Config.Height, Config.Format);
-		VPlane.stride = ScaleX(Config.Width, Config.Format);
-		YUVInputBuffer.planes[2] = VPlane;
-		SequenceNumber++;
 
 		bool Done;
-		Result = vvenc_encode(Encoder, &YUVInputBuffer, &AU, &Done);
+		Result = vvenc_encode(Encoder, YUVInputBufferPtr, &AU, &Done);
 		if (Result != VVENC_OK)
 		{
 			vvenc_YUVBuffer_free_buffer(&YUVInputBuffer);
@@ -208,10 +161,9 @@ EncodeResult* VvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 
 		if (AU.payloadUsedSize > 0 && OnEncodedImageCallback != nullptr)
 		{
-			// TODO (belchy06): Convert access unit into individual NALs
 			std::stringstream Stream;
-
 			Stream.write((const char*)AU.payload, AU.payloadUsedSize);
+
 			bool Continue = true;
 			while (Continue)
 			{

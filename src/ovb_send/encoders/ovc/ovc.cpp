@@ -88,68 +88,30 @@ EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 
 	ovc_picture* Input = new ovc_picture();
 
-	int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
 	uint8_t* SrcBytes = InPictureBytes.data();
-	int		 FrameSize = Config.Width * Config.Height;
+	int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
 	for (int c = 0; c < NumComponents; c++)
 	{
-		const EYuvComponent Component = static_cast<EYuvComponent>(c);
-		if (Component == EYuvComponent::Y)
-		{
-			Input->planes[0].data = new uint8_t[FrameSize]{ 0 };
-			memcpy(Input->planes[0].data, SrcBytes, FrameSize);
-			Input->planes[0].width = Config.Width;
-			Input->planes[0].height = Config.Height;
-		}
-		else if (Component == EYuvComponent::U)
-		{
-			switch (Config.Format)
-			{
-				case EChromaFormat::CHROMA_FORMAT_420:
-					Input->planes[1].data = new uint8_t[FrameSize / 4]{ 0 };
-					memcpy(Input->planes[1].data, SrcBytes + FrameSize, (FrameSize) / 4);
-					break;
-				case EChromaFormat::CHROMA_FORMAT_422:
-					Input->planes[1].data = new uint8_t[(Config.Width / 2) * Config.Height]{ 0 };
-					memcpy(Input->planes[1].data, SrcBytes + FrameSize, (Config.Width / 2) * Config.Height);
-					break;
-				case EChromaFormat::CHROMA_FORMAT_444:
-					Input->planes[1].data = new uint8_t[FrameSize]{ 0 };
-					memcpy(Input->planes[1].data, SrcBytes + FrameSize, FrameSize);
-					break;
-				case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-				case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
-				default:
-					break;
-			}
-			Input->planes[1].width = ScaleX(Config.Width, Config.Format);
-			Input->planes[1].height = ScaleY(Config.Height, Config.Format);
-		}
-		else if (Component == EYuvComponent::V)
-		{
-			switch (Config.Format)
-			{
-				case EChromaFormat::CHROMA_FORMAT_420:
-					Input->planes[2].data = new uint8_t[FrameSize / 4]{ 0 };
-					memcpy(Input->planes[2].data, SrcBytes + (5 / 4) * FrameSize, (FrameSize) / 4);
-					break;
-				case EChromaFormat::CHROMA_FORMAT_422:
-					Input->planes[2].data = new uint8_t[(Config.Width / 2) * Config.Height]{ 0 };
-					memcpy(Input->planes[2].data, SrcBytes + (Config.Width * Config.Width) + (3 * Config.Width * Config.Height) + (2 * Config.Height * Config.Height), (Config.Width / 2) * Config.Height);
-					break;
-				case EChromaFormat::CHROMA_FORMAT_444:
-					Input->planes[2].data = new uint8_t[FrameSize]{ 0 };
-					memcpy(Input->planes[2].data, SrcBytes + 2 * FrameSize, FrameSize);
-					break;
-				case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-				case EChromaFormat::CHROMA_FORMAT_UNDEFINED:
-				default:
-					break;
-			}
+		int Width = c == 0 ? Config.Width : ScaleX(Config.Width, Config.Format);
+		int Height = c == 0 ? Config.Height : ScaleX(Config.Height, Config.Format);
 
-			Input->planes[2].width = ScaleX(Config.Width, Config.Format);
-			Input->planes[2].height = ScaleY(Config.Height, Config.Format);
+		uint8_t* PlanePtr = new uint8_t[Width * Height]{ 0 };
+
+		for (int y = 0; y < Height; y++)
+		{
+			for (int x = 0; x < Width; x++)
+			{
+				PlanePtr[x] = SrcBytes[x];
+			}
+			SrcBytes += Width;
+			PlanePtr += Width;
 		}
+
+		ovc_plane Plane = ovc_plane();
+		Plane.data = PlanePtr - Width * Height;
+		Plane.width = Width;
+		Plane.height = Height;
+		Input->planes[c] = std::move(Plane);
 	}
 
 	ovc_enc_result Result = Encoder->encode(Input, &NalUnits, &NumNalUnits);

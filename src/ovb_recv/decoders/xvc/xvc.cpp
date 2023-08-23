@@ -63,8 +63,41 @@ DecodeResult* XvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 		if (OnDecodedImageCallback != nullptr)
 		{
 			DecodedImage Image;
-			Image.Bytes.resize(DecodedPicture.size);
-			memcpy(Image.Bytes.data(), DecodedPicture.bytes, DecodedPicture.size);
+			if (DecodedPicture.stats.chroma_format != xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_UNDEFINED)
+			{
+				// clang-format off
+				if       (DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_MONOCHROME) {
+					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_MONOCHROME;
+				} else if(DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_420) {
+					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_420;
+				} else if(DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_422) {
+					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_422;
+				} else if(DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_444) {
+					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_444;
+				}
+				// clang-format on
+			}
+
+			Image.Bytes.reserve(DecodedPicture.size);
+			for (size_t c = 0; c < (size_t)(DecodedPicture.stats.chroma_format == XVC_DEC_CHROMA_FORMAT_MONOCHROME ? 1 : 3); c++)
+			{
+				const char* Plane = DecodedPicture.planes[c];
+
+				int Width = c == 0 ? DecodedPicture.stats.width : ScaleX(DecodedPicture.stats.width, Image.Config.Format);
+				int Height = c == 0 ? DecodedPicture.stats.height : ScaleY(DecodedPicture.stats.height, Image.Config.Format);
+
+				std::vector<uint8_t> PlaneVec;
+				PlaneVec.reserve(Width * Height);
+				for (int y = 0; y < Height; y++)
+				{
+					for (int x = 0; x < Width; x++)
+					{
+						PlaneVec.push_back(Plane[x + y * Width]);
+					}
+				}
+				Image.Bytes.insert(Image.Bytes.end(), PlaneVec.begin(), PlaneVec.end());
+			}
+
 			Image.Size = DecodedPicture.size;
 			Image.Config.BitDepth = DecodedPicture.stats.bitdepth;
 			Image.Config.Width = DecodedPicture.stats.width;
@@ -81,24 +114,41 @@ DecodeResult* XvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 				Image.Config.FramerateDenom = 1000;
 			}
 
-			if (DecodedPicture.stats.chroma_format != xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_UNDEFINED)
-			{
-				// clang-format off
-				if       (DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_MONOCHROME) {
-					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_MONOCHROME;
-				} else if(DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_420) {
-					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_420;
-				} else if(DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_422) {
-					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_422;
-				} else if(DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_444) {
-					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_444;
-				}
-				// clang-format on
-			}
-
 			OnDecodedImageCallback->OnDecodeComplete(Image);
 		}
 	}
 
 	return new XvcResult(XVC_DEC_OK);
+}
+
+int XvcDecoder::ScaleX(int InX, EChromaFormat InFormat)
+{
+	switch (InFormat)
+	{
+		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+			return 0;
+		case EChromaFormat::CHROMA_FORMAT_444:
+			return InX;
+		case EChromaFormat::CHROMA_FORMAT_420:
+		case EChromaFormat::CHROMA_FORMAT_422:
+			return InX >> 1;
+		default:
+			return 0;
+	}
+}
+
+int XvcDecoder::ScaleY(int InY, EChromaFormat InFormat)
+{
+	switch (InFormat)
+	{
+		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+			return 0;
+		case EChromaFormat::CHROMA_FORMAT_444:
+		case EChromaFormat::CHROMA_FORMAT_422:
+			return InY;
+		case EChromaFormat::CHROMA_FORMAT_420:
+			return InY >> 1;
+		default:
+			return 0;
+	}
 }

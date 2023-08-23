@@ -161,7 +161,13 @@ DecodeResult* VvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 				vvdecPlane			 Plane = PcFrame->planes[c];
 				std::vector<uint8_t> PlaneVec;
 				PlaneVec.reserve(Plane.width * Plane.height * Plane.bytesPerSample);
-				PlaneVec.assign(reinterpret_cast<uint8_t*>(Plane.ptr), reinterpret_cast<uint8_t*>(Plane.ptr) + (Plane.width * Plane.height * Plane.bytesPerSample));
+				for (size_t y = 0; y < Plane.height; y++)
+				{
+					for (size_t x = 0; x < Plane.width; x++)
+					{
+						PlaneVec.push_back(Plane.ptr[x + y * Plane.width]);
+					}
+				}
 				ImageBytes.insert(ImageBytes.end(), PlaneVec.begin(), PlaneVec.end());
 			}
 
