@@ -6,6 +6,7 @@
 #include "ovb_relay/relay.h"
 
 Relay::Relay()
+	: PacketId(0)
 {
 	Options.SendIP = "";
 	Options.SendPort = 0;
@@ -127,12 +128,11 @@ void Relay::ValidateArgs()
 	SendSock->Init(SendConfig);
 
 	DropConfig DropperConfig;
+	// Values from https://ieeexplore-ieee-org.elibrary.jcu.edu.au/document/6465309 Table 1
 	DropperConfig.DropGood = 0.f;
 	DropperConfig.DropBad = 1.f;
-	DropperConfig.P = 0.09f;
-	DropperConfig.InvP = 1 - 0.09f;
-	DropperConfig.R = 0.4f;
-	DropperConfig.InvR = 1 - 0.4f;
+	DropperConfig.P = 0.05f;
+	DropperConfig.R = 0.5f;
 
 	Drop = Dropper::Create(Options.DropChance, Options.DropType, DropperConfig);
 	Tamper = Tamperer::Create(Options.TamperChance);
@@ -155,6 +155,7 @@ void Relay::PrintSettings()
 
 void Relay::Run()
 {
+	RecvSock->Receive();
 }
 
 void Relay::PrintHelp()
@@ -182,6 +183,7 @@ void Relay::PrintHelp()
 
 void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 {
+	std::cout << "Received packet " << PacketId << std::endl;
 	bool bDrop = false;
 	if (Drop)
 	{
@@ -191,6 +193,8 @@ void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 	if (bDrop)
 	{
 		// Drop this packet
+		std::cout << "[WARNING] Dropping packet " << PacketId << std::endl;
+		PacketId++;
 		return;
 	}
 
@@ -204,4 +208,6 @@ void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 	{
 		SendSock->Send(Data, InSize);
 	}
+
+	PacketId++;
 }

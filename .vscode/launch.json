@@ -40,6 +40,8 @@
                 "0.05", // 5%
                 "--tamper-chance",
                 "0",
+                "--drop-type",
+                "bursty"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

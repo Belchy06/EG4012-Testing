@@ -9,7 +9,7 @@ std::shared_ptr<Dropper> Dropper::Create(float InDropChance, EDropType InDropTyp
 {
 	if (Self == nullptr)
 	{
-		std::shared_ptr<Dropper> Temp(new Dropper(InDropChance, InDropType));
+		std::shared_ptr<Dropper> Temp(new Dropper(InDropChance, InDropType, InConfig));
 		Self = Temp;
 	}
 	return Self;
@@ -21,7 +21,6 @@ Dropper::Dropper(float InDropChance, EDropType InDropType, DropConfig InConfig)
 	, Config(InConfig)
 	, CurrentState(State::GOOD)
 {
-	States = { State::GOOD, State::BAD };
 }
 
 bool Dropper::Drop()
@@ -36,6 +35,27 @@ bool Dropper::Drop()
 	}
 	else
 	{
-		// TODO (belchy06): Markov model
+		std::mt19937 Gen;
+		// Always use same seed for repeatability
+		std::random_device rd;
+		Gen.seed(rd());
+		// Test if we should change state
+		std::bernoulli_distribution Dis(CurrentState == State::GOOD ? Config.P : Config.R);
+		bool						ChangeState = Dis(Gen);
+		// Update state if we're changing
+		if (ChangeState)
+		{
+			if (CurrentState == State::GOOD)
+			{
+				CurrentState = State::BAD;
+			}
+			else
+			{
+				CurrentState = State::GOOD;
+			}
+		}
+		std::uniform_real_distribution<float> UDis(0, 1);
+		// Use drop percentage based on updated state
+		return UDis(Gen) < (CurrentState == State::GOOD ? Config.DropGood : Config.DropBad);
 	}
 }

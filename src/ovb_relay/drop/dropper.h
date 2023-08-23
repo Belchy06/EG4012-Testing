@@ -18,7 +18,7 @@ public:
 	float InvP;
 	// 1- r
 	float InvR;
-}
+};
 
 class Dropper
 {
@@ -44,6 +44,5 @@ private:
 		BAD
 	} State;
 
-	std::array<State, 2> States;
-	State				 CurrentState;
+	State CurrentState;
 };

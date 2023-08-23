@@ -32,4 +32,6 @@ private:
 
 	std::shared_ptr<Dropper>  Drop;
 	std::shared_ptr<Tamperer> Tamper;
+
+	uint64_t PacketId;
 };
