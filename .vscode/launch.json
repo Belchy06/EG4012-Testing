@@ -38,12 +38,12 @@
                 "127.0.0.1",
                 "--send-port",
                 "8888",
-                "--drop-chance",
-                "0.05", // 5%
-                "--tamper-chance",
-                "0",
+                "--tamper-config",
+                    "--prob=0",
                 "--drop-type",
                 "bursty",
+                "--drop-config",
+                    "--hg=0,--hb=1,--p=0.05,--r=0.5",
                 "--log-level",
                 "details"
             ],

@@ -40,7 +40,9 @@ set(OVB_SEND_SOURCES
     "ovb_send/main.cpp")
 
 set(OVB_RELAY_SOURCES
-    "ovb_relay/drop/dropper.cpp"
+    "ovb_relay/drop/bursty/bursty_dropper.cpp"
+    "ovb_relay/drop/continuous/continuous_dropper.cpp"
+    "ovb_relay/drop/dropper_factory.cpp"
     "ovb_relay/tamper/tamperer.cpp"
     "ovb_relay/recv_socket/socket.cpp"
     "ovb_relay/send_socket/socket.cpp"

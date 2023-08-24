@@ -5,6 +5,7 @@
 #include "ovb_common/common.h"
 #include "ovb_common/socket/socket_config.h"
 #include "ovb_relay/relay.h"
+#include "ovb_relay/drop/dropper_factory.h"
 
 #define LogRelay "LogRelay"
 
@@ -14,11 +15,15 @@ Relay::Relay()
 	Options.SendIP = "";
 	Options.SendPort = 0;
 	Options.RecvPort = 0;
-	Options.DropChance = 0.f;
-	Options.TamperChance = 0.f;
 	Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
 	Options.DropType = EDropType::LOSS_BURSTY;
-	Options.Seed = 1337;
+	Options.DropOptions.Seed = Options.TamperOptions.Seed = 1337;
+
+	// Values from https://ieeexplore-ieee-org.elibrary.jcu.edu.au/document/6465309 Table 1
+	Options.DropOptions.DropChanceGood = 0.f;
+	Options.DropOptions.DropChanceBad = 1.f;
+	Options.DropOptions.P = 0.05f;
+	Options.DropOptions.R = 0.5f;
 }
 
 Relay::~Relay()
@@ -53,13 +58,12 @@ void Relay::ParseArgs(int argc, const char* argv[])
             std::stringstream(argv[++i]) >> Options.SendPort;
         } else if(Arg == "--recv-port") {
             std::stringstream(argv[++i]) >> Options.RecvPort;
-        } else if(Arg == "--drop-chance") {
-            std::stringstream(argv[++i]) >> Options.DropChance;
-        } else if(Arg == "--tamper-chance") {
-            std::stringstream(argv[++i]) >> Options.TamperChance;
         } else if(Arg == "--seed") {
-            std::stringstream(argv[++i]) >> Options.Seed;
-        }else if(Arg == "--log-level") {
+            uint16_t Seed;
+            std::stringstream(argv[++i]) >> Seed;
+            Options.DropOptions.Seed = Seed;
+            Options.TamperOptions.Seed = Seed;
+        } else if(Arg == "--log-level") {
             std::string LevelStr(argv[++i]);
             if(LevelStr == "silent") {
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
@@ -88,6 +92,42 @@ void Relay::ParseArgs(int argc, const char* argv[])
             } else {
 				LOG(LogRelay, LOG_SEVERITY_WARNING, "Unknown loss type \"{}\". Defaulting to LOSS_BURSTY", LossStr);
                 Options.DropType = EDropType::LOSS_BURSTY;
+            }
+        } else if(Arg == "--drop-config") {
+            std::string Config(argv[++i]);
+            std::istringstream Stream(Config);
+            std::string Option;
+            while(std::getline(Stream, Option, ','))
+            {
+                std::string Key = Option.substr(0, Option.find("="));
+                std::string Value = Option.substr(Option.find("=") + 1);
+                if(Key == "--hg") {
+                    std::stringstream(Value) >> Options.DropOptions.DropChanceGood;
+                } else if(Key == "--hb") {
+                    std::stringstream(Value) >> Options.DropOptions.DropChanceBad;
+                } else if(Key == "--p") {
+                    std::stringstream(Value) >> Options.DropOptions.P;
+                } else if(Key == "--r") {
+                    std::stringstream(Value) >> Options.DropOptions.R;
+                } else if(Key == "--prob") {
+                    std::stringstream(Value) >> Options.DropOptions.DropChance;
+                } else {
+                    LOG(LogRelay, LOG_SEVERITY_WARNING, "Unknown drop config option \"{}\"", Key);
+                }
+            }
+        } else if(Arg == "--tamper-config") {
+            std::string Config(argv[++i]);
+            std::istringstream Stream(Config);
+            std::string Option;
+            while(std::getline(Stream, Option, ','))
+            {
+                std::string Key = Option.substr(0, Option.find("="));
+                std::string Value = Option.substr(0, Option.find("="));
+                if(Key == "--prob") {
+                    std::stringstream(Value) >> Options.TamperOptions.TamperChance;
+                } else {
+                    LOG(LogRelay, LOG_SEVERITY_WARNING, "Unknown tamper config option \"{}\"", Key);
+                }
             }
         } else {
 			LOG(LogRelay, LOG_SEVERITY_ERROR, "Unknown argument \"{}\"", Arg);
@@ -133,15 +173,8 @@ void Relay::ValidateArgs()
 	SendSock = SendSocket::Create();
 	SendSock->Init(SendConfig);
 
-	DropConfig DropperConfig;
-	// Values from https://ieeexplore-ieee-org.elibrary.jcu.edu.au/document/6465309 Table 1
-	DropperConfig.DropGood = 0.f;
-	DropperConfig.DropBad = 1.f;
-	DropperConfig.P = 0.05f;
-	DropperConfig.R = 0.5f;
-
-	Drop = Dropper::Create(Options.DropChance, Options.DropType, DropperConfig, Options.Seed);
-	Tamper = Tamperer::Create(Options.TamperChance, Options.Seed);
+	Drop = DropperFactory::Create(Options.DropType, Options.DropOptions);
+	Tamper = Tamperer::Create(Options.TamperOptions);
 
 	OvbLogging::Verbosity = Options.LogLevel;
 }
@@ -154,9 +187,19 @@ void Relay::PrintSettings()
 	std::cout << "  --send-ip: " << Options.SendIP << std::endl;
 	std::cout << "  --send-port: " << Options.SendPort << std::endl;
 	std::cout << "  --recv-port: " << Options.RecvPort << std::endl;
-    std::cout << "  --drop-chance: " << Options.DropChance << std::endl;
     std::cout << "  --drop-type: " << DropTypeToString(Options.DropType) << std::endl;
-    std::cout << "  --tamper-chance: " << Options.TamperChance << std::endl;
+    if(Options.DropType == EDropType::LOSS_BURSTY) {
+    std::cout << "  --drop-config: " << std::endl;
+    std::cout << "    --hg: " << Options.DropOptions.DropChanceGood << std::endl;
+    std::cout << "    --hb: " << Options.DropOptions.DropChanceBad << std::endl;
+    std::cout << "    --p: " << Options.DropOptions.P << std::endl;
+    std::cout << "    --r: " << Options.DropOptions.R << std::endl;
+    } else if(Options.DropType == EDropType::LOSS_BURSTY) {
+    std::cout << "  --drop-config: " << std::endl;
+    std::cout << "    --prob: " << Options.DropOptions.DropChance << std::endl;
+    }
+    std::cout << "  --tamper-config: " << std::endl;
+    std::cout << "    --prob: " << Options.TamperOptions.TamperChance << std::endl;
     std::cout << "  --log-level: " << "LOG_SEVERITY_" << SeverityToString(Options.LogLevel) << std::endl;
 	// clang-format on
 }
@@ -173,11 +216,17 @@ void Relay::PrintHelp()
     std::cout << "Usage:" << std::endl;
 	std::cout << "  --send-ip <string> --send-port <int> --recv-port <int> [Optional parameters]" << std::endl << std::endl;
     std::cout << "Optional parameters:"  << std::endl;
-    std::cout << "  --tamper-chance <float> " << std::endl;
-    std::cout << "  --drop-chance   <float> " << std::endl;
     std::cout << "  --drop-type     <string>" << std::endl;
     std::cout << "      \"continuous\"      " << std::endl;
     std::cout << "      \"bursty\"          " << std::endl;
+    std::cout << "  --drop-config   <string>" << std::endl;
+    std::cout << "      --hg=<float>,       " << std::endl;
+    std::cout << "      --hb=<float>,       " << std::endl;
+    std::cout << "      --p=<float>,        " << std::endl;
+    std::cout << "      --r=<float>,        " << std::endl;
+    std::cout << "      --prob=<float>      " << std::endl;
+    std::cout << "  --tamper-config <string>" << std::endl;
+    std::cout << "      --prob=<float>      " << std::endl;
     std::cout << "  --log-level     <string>" << std::endl;
     std::cout << "      \"silent\"          " << std::endl;
     std::cout << "      \"error\"           " << std::endl;

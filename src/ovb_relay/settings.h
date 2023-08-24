@@ -23,6 +23,35 @@ static inline std::string DropTypeToString(EDropType InDropType)
 	}
 }
 
+class DropSettings
+{
+public:
+	// h_g
+	float DropChanceGood;
+	// h_b
+	float DropChanceBad;
+	// p
+	float P;
+	// r
+	float R;
+
+	float DropChance;
+
+	// Random Seed
+	uint16_t Seed;
+
+	bool IsSet = false;
+};
+
+class TamperSettings
+{
+public:
+	float TamperChance;
+
+	// Random Seed
+	uint16_t Seed;
+};
+
 class RelaySettings
 {
 public:
@@ -37,15 +66,12 @@ public:
 	// Logging severity
 	ELogSeverity LogLevel;
 
-	// Drop
-	float DropChance;
-
-	// Tamper
-	float TamperChance;
-
 	// Drop Model
 	EDropType DropType;
 
-	// Random Seed
-	uint16_t Seed;
+	// Drop
+	DropSettings DropOptions;
+
+	// Tamper
+	TamperSettings TamperOptions;
 };
