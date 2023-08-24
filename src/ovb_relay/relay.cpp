@@ -183,7 +183,6 @@ void Relay::PrintHelp()
 
 void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 {
-	std::cout << "Received packet " << PacketId << std::endl;
 	bool bDrop = false;
 	if (Drop)
 	{
@@ -193,7 +192,7 @@ void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 	if (bDrop)
 	{
 		// Drop this packet
-		std::cout << "[WARNING] Dropping packet " << PacketId << std::endl;
+		std::cout << "Dropping packet " << PacketId << std::endl;
 		PacketId++;
 		return;
 	}
@@ -203,11 +202,17 @@ void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 	{
 		Tamper->Tamper(const_cast<uint8_t*>(InData), InSize, &Data);
 	}
+	else
+	{
+		memcpy(Data, InData, InSize);
+	}
 
 	if (SendSock)
 	{
 		SendSock->Send(Data, InSize);
 	}
+
+	std::cout << "Passing packet " << PacketId << std::endl;
 
 	PacketId++;
 }

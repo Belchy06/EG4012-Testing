@@ -59,15 +59,17 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 		// clang-format on
 	}
 
+	Params->repeat_vps = 1;
+
 	Params->wavelet_family = OVC_WAVELET_FAMILY_BIORTHOGONAL;
 	Params->wavelet_config = { .biorthogonal_config = OVC_WAVELET_BIORTHOGONAL_3p9 };
 
 	Params->partition_type = OVC_PARTITION_OFFSET_ZEROTREE;
 	Params->num_levels = 3;
-	Params->num_streams_exp = 0;
+	Params->num_streams_exp = 1;
 
 	Params->spiht = OVC_SPIHT_ENABLE;
-	Params->bits_per_pixel = 0.3f;
+	Params->bits_per_pixel = 8.f;
 
 	Params->entropy_coder = ovc_entropy_coder::OVC_ENTROPY_CODER_ARITHMETIC;
 

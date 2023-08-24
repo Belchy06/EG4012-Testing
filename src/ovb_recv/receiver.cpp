@@ -135,7 +135,7 @@ void Receiver::OnNALReceived(uint8_t* InData, size_t InSize)
 	if (!Result->IsSuccess())
 	{
 		std::cerr << "Error: Decoding \"" << Result->Error() << "\"" << std::endl;
-		std::exit(-1);
+		// std::exit(-1);
 	}
 }
 
@@ -159,12 +159,16 @@ void Receiver::PrintHelp()
     std::cout << "Optional parameters:" << std::endl;
     std::cout << "  --port <int> (default: 8888)" << std::endl;
     std::cout << "  --loglevel <string> " << std::endl;
-    std::cout << "      \"log\"        " << std::endl;
-    std::cout << "      \"verbose\"    " << std::endl;
-    std::cout << "      \"veryverbose\"" << std::endl;
-    std::cout << "  --codec <string>    " << std::endl;
-    std::cout << "      \"VVC\"        " << std::endl;
-    std::cout << "      \"XVC\"        " << std::endl;
-    std::cout << "      \"OVC\"        " << std::endl;
+    std::cout << "      \"silent\"          " << std::endl;
+    std::cout << "      \"error\"           " << std::endl;
+    std::cout << "      \"warning\"         " << std::endl;
+    std::cout << "      \"info\"            " << std::endl;
+    std::cout << "      \"notice\"          " << std::endl;
+    std::cout << "      \"verbose\"         " << std::endl;
+    std::cout << "      \"details\"         " << std::endl;
+    std::cout << "  --codec <string>        " << std::endl;
+    std::cout << "      \"VVC\"             " << std::endl;
+    std::cout << "      \"XVC\"             " << std::endl;
+    std::cout << "      \"OVC\"             " << std::endl;
 	// clang-format on
 }

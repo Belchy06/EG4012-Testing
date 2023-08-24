@@ -31,11 +31,11 @@ void Tamperer::Tamper(uint8_t* InData, size_t InSize, uint8_t** OutData)
 	// Don't tamper with this packet, leave packet in original state
 	if (!bTamper)
 	{
-		memcpy(InData, *OutData, InSize);
+		memcpy(*OutData, InData, InSize);
 		return;
 	}
 
 	// TODO (belchy06): Tamper
 
-	memcpy(InData, *OutData, InSize);
+	memcpy(*OutData, InData, InSize);
 }

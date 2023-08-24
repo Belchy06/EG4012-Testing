@@ -28,7 +28,7 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 
 	uint8_t* PacketData = InPacket.GetPayload();
 	size_t	 PacketSize = InPacket.GetPayloadSize();
-	assert(PacketSize > 2);
+	// assert(PacketSize > 2);
 
 	// clang-format off
 	uint8_t ForbiddenZeroBit =   (PacketData[0] & 0b10000000) >> 7;
@@ -37,8 +37,8 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 	uint8_t NalUnitType =        (PacketData[1] & 0b11111000) >> 3;
 	uint8_t NuhTemporalIdPlus1 = (PacketData[1] & 0b00000111) >> 0;
 	// clang-format on
-	assert(ForbiddenZeroBit == 0);
-	assert(NuhReservedZeroBit == 0);
+	// assert(ForbiddenZeroBit == 0);
+	// assert(NuhReservedZeroBit == 0);
 	LOG(LogVvcDepacketizer, LOG_SEVERITY_DETAILS, "Depacketizing NAL. Type: %d; Size: %d", +NalUnitType, PacketSize);
 
 	if (NalUnitType != 29)

@@ -34,8 +34,8 @@ void OvcDepacketizer::HandlePacket(RTPPacket InPacket)
 	uint8_t ZeroBits    = (PacketData[1] & 0b11000000) >> 6;
 	uint8_t NalUnitType = (PacketData[1] & 0b00111111) >> 0;
 	// clang-format on
-	assert(StartByte == 0);
-	assert(ZeroBits == 0);
+	// assert(StartByte == 0);
+	// assert(ZeroBits == 0);
 
 	LOG(LogOvcDepacketizer, LOG_SEVERITY_DETAILS, "Depacketizing NAL. Type: %d; Size: %d", +NalUnitType, PacketSize);
 
