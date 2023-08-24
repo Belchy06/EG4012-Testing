@@ -83,7 +83,6 @@ std::vector<RTPPacket> XvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 
 		*/
 
-		// Update size to remove the NAL Header as we'll be re-writing this ourself
 		// Fragmentation Unit
 		std::vector<uint8_t> NALHeader;
 		uint8_t				 NalByte;

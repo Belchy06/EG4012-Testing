@@ -67,7 +67,7 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 	Params->num_streams_exp = 0;
 
 	Params->spiht = OVC_SPIHT_ENABLE;
-	Params->bits_per_pixel = 1.f;
+	Params->bits_per_pixel = 0.3f;
 
 	Params->entropy_coder = ovc_entropy_coder::OVC_ENTROPY_CODER_ARITHMETIC;
 

@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "ovb_common/common.h"
 #include "ovb_recv/depacketizer/vvc/vvc_depacketizer.h"
 #include "vvdec/vvdec.h"
