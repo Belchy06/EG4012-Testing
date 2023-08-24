@@ -13,11 +13,13 @@
                 "--file",
                 "${workspaceFolder}\\resources\\carphone_qcif.y4m",
                 "--codec",
-                "VVC",
+                "XVC",
                 "--ip",
                 "127.0.0.1",
                 "--port",
-                "8888"
+                "8888",
+                "--log-level",
+                "details"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -57,7 +59,7 @@
                 "--file",
                 "${workspaceFolder}\\resources\\out.y4m",
                 "--codec",
-                "VVC",
+                "XVC",
                 "--port",
                 "8888"
             ],

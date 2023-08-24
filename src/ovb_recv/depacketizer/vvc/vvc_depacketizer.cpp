@@ -41,9 +41,7 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 	// clang-format on
 	assert(ForbiddenZeroBit == 0);
 	assert(NuhReservedZeroBit == 0);
-	std::cout << "NuhLayerId: " << +NuhLayerId << std::endl;
-	std::cout << "NalUnitType: " << +NalUnitType << std::endl;
-	std::cout << "NuhTemporalIdPlus1: " << +NuhTemporalIdPlus1 << std::endl;
+	LOG(LogVvcDepacketizer, LOG_SEVERITY_DETAILS, "Depacketizing NAL. Type: %d; Size: %d", +NalUnitType, PacketSize);
 
 	if (NalUnitType != 29)
 	{
@@ -57,8 +55,6 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 
 		std::vector<uint8_t> ReconstructedNalBytes;
 		// Start sequence
-		ReconstructedNalBytes.push_back(0x0);
-		ReconstructedNalBytes.push_back(0x0);
 		// clang-format off
 		if (NalUnitType == VVC_NAL_UNIT_DCI || 
             NalUnitType == VVC_NAL_UNIT_VPS || 
@@ -70,6 +66,8 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 			ReconstructedNalBytes.push_back(0x0);
 		}
 		// clang-format on
+		ReconstructedNalBytes.push_back(0x0);
+		ReconstructedNalBytes.push_back(0x0);
 		ReconstructedNalBytes.push_back(0x1);
 
 		for (size_t i = 0; i < PacketSize; i++)
@@ -141,11 +139,6 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 
 			Fragments.clear();
 		}
-	}
-	else
-	{
-		unimplemented();
-		return;
 	}
 }
 

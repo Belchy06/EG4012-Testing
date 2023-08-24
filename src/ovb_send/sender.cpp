@@ -87,6 +87,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
 		// clang-format on
 	}
 
+	OvbLogging::Verbosity = Options.LogLevel;
+
 	RtpSender->Init(Config);
 }
 

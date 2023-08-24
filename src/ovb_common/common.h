@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <format>
+#include <iostream>
 #include <string>
 
 #ifndef unimplemented

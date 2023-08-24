@@ -4,6 +4,8 @@
 #include "ovb_common/common.h"
 #include "ovb_send/packetizer/vvc/vvc_packetizer.h"
 
+#define LogVvcPacketizer "LogVvcPacketizer"
+
 std::vector<RTPPacket> VvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 {
 	assert(InSize > 0);
@@ -35,16 +37,12 @@ std::vector<RTPPacket> VvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 	// clang-format on
 	assert(ForbiddenZeroBit == 0);
 	assert(NuhReservedZeroBit == 0);
-	std::cout << "NuhLayerId: " << +NuhLayerId << std::endl;
-	std::cout << "NalUnitType: " << +NalUnitType << std::endl;
-	std::cout << "NuhTemporalIdPlus1: " << +NuhTemporalIdPlus1 << std::endl;
+	LOG(LogVvcPacketizer, LOG_SEVERITY_DETAILS, "Packetizing NAL. Type: %d; Size: %d", +NalUnitType, InSize);
 
 	if (InSize < RTP_PAYLOAD_SIZE)
 	{
 		// Single NAL (4.3.1 https://www.rfc-editor.org/rfc/rfc9328.pdf)
 		// TODO (belchy06): Aggregation Packets
-
-		// TODO (belchy06): Removing the 0x0 0x0 0x1 or 0x0 0x0 0x0 0x1 may cause decoder issues. Check
 		RTPPacket Packet = RTPPacket(10, (size_t)SequenceNumber++, 0, InData, InSize, false);
 		// TODO (belchy06): RTP Timestamp
 		Packets.push_back(Packet);
@@ -115,3 +113,5 @@ std::vector<RTPPacket> VvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 
 	return Packets;
 }
+
+#undef LogVvcPacketizer
