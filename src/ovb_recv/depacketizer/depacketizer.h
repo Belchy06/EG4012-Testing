@@ -9,20 +9,19 @@
 class Depacketizer
 {
 public:
-	static std::shared_ptr<Depacketizer> Create();
+	Depacketizer()
+		: PrevTimestamp(0), PrevSequenceNumber(0)
+	{
+	}
 
-	void HandlePacket(RTPPacket InPacket);
-	void RegiseterDepacketizerListener(IDepacketizerListener* InDepacketizerListener);
+	void RegiseterDepacketizerListener(IDepacketizerListener* InDepacketizerListener) { DepacketizerListener = InDepacketizerListener; }
 
-private:
-	Depacketizer();
+	virtual void HandlePacket(RTPPacket InPacket) = 0;
 
-private:
-	int					   prevMarker;
-	uint32_t			   prevTimestamp;
-	uint16_t			   prevSequenceNumber;
-	std::vector<RTPPacket> Packets;
+protected:
+	uint32_t			   PrevTimestamp;
+	uint16_t			   PrevSequenceNumber;
+	std::vector<RTPPacket> Fragments;
 
-	static std::shared_ptr<Depacketizer> Self;
-	IDepacketizerListener*				 DepacketizerListener;
+	IDepacketizerListener* DepacketizerListener;
 };

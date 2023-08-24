@@ -149,7 +149,7 @@ void Relay::PrintSettings()
     std::cout << "  --drop-chance: " << Options.DropChance << std::endl;
     std::cout << "  --drop-type: " << DropTypeToString(Options.DropType) << std::endl;
     std::cout << "  --tamper-chance: " << Options.TamperChance << std::endl;
-    std::cout << "  --log-level: " << SeverityToString(Options.LogLevel) << std::endl;
+    std::cout << "  --log-level: " << "LOG_SEVERITY_" << SeverityToString(Options.LogLevel) << std::endl;
 	// clang-format on
 }
 

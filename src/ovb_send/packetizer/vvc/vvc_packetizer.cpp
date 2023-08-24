@@ -72,10 +72,11 @@ std::vector<RTPPacket> VvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 
 		size_t	SizePacketized = 0;
 		uint8_t bIsFirst = 1;
+		size_t	MaxSize = (size_t)RTP_PAYLOAD_SIZE - 3;
 		while (SizePacketized < InSize)
 		{
-			size_t	PacketSize = std::min((size_t)RTP_PAYLOAD_SIZE, InSize - SizePacketized);
-			uint8_t bIsLast = PacketSize < (size_t)RTP_PAYLOAD_SIZE;
+			size_t	PacketSize = std::min(MaxSize, InSize - SizePacketized);
+			uint8_t bIsLast = PacketSize < MaxSize;
 
 			std::vector<uint8_t> FUHeader;
 			// clang-format off
@@ -88,7 +89,19 @@ std::vector<RTPPacket> VvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
             FUHeader.push_back(FUHeaderByte);
 			// clang-format on
 
-			RTPPacket Packet = RTPPacket(10, (size_t)SequenceNumber++, 0, InData + SizePacketized, PacketSize, PacketSize < (size_t)RTP_PAYLOAD_SIZE);
+			std::vector<uint8_t> FUPayload;
+			for (size_t i = 0; i < PacketSize; i++)
+			{
+				FUPayload.push_back((InData + SizePacketized)[i]);
+			}
+
+			std::vector<uint8_t> RTPPayload;
+			RTPPayload.reserve(NALHeader.size() + FUHeader.size() + FUPayload.size());
+			RTPPayload.insert(RTPPayload.end(), NALHeader.begin(), NALHeader.end());
+			RTPPayload.insert(RTPPayload.end(), FUHeader.begin(), FUHeader.end());
+			RTPPayload.insert(RTPPayload.end(), FUPayload.begin(), FUPayload.end());
+
+			RTPPacket Packet = RTPPacket(10, (size_t)SequenceNumber++, 0, RTPPayload.data(), RTPPayload.size(), false);
 			// TODO (belchy06): RTP Timestamp
 			Packets.push_back(Packet);
 

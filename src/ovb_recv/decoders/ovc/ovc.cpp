@@ -10,7 +10,7 @@
 #include "ovc_common/nal.h"
 
 OvcDecoder::OvcDecoder()
-	: Params(nullptr), Decoder(nullptr)
+	: Params(new ovc_dec_config()), Decoder(nullptr)
 {
 }
 
@@ -38,7 +38,9 @@ DecodeResult* OvcDecoder::Init(DecoderConfig& InConfig)
 		std::exit(-1);
 	}
 
-	return new OvcResult(Decoder->init());
+	Params->log_verbosity = static_cast<ovc_verbosity>(InConfig.LogLevel);
+
+	return new OvcResult(Decoder->init(Params));
 }
 
 DecodeResult* OvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)

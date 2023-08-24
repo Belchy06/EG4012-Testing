@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <format>
 #include <string>
 
 #ifndef unimplemented
@@ -83,20 +84,41 @@ static inline std::string SeverityToString(ELogSeverity InSeverity)
 	switch (InSeverity)
 	{
 		case LOG_SEVERITY_SILENT:
-			return "LOG_SEVERITY_SILENT";
+			return "SILENT";
 		case LOG_SEVERITY_ERROR:
-			return "LOG_SEVERITY_ERROR";
+			return "ERROR";
 		case LOG_SEVERITY_WARNING:
-			return "LOG_SEVERITY_WARNING";
+			return "WARNING";
 		case LOG_SEVERITY_INFO:
-			return "LOG_SEVERITY_INFO";
+			return "INFO";
 		case LOG_SEVERITY_NOTICE:
-			return "LOG_SEVERITY_NOTICE";
+			return "NOTICE";
 		case LOG_SEVERITY_VERBOSE:
-			return "LOG_SEVERITY_VERBOSE";
+			return "VERBOSE";
 		case LOG_SEVERITY_DETAILS:
-			return "LOG_SEVERITY_DETAILS";
+			return "DETAILS";
 		default:
 			return "UNKNOWN";
 	}
 }
+
+namespace OvbLogging
+{
+	static ELogSeverity Verbosity;
+}
+
+#define LOG(InCategory, InVerbosity, InFormat, ...)                                                                                              \
+	{                                                                                                                                            \
+		if (InVerbosity <= OvbLogging::Verbosity)                                                                                                \
+		{                                                                                                                                        \
+			std::cout << "[ " << SeverityToString(InVerbosity) << " ]" << InCategory << ": " << std::format(InFormat, __VA_ARGS__) << std::endl; \
+		}                                                                                                                                        \
+	}
+
+#define LOG_ERROR(InCategory, InVerbosity, InFormat, ...)                                                                                        \
+	{                                                                                                                                            \
+		if (InVerbosity <= OvbLogging::Verbosity)                                                                                                \
+		{                                                                                                                                        \
+			std::cerr << "[ " << SeverityToString(InVerbosity) << " ]" << InCategory << ": " << std::format(InFormat, __VA_ARGS__) << std::endl; \
+		}                                                                                                                                        \
+	}

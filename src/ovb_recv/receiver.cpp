@@ -6,11 +6,11 @@
 #include <iostream>
 
 #include "ovb_recv/decoders/decoder_factory.h"
+#include "ovb_recv/depacketizer/depacketizer_factory.h"
 #include "receiver.h"
 
 Receiver::Receiver()
 	: RtpReceiver(RTPReceiver::Create())
-	, Depacketizer(Depacketizer::Create())
 	, Writer(nullptr)
 {
 }
@@ -83,6 +83,8 @@ void Receiver::ParseArgs(int argc, const char* argv[])
 
 	RtpReceiver->Init(Config);
 	RtpReceiver->RegisterRTPPacketListener(this);
+
+	Depacketizer = DepacketizerFactory::Create(Options.Codec);
 	Depacketizer->RegiseterDepacketizerListener(this);
 }
 
