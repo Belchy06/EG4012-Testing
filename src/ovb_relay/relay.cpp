@@ -2,8 +2,11 @@
 #include <string>
 #include <sstream>
 
+#include "ovb_common/common.h"
 #include "ovb_common/socket/socket_config.h"
 #include "ovb_relay/relay.h"
+
+#define LogRelay "LogRelay"
 
 Relay::Relay()
 	: PacketId(0)
@@ -25,7 +28,7 @@ void Relay::ParseArgs(int argc, const char* argv[])
 {
 	if (argc <= 1)
 	{
-		std::cerr << "Error: No args specified" << std::endl;
+		LOG(LogRelay, LOG_SEVERITY_ERROR, "No args specified");
 		PrintHelp();
 		std::exit(1);
 	}
@@ -33,27 +36,27 @@ void Relay::ParseArgs(int argc, const char* argv[])
 	// Parse command line
 	for (int i = 1; i < argc; i++)
 	{
-		std::string arg(argv[i]);
+		std::string Arg(argv[i]);
 
 		// clang-format off
 		if(argc - 1 == i) {
-            std::cerr << "Error: Missing argument value: " << arg << std::endl;
+			LOG(LogRelay, LOG_SEVERITY_ERROR, "Missing argument value: {}", Arg);
             PrintHelp();
 			std::exit(1);
-        } else if (arg == "-h") {
+        } else if (Arg == "-h") {
 			PrintHelp();
 			std::exit(1);
-		} else if(arg == "--send-ip") {
+		} else if(Arg == "--send-ip") {
             std::stringstream(argv[++i]) >> Options.SendIP;
-        } else if(arg == "--send-port") {
+        } else if(Arg == "--send-port") {
             std::stringstream(argv[++i]) >> Options.SendPort;
-        } else if(arg == "--recv-port") {
+        } else if(Arg == "--recv-port") {
             std::stringstream(argv[++i]) >> Options.RecvPort;
-        } else if(arg == "--drop-chance") {
+        } else if(Arg == "--drop-chance") {
             std::stringstream(argv[++i]) >> Options.DropChance;
-        } else if(arg == "--tamper-chance") {
+        } else if(Arg == "--tamper-chance") {
             std::stringstream(argv[++i]) >> Options.TamperChance;
-        } else if(arg == "--log-level") {
+        } else if(Arg == "--log-level") {
             std::string LevelStr(argv[++i]);
             if(LevelStr == "silent") {
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
@@ -70,21 +73,21 @@ void Relay::ParseArgs(int argc, const char* argv[])
             } else if(LevelStr == "details") {
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_DETAILS;
             } else {
-                std::cerr << "Warning: Unknown log level " << LevelStr << "\n" << "Warning: Default to SEVERITY_INFO" << std::endl;
+				LOG(LogRelay, LOG_SEVERITY_WARNING, "Unknown log level \"{}\". Defaulting to LOG_SEVERITY_INFO", LevelStr);
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
             }
-        } else if(arg == "--drop-type") {
+        } else if(Arg == "--drop-type") {
             std::string LossStr(argv[++i]);
             if(LossStr == "continuous") {
                 Options.DropType = EDropType::LOSS_CONTINUOUS;
             } else if(LossStr == "bursty") {
                 Options.DropType = EDropType::LOSS_BURSTY;
             } else {
-                std::cerr << "Warning: Unknown loss type " << LossStr << "\n" << "Warning: Default to LOSS_BURSTY" << std::endl;
+				LOG(LogRelay, LOG_SEVERITY_WARNING, "Unknown loss type \"{}\". Defaulting to LOSS_BURSTY", LossStr);
                 Options.DropType = EDropType::LOSS_BURSTY;
             }
         } else {
-            std::cerr << "Error: Unknown argument: " << arg << std::endl;
+			LOG(LogRelay, LOG_SEVERITY_ERROR, "Unknown argument \"{}\"", Arg);
             PrintHelp();
             std::exit(1);
         }
@@ -96,21 +99,21 @@ void Relay::ValidateArgs()
 {
 	if (Options.SendIP.empty())
 	{
-		std::cerr << "Error: Missing \"--send-ip\" argument" << std::endl;
+		LOG(LogRelay, LOG_SEVERITY_ERROR, "Missing \"--send-ip\" argument");
 		PrintHelp();
 		std::exit(-1);
 	}
 
 	if (Options.SendPort == 0)
 	{
-		std::cerr << "Error: Missing \"--send-port\" argument" << std::endl;
+		LOG(LogRelay, LOG_SEVERITY_ERROR, "Missing \"--send-port\" argument");
 		PrintHelp();
 		std::exit(-1);
 	}
 
 	if (Options.RecvPort == 0)
 	{
-		std::cerr << "Error: Missing \"--recv-port\" argument" << std::endl;
+		LOG(LogRelay, LOG_SEVERITY_ERROR, "Missing \"--recv-port\" argument");
 		PrintHelp();
 		std::exit(-1);
 	}
@@ -136,6 +139,8 @@ void Relay::ValidateArgs()
 
 	Drop = Dropper::Create(Options.DropChance, Options.DropType, DropperConfig);
 	Tamper = Tamperer::Create(Options.TamperChance);
+
+	OvbLogging::Verbosity = Options.LogLevel;
 }
 
 void Relay::PrintSettings()
@@ -216,3 +221,5 @@ void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 
 	PacketId++;
 }
+
+#undef LogRelay

@@ -6,6 +6,8 @@
 
 #define MAX_CODED_PICTURE_SIZE 800000
 
+#define LogVvcDecoder "LogVvcDecoder"
+
 void msgFnc(void*, int level, const char* fmt, va_list args)
 {
 	std::vfprintf(stdout, fmt, args);
@@ -62,7 +64,7 @@ DecodeResult* VvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 	bool		 MultipleSlices = false;
 	vvdecNalType NalType = vvdec_get_nal_unit_type(AccessUnit);
 	std::string	 NalStr = GetNalUnitTypeAsString(NalType);
-	std::cout << "read nal " << NalStr << " size " << AccessUnit->payloadUsedSize << std::endl;
+	LOG(LogVvcDecoder, LOG_SEVERITY_DETAILS, "Read Nal {}. Size {}", NalStr, AccessUnit->payloadUsedSize);
 
 	if (NalType == VVC_NAL_UNIT_PH)
 	{
@@ -117,11 +119,10 @@ DecodeResult* VvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 	}
 	else if (Result != VVDEC_OK)
 	{
-		std::string Err = vvdec_get_last_error(Decoder);
-		std::cerr << "Error: " << Err << std::endl;
+		LOG(LogVvcDecoder, LOG_SEVERITY_ERROR, "{}", vvdec_get_last_error(Decoder));
 		if (std::string AdditionErr = vvdec_get_last_additional_error(Decoder); !AdditionErr.empty())
 		{
-			std::cerr << "Info: " << AdditionErr << std::endl;
+			LOG(LogVvcDecoder, LOG_SEVERITY_DETAILS, "{}", AdditionErr);
 		}
 		return new VvcResult(Result);
 	}
@@ -330,5 +331,7 @@ int VvcDecoder::ScaleY(int InY, EChromaFormat InFormat)
 			return 0;
 	}
 }
+
+#undef LogVvcDecoder
 
 #undef MAX_CODED_PICTURE_SIZE

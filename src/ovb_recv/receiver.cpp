@@ -5,9 +5,12 @@
 #include <string>
 #include <iostream>
 
+#include "ovb_common/common.h"
 #include "ovb_recv/decoders/decoder_factory.h"
 #include "ovb_recv/depacketizer/depacketizer_factory.h"
-#include "receiver.h"
+#include "ovb_recv/receiver.h"
+
+#define LogReceiver "LogReceiver"
 
 Receiver::Receiver()
 	: RtpReceiver(RTPReceiver::Create())
@@ -19,30 +22,29 @@ void Receiver::ParseArgs(int argc, const char* argv[])
 {
 	if (argc <= 1)
 	{
-		std::cerr << "Error: No args specified" << std::endl;
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "No args specified");
 		PrintHelp();
 		std::exit(1);
 	}
 
-	SocketConfig Config;
 	// Parse command line
 	for (int i = 1; i < argc; i++)
 	{
-		std::string arg(argv[i]);
+		std::string Arg(argv[i]);
 
 		// clang-format off
 		if(argc - 1 == i) {
-            std::cerr << "Error: Missing argument value: " << arg << std::endl;
+			LOG(LogReceiver, LOG_SEVERITY_ERROR, "Missing argument value");
             PrintHelp();
 			std::exit(1);
-        } else if(arg == "-h") {
+        } else if(Arg == "-h") {
 			PrintHelp();
 			std::exit(1);
-        } else if(arg == "--port") {
-            Config.Port = atoi(argv[++i]);
-        } else if(arg == "--file") {
-            Options.File = std::string(argv[++i]);
-        } else if(arg == "--codec") {
+        } else if(Arg == "--port") {
+			std::stringstream(argv[++i]) >> Options.Port;
+        } else if(Arg == "--file") {
+            std::stringstream(argv[++i]) >> Options.File;
+        } else if(Arg == "--codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "VVC") {
                 Options.Codec = ECodec::CODEC_VVC;
@@ -53,7 +55,7 @@ void Receiver::ParseArgs(int argc, const char* argv[])
             } else {
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }
-        } else if(arg == "--log-level") {
+        } else if(Arg == "--log-level") {
             std::string LevelStr(argv[++i]);
             if(LevelStr == "silent") {
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
@@ -70,17 +72,21 @@ void Receiver::ParseArgs(int argc, const char* argv[])
             } else if(LevelStr == "details") {
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_DETAILS;
             } else {
-                std::cerr << "Warning: Unknown log level " << LevelStr << "\n" << "Warning: Default to SEVERITY_INFO" << std::endl;
+				LOG(LogReceiver, LOG_SEVERITY_WARNING, "Unknown log level \"{}\". Default to SEVERITY_INFO", LevelStr);
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
             }
         } else {
-            std::cerr << "Error: Unknown argument: " << arg << std::endl;
+			LOG(LogReceiver, LOG_SEVERITY_WARNING, "Unknown argument \"{}\"", Arg);
             PrintHelp();
             std::exit(1);
         }
 		// clang-format on
 	}
 
+	OvbLogging::Verbosity = Options.LogLevel;
+
+	SocketConfig Config;
+	Config.Port = Options.Port;
 	RtpReceiver->Init(Config);
 	RtpReceiver->RegisterRTPPacketListener(this);
 
@@ -92,7 +98,7 @@ void Receiver::ValidateArgs()
 {
 	if (Options.File.empty())
 	{
-		std::cerr << "Error: Missing input file argument" << std::endl;
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Missing input file argument");
 		std::exit(-1);
 	}
 
@@ -100,7 +106,7 @@ void Receiver::ValidateArgs()
 	FileStream.open(Options.File, std::ios_base::binary);
 	if (!FileStream)
 	{
-		std::cerr << "Error: Failed to open file" << Options.File << std::endl;
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to open file {}", Options.File);
 		std::exit(-1);
 	}
 	OutputStream = &FileStream;
@@ -115,7 +121,7 @@ void Receiver::Run()
 	DecodeResult* Result = WrappedDecoder->Init(Config);
 	if (!Result->IsSuccess())
 	{
-		std::cerr << "Error: Initializing config" << std::endl;
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Error initializing config");
 		std::exit(-1);
 	}
 
@@ -134,17 +140,13 @@ void Receiver::OnNALReceived(uint8_t* InData, size_t InSize)
 	DecodeResult* Result = WrappedDecoder->Decode(InData, InSize);
 	if (!Result->IsSuccess())
 	{
-		std::cerr << "Error: Decoding \"" << Result->Error() << "\"" << std::endl;
-		// std::exit(-1);
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Decoding: \"{}\"", Result->Error());
 	}
 }
 
 void Receiver::OnDecodeComplete(DecodedImage InImage)
 {
-	std::cout << "====================" << std::endl;
-	std::cout << "  OnDecodeComplete  " << std::endl;
-	std::cout << "====================" << std::endl;
-	std::cout << "Size: " << InImage.Size << std::endl;
+	LOG(LogReceiver, LOG_SEVERITY_NOTICE, "OnDecodeComplete: Size {}", InImage.Size);
 
 	Writer.WriteImageHeader(InImage);
 	Writer.WriteImage(InImage);
@@ -172,3 +174,17 @@ void Receiver::PrintHelp()
     std::cout << "      \"OVC\"             " << std::endl;
 	// clang-format on
 }
+
+void Receiver::PrintSettings()
+{
+	// clang-format off
+	std::cout << std::endl;
+    std::cout << "Running Receiver:" << std::endl;
+	std::cout << "  --file: " << Options.File << std::endl;
+	std::cout << "  --port: " << Options.Port << std::endl;
+    std::cout << "  --codec: " << CodecToString(Options.Codec) << std::endl;
+    std::cout << "  --log-level: " << "LOG_SEVERITY_" << SeverityToString(Options.LogLevel) << std::endl;
+	// clang-format on
+}
+
+#undef LogReceiver

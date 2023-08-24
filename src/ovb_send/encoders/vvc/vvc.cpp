@@ -1,6 +1,9 @@
+#include "ovb_common/common.h"
 #include "ovb_send/encoders/vvc/vvc.h"
 
 #define MAX_CODED_PICTURE_SIZE 800000
+
+#define LogVvcEncoder "LogVvcEncoder"
 
 vvencMsgLevel g_verbosity = VVENC_DETAILS;
 
@@ -80,7 +83,7 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 
 	vvenc_get_config(Encoder, Params);
 
-	std::cout << vvenc_get_config_as_string(Params, Params->m_verbosity) << std::endl;
+	LOG(LogVvcEncoder, LOG_SEVERITY_DETAILS, "{}", vvenc_get_config_as_string(Params, Params->m_verbosity));
 
 	return new VvcResult(VVENC_OK);
 }
@@ -256,14 +259,13 @@ int VvcEncoder::ReadNalFromStream(std::stringstream* InStream, vvencAccessUnit* 
 	}
 	else
 	{
-		std::cerr << "ERR: readBitstreamFromFile: Error in next start code search" << std::endl;
+		LOG(LogVvcEncoder, LOG_SEVERITY_ERROR, "readBitstreamFromFile: Error in next start code search");
 	}
 
 	InStream->seekg(Rewind, InStream->cur);
 	if (InStream->bad() || InStream->fail())
 	{
-
-		std::cerr << "ERR: readBitstreamFromFile: Cannot seek " << Rewind << " in the bit stream file" << std::endl;
+		LOG(LogVvcEncoder, LOG_SEVERITY_ERROR, "readBitstreamFromFile: Cannot seek {} in the bit stream file", Rewind);
 		return -1;
 	}
 
@@ -295,5 +297,7 @@ int VvcEncoder::RetrieveNalStartCode(unsigned char* pB, int InZerosInStartcode)
 
 	return info;
 }
+
+#undef LogVvcEncoder
 
 #undef MAX_CODED_PICTURE_SIZE

@@ -7,7 +7,9 @@
 #include "ovb_common/common.h"
 #include "ovb_send/encoders/encoder.h"
 #include "ovb_send/encoders/encoder_config.h"
-#include "sender.h"
+#include "ovb_send/sender.h"
+
+#define LogSender "LogSender"
 
 Sender::Sender()
 	: InputStream(nullptr)
@@ -28,7 +30,6 @@ void Sender::ParseArgs(int argc, const char* argv[])
 		std::exit(1);
 	}
 
-	SocketConfig Config;
 	// Parse command line
 	for (int i = 1; i < argc; i++)
 	{
@@ -43,9 +44,9 @@ void Sender::ParseArgs(int argc, const char* argv[])
 			PrintHelp();
 			std::exit(1);
 		} else if(arg == "--ip") {
-            std::stringstream(argv[++i]) >> Config.IP;
+            std::stringstream(argv[++i]) >> Options.IP;
         } else if(arg == "--port") {
-            Config.Port = atoi(argv[++i]);
+            std::stringstream(argv[++i]) >> Options.Port;
         } else if(arg == "--codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "VVC") {
@@ -58,7 +59,7 @@ void Sender::ParseArgs(int argc, const char* argv[])
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }
         } else if(arg == "--file") {
-            Options.File = std::string(argv[++i]);
+            std::stringstream(argv[++i]) >> Options.File;
         } else if(arg == "--log-level") {
             std::string LevelStr(argv[++i]);
             if(LevelStr == "silent") {
@@ -89,6 +90,9 @@ void Sender::ParseArgs(int argc, const char* argv[])
 
 	OvbLogging::Verbosity = Options.LogLevel;
 
+	SocketConfig Config;
+	Config.IP = Options.IP;
+	Config.Port = Options.Port;
 	RtpSender->Init(Config);
 }
 
@@ -96,14 +100,14 @@ void Sender::ValidateArgs()
 {
 	if (Options.File.empty())
 	{
-		std::cerr << "Error: Missing input file argument" << std::endl;
+		LOG(LogSender, LOG_SEVERITY_ERROR, "Missing input file argument");
 		std::exit(-1);
 	}
 
 	FileStream.open(Options.File, std::ios_base::binary);
 	if (!FileStream)
 	{
-		std::cerr << "Error: Failed to open file" << Options.File << std::endl;
+		LOG(LogSender, LOG_SEVERITY_ERROR, "Failed to open file");
 		std::exit(-1);
 	}
 	InputStream = &FileStream;
@@ -114,13 +118,13 @@ void Sender::ValidateArgs()
 	Y4mReader Reader(InputStream);
 	if (!Reader.Read(PicFormat, StartSkip, PictureSkip))
 	{
-		std::cout << "Reading unsuccessful" << std::endl;
+		LOG(LogSender, LOG_SEVERITY_ERROR, "Reading unsuccessful");
 		std::exit(-1);
 	}
 
 	if (Options.Codec == ECodec::CODEC_UNDEFINED)
 	{
-		std::cerr << "Error: Invalid codec" << std::endl;
+		LOG(LogSender, LOG_SEVERITY_ERROR, "Invalid codec");
 		std::exit(-1);
 	}
 }
@@ -129,8 +133,7 @@ void Sender::Run()
 {
 	do
 	{
-		std::cout << '\n'
-				  << "Press a key to continue...";
+		LOG(LogSender, LOG_SEVERITY_SILENT, "\nPress a key to continue...");
 	}
 	while (std::cin.get() != '\n');
 
@@ -193,13 +196,9 @@ void Sender::Run()
 
 void Sender::OnEncodeComplete(uint8_t* InData, size_t InSize)
 {
-	// std::cout << "====================" << std::endl;
-	// std::cout << "  OnEncodeComplete  " << std::endl;
-	// std::cout << "====================" << std::endl;
-	// std::cout << "Size: " << InSize << std::endl;
+	LOG(LogSender, LOG_SEVERITY_NOTICE, "OnEncodeComplete: Size {}", InSize);
 
 	std::vector<RTPPacket> Packets = Packetizer->Packetize(InData, InSize);
-
 	RtpSender->Send(Packets);
 }
 
@@ -223,12 +222,31 @@ void Sender::PrintHelp()
     std::cout << "  --ip <string>       (default: \"127.0.0.1\")" << std::endl;
     std::cout << "  --port <int>        (default: 8888)" << std::endl;
     std::cout << "  --log-level <string> " << std::endl;
-    std::cout << "      \"log\"        " << std::endl;
-    std::cout << "      \"verbose\"    " << std::endl;
-    std::cout << "      \"veryverbose\"" << std::endl;
-    std::cout << "  --codec <string>    " << std::endl;
-    std::cout << "      \"VVC\"        " << std::endl;
-    std::cout << "      \"XVC\"        " << std::endl;
-    std::cout << "      \"OVC\"        " << std::endl;
+    std::cout << "      \"silent\"          " << std::endl;
+    std::cout << "      \"error\"           " << std::endl;
+    std::cout << "      \"warning\"         " << std::endl;
+    std::cout << "      \"info\"            " << std::endl;
+    std::cout << "      \"notice\"          " << std::endl;
+    std::cout << "      \"verbose\"         " << std::endl;
+    std::cout << "      \"details\"         " << std::endl;
+    std::cout << "  --codec <string>        " << std::endl;
+    std::cout << "      \"VVC\"             " << std::endl;
+    std::cout << "      \"XVC\"             " << std::endl;
+    std::cout << "      \"OVC\"             " << std::endl;
 	// clang-format on
 }
+
+void Sender::PrintSettings()
+{
+	// clang-format off
+	std::cout << std::endl;
+    std::cout << "Running Sender:" << std::endl;
+	std::cout << "  --file: " << Options.File << std::endl;
+	std::cout << "  --ip: " << Options.IP << std::endl;
+	std::cout << "  --port: " << Options.Port << std::endl;
+    std::cout << "  --codec: " << CodecToString(Options.Codec) << std::endl;
+    std::cout << "  --log-level: " << "LOG_SEVERITY_" << SeverityToString(Options.LogLevel) << std::endl;
+	// clang-format on
+}
+
+#undef LogSender

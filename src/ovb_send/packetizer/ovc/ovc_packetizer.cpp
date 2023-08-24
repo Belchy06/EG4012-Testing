@@ -20,7 +20,7 @@ std::vector<RTPPacket> OvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 	// clang-format on
 	assert((StartByte & ZeroBits) == 0);
 
-	LOG(LogOvcPacketizer, LOG_SEVERITY_DETAILS, "Packetizing NAL. Type: %d; Size: %d", +NalUnitType, InSize);
+	LOG(LogOvcPacketizer, LOG_SEVERITY_DETAILS, "Packetizing NAL. Type: {}; Size: {}", +NalUnitType, InSize);
 
 	if (InSize < RTP_PAYLOAD_SIZE)
 	{

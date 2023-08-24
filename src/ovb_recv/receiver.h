@@ -21,6 +21,7 @@ public:
 
 	void ParseArgs(int argc, const char* argv[]);
 	void ValidateArgs();
+	void PrintSettings();
 	void Run();
 
 private:

@@ -12,6 +12,8 @@
 #include "ovc_common/picture.h"
 #include "ovc_result.h"
 
+#define LogOvcEncoder "LogOvcEncoder"
+
 OvcEncoder::OvcEncoder()
 	: Params(new ovc_enc_config()), Encoder(nullptr)
 {
@@ -69,14 +71,14 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 	Params->num_streams_exp = 1;
 
 	Params->spiht = OVC_SPIHT_ENABLE;
-	Params->bits_per_pixel = 8.f;
+	Params->bits_per_pixel = 1.f;
 
 	Params->entropy_coder = ovc_entropy_coder::OVC_ENTROPY_CODER_ARITHMETIC;
 
 	Encoder = new ovc_encoder();
 	if (!Encoder)
 	{
-		std::cerr << "Error: Failed to allocate encoder" << std::endl;
+		LOG(LogOvcEncoder, LOG_SEVERITY_ERROR, "Failed to allocate encoder");
 		std::exit(-1);
 	}
 
@@ -130,3 +132,5 @@ EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 
 	return new OvcResult(Result);
 }
+
+#undef LogOvcEncoder

@@ -1,6 +1,9 @@
 #include <iostream>
 
-#include "socket.h"
+#include "ovb_common/common.h"
+#include "ovb_send/socket/socket.h"
+
+#define LogSendSocket "LogSendSocket"
 
 std::shared_ptr<Socket> Socket::Self = nullptr;
 
@@ -32,14 +35,14 @@ bool Socket::Init(SocketConfig InConfig)
 	WSADATA WsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &WsaData) != 0)
 	{
-		std::cerr << "WSAStartup failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogSendSocket, LOG_SEVERITY_ERROR, "WSAStartup failed with error {}", WSAGetLastError());
 		return false;
 	}
 
 	// Create a socket
 	if ((Sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 	{
-		std::cerr << "socket failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogSendSocket, LOG_SEVERITY_ERROR, "socket failed with error {}", WSAGetLastError());
 		return false;
 	}
 
@@ -73,9 +76,11 @@ bool Socket::Send(RTPPacket* Packet)
 
 	if (sendto(Sock, Buf, (int)TotalSize, 0, (struct sockaddr*)&Other, sizeof(Other)) == SOCKET_ERROR)
 	{
-		std::cerr << "sendto failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogSendSocket, LOG_SEVERITY_ERROR, "sendto failed with error {}", WSAGetLastError());
 		return false;
 	}
 
 	return true;
 }
+
+#undef LogSendSocket

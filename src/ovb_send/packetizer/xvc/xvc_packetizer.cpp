@@ -49,7 +49,7 @@ std::vector<RTPPacket> XvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 	}
 
 	uint8_t NalUnitType = ((Header >> 1) & 0b00011111);
-	LOG(LogXvcPacketizer, LOG_SEVERITY_DETAILS, "Packetizing NAL. Type: %d; Size: %d", +NalUnitType, InSize);
+	LOG(LogXvcPacketizer, LOG_SEVERITY_DETAILS, "Packetizing NAL. Type: {}; Size: {}", +NalUnitType, InSize);
 
 	if (InSize < RTP_PAYLOAD_SIZE)
 	{

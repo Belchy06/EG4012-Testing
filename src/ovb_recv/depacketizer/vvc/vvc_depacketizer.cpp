@@ -17,7 +17,7 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 	if (InPacket.GetSequenceNumber() > PrevSequenceNumber + 1)
 	{
 		// A packet has come in with a sequence number higher than expected, notify users of the number of packets missed
-		LOG(LogVvcDepacketizer, LOG_SEVERITY_WARNING, "Missed packet(s): %d -> %d", PrevSequenceNumber + 1, InPacket.GetSequenceNumber() - 1);
+		LOG(LogVvcDepacketizer, LOG_SEVERITY_WARNING, "Missed packet(s): {} -> {}", PrevSequenceNumber + 1, InPacket.GetSequenceNumber() - 1);
 	}
 
 	// if (InPacket.GetTimeStamp() > prevTimestamp)
@@ -39,7 +39,7 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 	// clang-format on
 	// assert(ForbiddenZeroBit == 0);
 	// assert(NuhReservedZeroBit == 0);
-	LOG(LogVvcDepacketizer, LOG_SEVERITY_DETAILS, "Depacketizing NAL. Type: %d; Size: %d", +NalUnitType, PacketSize);
+	LOG(LogVvcDepacketizer, LOG_SEVERITY_DETAILS, "Depacketizing NAL. Type: {}; Size: {}", +NalUnitType, PacketSize);
 
 	if (NalUnitType != 29)
 	{
@@ -47,7 +47,7 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 		if (Fragments.size() > 0)
 		{
 			// We've received a new single nal without finishing off the last fragmented unit. Warn and continue
-			LOG(LogVvcDepacketizer, LOG_SEVERITY_WARNING, "Received new single nal without finishing previously fragmented nal. Dropping %d fragments", Fragments.size());
+			LOG(LogVvcDepacketizer, LOG_SEVERITY_WARNING, "Received new single nal without finishing previously fragmented nal. Dropping {} fragments", Fragments.size());
 			Fragments.clear();
 		}
 
@@ -88,7 +88,7 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 		if (bIsFirst && Fragments.size() > 0)
 		{
 			// We've received a new fragmented nal without finishing off the last fragmented unit. Warn and continue
-			LOG(LogVvcDepacketizer, LOG_SEVERITY_WARNING, "Received new fragmented nal without finishing previously fragmented nal. Dropping %d fragments", Fragments.size());
+			LOG(LogVvcDepacketizer, LOG_SEVERITY_WARNING, "Received new fragmented nal without finishing previously fragmented nal. Dropping {} fragments", Fragments.size());
 			Fragments.clear();
 		}
 

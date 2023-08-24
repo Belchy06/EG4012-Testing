@@ -4,6 +4,8 @@
 #include "xvc.h"
 #include "xvc_result.h"
 
+#define LogXvcDecoder "LogXvcDecoder"
+
 XvcDecoder::XvcDecoder()
 	: Api(xvc_decoder_api_get())
 	, Params(Api->parameters_create())
@@ -40,7 +42,7 @@ DecodeResult* XvcDecoder::Init(DecoderConfig& InConfig)
 	Decoder = Api->decoder_create(Params);
 	if (!Decoder)
 	{
-		std::cerr << "Error: Failed to allocate decoder" << std::endl;
+		LOG(LogXvcDecoder, LOG_SEVERITY_ERROR, "Failed to allocate decoder");
 		std::exit(-1);
 	}
 
@@ -152,3 +154,5 @@ int XvcDecoder::ScaleY(int InY, EChromaFormat InFormat)
 			return 0;
 	}
 }
+
+#undef LogXvcDecoder

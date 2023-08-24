@@ -1,6 +1,9 @@
 #include <iostream>
 
-#include "socket.h"
+#include "ovb_common/common.h"
+#include "ovb_relay/send_socket/socket.h"
+
+#define LogSendSocket "LogSendSocket"
 
 std::shared_ptr<SendSocket> SendSocket::Self = nullptr;
 
@@ -32,14 +35,14 @@ bool SendSocket::Init(SocketConfig InConfig)
 	WSADATA WsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &WsaData) != 0)
 	{
-		std::cerr << "WSAStartup failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogSendSocket, LOG_SEVERITY_ERROR, "WSAStartup failed with error: {}", WSAGetLastError());
 		return false;
 	}
 
 	// Create a socket
 	if ((Sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 	{
-		std::cerr << "socket failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogSendSocket, LOG_SEVERITY_ERROR, "socket failed with error: {}", WSAGetLastError());
 		return false;
 	}
 
@@ -57,9 +60,11 @@ bool SendSocket::Send(const uint8_t* InData, size_t InSize)
 	// Transmit
 	if (sendto(Sock, reinterpret_cast<const char*>(InData), (int)InSize, 0, (struct sockaddr*)&Other, sizeof(Other)) == SOCKET_ERROR)
 	{
-		std::cerr << "sendto failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogSendSocket, LOG_SEVERITY_ERROR, "sendto failed with error: {}", WSAGetLastError());
 		return false;
 	}
 
 	return true;
 }
+
+#undef LogSendSocket

@@ -6,6 +6,7 @@ int main(int argc, const char* argv[])
 
 	Receiver.ParseArgs(argc, argv);
 	Receiver.ValidateArgs();
+	Receiver.PrintSettings();
 	Receiver.Run();
 
 	return 0;

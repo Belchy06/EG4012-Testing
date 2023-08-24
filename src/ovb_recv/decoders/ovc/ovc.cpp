@@ -9,6 +9,8 @@
 #include "ovc_common/picture.h"
 #include "ovc_common/nal.h"
 
+#define LogOvcDecoder "LogOvcDecoder"
+
 OvcDecoder::OvcDecoder()
 	: Params(new ovc_dec_config()), Decoder(nullptr)
 {
@@ -34,7 +36,7 @@ DecodeResult* OvcDecoder::Init(DecoderConfig& InConfig)
 	Decoder = new ovc_decoder();
 	if (!Decoder)
 	{
-		std::cerr << "Error: Failed to allocate decoder" << std::endl;
+		LOG(LogOvcDecoder, LOG_SEVERITY_ERROR, "Failed to allocate decoder");
 		std::exit(-1);
 	}
 
@@ -127,3 +129,5 @@ DecodeResult* OvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 
 	return new OvcResult(OVC_DEC_OK);
 }
+
+#undef LogOvcDecoder

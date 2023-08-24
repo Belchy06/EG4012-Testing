@@ -4,7 +4,10 @@
 
 #include <iostream>
 
+#include "ovb_common/common.h"
 #include "socket.h"
+
+#define LogRecvSocket "LogRecvSocket"
 
 std::shared_ptr<RecvSocket> RecvSocket::Self = nullptr;
 
@@ -36,14 +39,14 @@ bool RecvSocket::Init(SocketConfig InConfig)
 	WSADATA WsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &WsaData) != 0)
 	{
-		std::cerr << "WSAStartup failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogRecvSocket, LOG_SEVERITY_ERROR, "WSAStartup failed with error: {}", WSAGetLastError());
 		return false;
 	}
 
 	// Create a socket
 	if ((Sock = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 	{
-		std::cerr << "socket failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogRecvSocket, LOG_SEVERITY_ERROR, "socket failed with error: {}", WSAGetLastError());
 		return false;
 	}
 
@@ -56,8 +59,7 @@ bool RecvSocket::Init(SocketConfig InConfig)
 	// Bind
 	if (bind(Sock, (struct sockaddr*)&Other, OtherLen) == SOCKET_ERROR)
 	{
-
-		std::cerr << "bind failed with error" << WSAGetLastError() << std::endl;
+		LOG(LogRecvSocket, LOG_SEVERITY_ERROR, "bind failed with error: {}", WSAGetLastError());
 		return false;
 	}
 
@@ -76,7 +78,7 @@ bool RecvSocket::Receive()
 		int RecvLen;
 		if ((RecvLen = recvfrom(Sock, Buf, DEFAULT_BUFFER_LENGTH, 0, (struct sockaddr*)&Other, &OtherLen)) == SOCKET_ERROR)
 		{
-			printf("recvfrom failed with error: %d", WSAGetLastError());
+			LOG(LogRecvSocket, LOG_SEVERITY_ERROR, "recvfrom failed with error: {}", WSAGetLastError());
 			return false;
 		}
 
@@ -93,3 +95,5 @@ void RecvSocket::RegisterSocketListener(ISocketListener* InSocketListener)
 {
 	SocketListener = InSocketListener;
 }
+
+#undef LogRecvSocket

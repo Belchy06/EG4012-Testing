@@ -10,6 +10,12 @@
 #include "ovb_common/settings.h"
 #include "ovb_send/y4m_reader.h"
 
+class SenderSettings : public Settings
+{
+public:
+	std::string IP;
+};
+
 // Sender should own the socket and the encoder
 class Sender : public IEncodeCompleteCallback
 {
@@ -19,6 +25,7 @@ public:
 
 	void ParseArgs(int argc, const char* argv[]);
 	void ValidateArgs();
+	void PrintSettings();
 	void Run();
 
 private:
@@ -35,7 +42,7 @@ private:
 	std::streamoff		 StartSkip;
 	std::streamoff		 PictureSkip;
 	PictureFormat		 PicFormat;
-	Settings			 Options;
+	SenderSettings		 Options;
 	std::vector<uint8_t> PictureBytes;
 
 	std::shared_ptr<Encoder>	WrappedEncoder;

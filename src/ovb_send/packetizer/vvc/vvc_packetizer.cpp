@@ -37,7 +37,7 @@ std::vector<RTPPacket> VvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 	// clang-format on
 	assert(ForbiddenZeroBit == 0);
 	assert(NuhReservedZeroBit == 0);
-	LOG(LogVvcPacketizer, LOG_SEVERITY_DETAILS, "Packetizing NAL. Type: %d; Size: %d", +NalUnitType, InSize);
+	LOG(LogVvcPacketizer, LOG_SEVERITY_DETAILS, "Packetizing NAL. Type: {}; Size: {}", +NalUnitType, InSize);
 
 	if (InSize < RTP_PAYLOAD_SIZE)
 	{
