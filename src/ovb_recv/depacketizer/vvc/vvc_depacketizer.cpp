@@ -2,6 +2,7 @@
 
 #include "ovb_common/common.h"
 #include "ovb_recv/depacketizer/vvc/vvc_depacketizer.h"
+#include "vvdec/vvdec.h"
 
 #define LogVvcDepacketizer "LogVvcDepacketizer"
 
@@ -58,6 +59,17 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 		// Start sequence
 		ReconstructedNalBytes.push_back(0x0);
 		ReconstructedNalBytes.push_back(0x0);
+		// clang-format off
+		if (NalUnitType == VVC_NAL_UNIT_DCI || 
+            NalUnitType == VVC_NAL_UNIT_VPS || 
+            NalUnitType == VVC_NAL_UNIT_SPS || 
+            NalUnitType == VVC_NAL_UNIT_PPS || 
+            NalUnitType == VVC_NAL_UNIT_PREFIX_APS || 
+            NalUnitType == VVC_NAL_UNIT_SUFFIX_APS)
+		{
+			ReconstructedNalBytes.push_back(0x0);
+		}
+		// clang-format on
 		ReconstructedNalBytes.push_back(0x1);
 
 		for (size_t i = 0; i < PacketSize; i++)

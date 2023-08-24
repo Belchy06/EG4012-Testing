@@ -51,6 +51,9 @@ std::vector<RTPPacket> VvcPacketizer::Packetize(uint8_t* InData, size_t InSize)
 	}
 	else
 	{
+		// Update size to remove the two byte NAL header as we'll be re-writing this ourself
+		InData += 2;
+		InSize -= 2;
 		// Fragmentation Unit (4.3.3 https://www.rfc-editor.org/rfc/rfc9328.pdf)
 		std::vector<uint8_t> NALHeader;
 		uint8_t				 NalByte;
