@@ -2,7 +2,7 @@
 
 #define MAX_CODED_PICTURE_SIZE 800000
 
-vvencMsgLevel g_verbosity = VVENC_VERBOSE;
+vvencMsgLevel g_verbosity = VVENC_DETAILS;
 
 void msgFnc(void*, int level, const char* fmt, va_list args)
 {

@@ -10,11 +10,11 @@ RTPPacket::RTPPacket(uint8_t InPType, uint16_t InFrameNB, uint32_t InTime, const
 	Extension = 0;
 	CC = 0;
 	Ssrc = 0;
+	Marker = 0;
 	// Variable header fields:
 	SequenceNumber = InFrameNB;
 	TimeStamp = InTime;
 	PayloadType = InPType;
-	Marker = InbIsLast ? 1 : 0;
 
 	// Defined in https://www.cl.cam.ac.uk/~jac22/books/mm/book/node159.html
 	// Construct header

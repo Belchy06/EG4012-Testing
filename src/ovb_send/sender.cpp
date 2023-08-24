@@ -11,7 +11,6 @@
 
 Sender::Sender()
 	: InputStream(nullptr)
-	, Packetizer(Packetizer::Create())
 	, RtpSender(RTPSender::Create())
 {
 }
@@ -134,6 +133,7 @@ void Sender::Run()
 	while (std::cin.get() != '\n');
 
 	WrappedEncoder = EncoderFactory::Create(Options.Codec);
+	Packetizer = PacketizerFactory::Create(Options.Codec);
 
 	EncoderConfig Config;
 	Config.Format = PicFormat.Format;
@@ -189,7 +189,7 @@ void Sender::Run()
 	}
 }
 
-void Sender::OnEncodeComplete(const uint8_t* InData, size_t InSize)
+void Sender::OnEncodeComplete(uint8_t* InData, size_t InSize)
 {
 	// std::cout << "====================" << std::endl;
 	// std::cout << "  OnEncodeComplete  " << std::endl;

@@ -5,7 +5,7 @@
 
 #include "ovb_send/encoders/encoder_factory.h"
 #include "ovb_send/encoders/encoder_callback.h"
-#include "ovb_send/packetizer/packetizer.h"
+#include "ovb_send/packetizer/packetizer_factory.h"
 #include "ovb_send/rtp_sender/rtp_sender.h"
 #include "ovb_common/settings.h"
 #include "ovb_send/y4m_reader.h"
@@ -26,7 +26,7 @@ private:
 	bool ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes);
 
 	// EncodeCompleteCallback interface
-	virtual void OnEncodeComplete(const uint8_t* InData, size_t InSize) override;
+	virtual void OnEncodeComplete(uint8_t* InData, size_t InSize) override;
 
 private:
 	std::istream*		 InputStream;
