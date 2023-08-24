@@ -50,6 +50,8 @@ bool RecvSocket::Init(SocketConfig InConfig)
 		return false;
 	}
 
+	WSASetIPUserMtu(Sock, 1500);
+
 	// Setup address structure
 	Other.sin_family = AF_INET;
 	Other.sin_addr.s_addr = INADDR_ANY;

@@ -39,7 +39,6 @@ private:
 	std::istream*		 InputStream;
 	std::ifstream		 FileStream;
 	std::streamsize		 FileSize;
-	std::streamoff		 StartSkip;
 	std::streamoff		 PictureSkip;
 	PictureFormat		 PicFormat;
 	SenderSettings		 Options;

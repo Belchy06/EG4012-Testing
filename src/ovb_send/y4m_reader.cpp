@@ -9,7 +9,7 @@ Y4mReader::Y4mReader(std::istream* InStream)
 {
 }
 
-bool Y4mReader::Read(PictureFormat& OutFormat, std::streamoff& OutStartSkip, std::streamoff& OutPictureSkip)
+bool Y4mReader::Read(PictureFormat& OutFormat, std::streamoff& OutPictureSkip)
 {
 	PictureFormat Picture;
 	char		  Buf[80];
@@ -152,7 +152,6 @@ bool Y4mReader::Read(PictureFormat& OutFormat, std::streamoff& OutStartSkip, std
 	assert(Picture.Format != EChromaFormat::CHROMA_FORMAT_UNDEFINED);
 
 	OutFormat = Picture;
-	OutStartSkip = Pos + 1;
 	OutPictureSkip = 6; // Skip "FRAME\n" before each picture
 
 	return true;

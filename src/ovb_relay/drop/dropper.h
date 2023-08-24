@@ -23,18 +23,19 @@ public:
 class Dropper
 {
 public:
-	static std::shared_ptr<Dropper> Create(float InDropChance, EDropType InDropType, DropConfig InConfig);
+	static std::shared_ptr<Dropper> Create(float InDropChance, EDropType InDropType, DropConfig InConfig, uint16_t InSeed);
 
 	bool Drop();
 
 private:
-	Dropper(float InDropChance, EDropType InDropType, DropConfig InConfig);
+	Dropper(float InDropChance, EDropType InDropType, DropConfig InConfig, uint16_t InSeed);
 
 private:
 	static std::shared_ptr<Dropper> Self;
 	float							DropChance;
 	EDropType						DropType;
 	DropConfig						Config;
+	uint16_t						Seed;
 
 private:
 	//

@@ -46,6 +46,8 @@ bool SendSocket::Init(SocketConfig InConfig)
 		return false;
 	}
 
+	WSASetIPUserMtu(Sock, 1500);
+
 	// setup address structure
 	ZeroMemory(&Other, sizeof(Other));
 	Other.sin_family = AF_INET;

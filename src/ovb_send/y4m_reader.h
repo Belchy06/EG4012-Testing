@@ -17,7 +17,7 @@ class Y4mReader
 {
 public:
 	Y4mReader(std::istream* InStream);
-	bool Read(PictureFormat& OutFormat, std::streamoff& OutStartSkip, std::streamoff& OutPictureSkip);
+	bool Read(PictureFormat& OutFormat, std::streamoff& OutPictureSkip);
 
 private:
 	std::istream* Stream;

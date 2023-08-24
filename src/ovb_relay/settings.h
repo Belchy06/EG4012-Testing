@@ -45,4 +45,7 @@ public:
 
 	// Drop Model
 	EDropType DropType;
+
+	// Random Seed
+	uint16_t Seed;
 };

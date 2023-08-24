@@ -43,7 +43,9 @@
                 "--tamper-chance",
                 "0",
                 "--drop-type",
-                "bursty"
+                "bursty",
+                "--log-level",
+                "details"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -61,7 +63,9 @@
                 "--codec",
                 "OVC",
                 "--port",
-                "8888"
+                "8888",
+                "--log-level",
+                "details"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

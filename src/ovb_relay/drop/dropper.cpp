@@ -5,21 +5,22 @@
 
 std::shared_ptr<Dropper> Dropper::Self = nullptr;
 
-std::shared_ptr<Dropper> Dropper::Create(float InDropChance, EDropType InDropType, DropConfig InConfig)
+std::shared_ptr<Dropper> Dropper::Create(float InDropChance, EDropType InDropType, DropConfig InConfig, uint16_t InSeed)
 {
 	if (Self == nullptr)
 	{
-		std::shared_ptr<Dropper> Temp(new Dropper(InDropChance, InDropType, InConfig));
+		std::shared_ptr<Dropper> Temp(new Dropper(InDropChance, InDropType, InConfig, InSeed));
 		Self = Temp;
 	}
 	return Self;
 }
 
-Dropper::Dropper(float InDropChance, EDropType InDropType, DropConfig InConfig)
+Dropper::Dropper(float InDropChance, EDropType InDropType, DropConfig InConfig, uint16_t InSeed)
 	: DropChance(InDropChance)
 	, DropType(InDropType)
 	, Config(InConfig)
 	, CurrentState(State::GOOD)
+	, Seed(InSeed)
 {
 }
 
@@ -29,7 +30,7 @@ bool Dropper::Drop()
 	{
 		std::mt19937 Gen;
 		// Always use same seed for repeatability
-		Gen.seed(0);
+		Gen.seed(Seed);
 		std::uniform_real_distribution<float> Dis(0, 1);
 		return Dis(Gen) < DropChance;
 	}
@@ -37,8 +38,7 @@ bool Dropper::Drop()
 	{
 		std::mt19937 Gen;
 		// Always use same seed for repeatability
-		std::random_device rd;
-		Gen.seed(rd());
+		Gen.seed(Seed);
 		// Test if we should change state
 		std::bernoulli_distribution Dis(CurrentState == State::GOOD ? Config.P : Config.R);
 		bool						ChangeState = Dis(Gen);

@@ -80,6 +80,10 @@ void Sender::ParseArgs(int argc, const char* argv[])
                 std::cerr << "Warning: Unknown log level " << LevelStr << "\n" << "Warning: Default to SEVERITY_INFO" << std::endl;
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
             }
+        } else if(arg == "--config") {
+            std::string ConfigStr(argv[++i]);
+
+			// TODO (belchy06): Parse config string for encoder settings
         } else {
             std::cerr << "Error: Unknown argument: " << arg << std::endl;
             PrintHelp();
@@ -116,7 +120,7 @@ void Sender::ValidateArgs()
 	InputStream->seekg(0, std::ifstream::beg);
 
 	Y4mReader Reader(InputStream);
-	if (!Reader.Read(PicFormat, StartSkip, PictureSkip))
+	if (!Reader.Read(PicFormat, PictureSkip))
 	{
 		LOG(LogSender, LOG_SEVERITY_ERROR, "Reading unsuccessful");
 		std::exit(-1);
@@ -133,7 +137,7 @@ void Sender::Run()
 {
 	do
 	{
-		LOG(LogSender, LOG_SEVERITY_SILENT, "\nPress a key to continue...");
+		LOG(LogSender, LOG_SEVERITY_SILENT, "Press a key to continue...");
 	}
 	while (std::cin.get() != '\n');
 
@@ -146,8 +150,6 @@ void Sender::Run()
 	Config.Width = PicFormat.Width;
 	Config.Height = PicFormat.Height;
 	Config.BitDepth = PicFormat.BitDepth;
-	Config.StartSkip = StartSkip;
-	Config.PictureSkip = PictureSkip;
 	Config.LogLevel = Options.LogLevel;
 
 	EncodeResult* Result = WrappedEncoder->Init(Config);

@@ -18,6 +18,7 @@ Relay::Relay()
 	Options.TamperChance = 0.f;
 	Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
 	Options.DropType = EDropType::LOSS_BURSTY;
+	Options.Seed = 1337;
 }
 
 Relay::~Relay()
@@ -56,7 +57,9 @@ void Relay::ParseArgs(int argc, const char* argv[])
             std::stringstream(argv[++i]) >> Options.DropChance;
         } else if(Arg == "--tamper-chance") {
             std::stringstream(argv[++i]) >> Options.TamperChance;
-        } else if(Arg == "--log-level") {
+        } else if(Arg == "--seed") {
+            std::stringstream(argv[++i]) >> Options.Seed;
+        }else if(Arg == "--log-level") {
             std::string LevelStr(argv[++i]);
             if(LevelStr == "silent") {
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
@@ -137,8 +140,8 @@ void Relay::ValidateArgs()
 	DropperConfig.P = 0.05f;
 	DropperConfig.R = 0.5f;
 
-	Drop = Dropper::Create(Options.DropChance, Options.DropType, DropperConfig);
-	Tamper = Tamperer::Create(Options.TamperChance);
+	Drop = Dropper::Create(Options.DropChance, Options.DropType, DropperConfig, Options.Seed);
+	Tamper = Tamperer::Create(Options.TamperChance, Options.Seed);
 
 	OvbLogging::Verbosity = Options.LogLevel;
 }
