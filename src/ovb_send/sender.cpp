@@ -13,7 +13,7 @@
 
 Sender::Sender()
 	: InputStream(nullptr)
-	, RtpSender(RTPSender::Create())
+	, FrameCount(0)
 {
 }
 
@@ -91,8 +91,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Config.OvcBitsPerPixel;
                 } else if(Key == "--ovc-repeat-vps") {
                     std::stringstream(Value) >> Config.OvcRepeatVPS;
-                } else if(Key == "--ovc-num-streams-exp") {
-                    std::stringstream(Value) >> Config.OvcNumStreamsExp;
+                } else if(Key == "--ovc-num-parts-exp") {
+                    std::stringstream(Value) >> Config.OvcNumPartsExp;
                 } else if(Key == "--ovc-num-levels") {
                     std::stringstream(Value) >> Config.OvcNumLevels;
                 } else if(Key == "--ovc-wavelet-family") {
@@ -168,6 +168,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
 	SocketConfig Config;
 	Config.IP = Options.IP;
 	Config.Port = Options.Port;
+
+	RtpSender = RTPSender::Create();
 	RtpSender->Init(Config);
 }
 
@@ -257,6 +259,7 @@ void Sender::Run()
 		bContinue = ReadNextPicture(InputStream, PictureBytes);
 		bool bLastPic = !bContinue;
 
+		LOG(LogSender, LOG_SEVERITY_INFO, "Encoding Frame {}", FrameCount++);
 		Result = WrappedEncoder->Encode(PictureBytes, bLastPic);
 		if (!Result->IsSuccess())
 		{
@@ -322,7 +325,7 @@ void Sender::PrintSettings()
     if(Options.Codec == CODEC_OVC) {
     std::cout << "    --ovc-bits-per-pixel: " << Config.OvcBitsPerPixel << std::endl;
     std::cout << "    --ovc-repeat-vps: " << (Config.OvcRepeatVPS ? "true" : "false") << std::endl;
-    std::cout << "    --ovc-num-streams-exp: " << Config.OvcNumStreamsExp << std::endl;
+    std::cout << "    --ovc-num-parts-exp: " << Config.OvcNumPartsExp << std::endl;
     std::cout << "    --ovc-num-levels: " << Config.OvcNumLevels << std::endl;
     std::cout << "    --ovc-wavelet-family: " << wavelet_family_to_string(Config.OvcWaveletFamily) << std::endl;
     if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_BIORTHOGONAL) {

@@ -13,9 +13,9 @@
                 "--file",
                 "${workspaceFolder}\\resources\\carphone_qcif.y4m",
                 "--codec",
-                "VVC",
+                "OVC",
                 "--encoder-config",
-                    "--ovc-bits-per-pixel=0.5,--ovc-repeat-vps=1,--ovc-num-streams-exp=1,--ovc-num-levels=3,--ovc-wavelet-family=biorthogonal,--ovc-wavelet-config=11,--ovc-partition-type=offset-zerotree,--ovc-spiht=enable,--ovc-entropy-coder=arithmetic",
+                    "--ovc-bits-per-pixel=4,--ovc-repeat-vps=1,--ovc-num-parts-exp=2,--ovc-num-levels=3,--ovc-wavelet-family=biorthogonal,--ovc-wavelet-config=11,--ovc-partition-type=offset-zerotree,--ovc-spiht=enable,--ovc-entropy-coder=arithmetic",
                 "--encoder-config",
                     "--xvc-num-ref-pics=0,--xvc-max-key-pic-distance=0",
                 "--encoder-config",
@@ -25,7 +25,7 @@
                 "--port",
                 "4444",
                 "--log-level",
-                "details"
+                "info"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -49,9 +49,9 @@
                 "--drop-type",
                 "bursty",
                 "--drop-config",
-                    "--hg=0,--hb=1,--p=0.05,--r=0.5",
+                    "--hg=0,--hb=0,--p=0,--r=0",
                 "--log-level",
-                "details",
+                "verbose",
                 "--seed",
                 "1337"
             ],
@@ -69,11 +69,11 @@
                 "--file",
                 "${workspaceFolder}\\resources\\out.y4m",
                 "--codec",
-                "VVC",
+                "OVC",
                 "--port",
                 "8888",
                 "--log-level",
-                "details"
+                "verbose"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

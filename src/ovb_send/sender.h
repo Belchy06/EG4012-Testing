@@ -36,6 +36,7 @@ private:
 	virtual void OnEncodeComplete(uint8_t* InData, size_t InSize) override;
 
 private:
+	size_t		   FrameCount;
 	std::istream*  InputStream;
 	std::ifstream  FileStream;
 	std::streamoff PictureSkip;

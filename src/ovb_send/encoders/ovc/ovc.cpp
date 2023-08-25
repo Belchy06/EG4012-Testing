@@ -68,7 +68,7 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 
 	Params->partition_type = InConfig.OvcPartitionType;
 	Params->num_levels = InConfig.OvcNumLevels;
-	Params->num_streams_exp = InConfig.OvcNumStreamsExp;
+	Params->num_parts_exp = InConfig.OvcNumPartsExp;
 
 	Params->spiht = InConfig.OvcSPIHT;
 	Params->bits_per_pixel = InConfig.OvcBitsPerPixel;
@@ -119,6 +119,14 @@ EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 	}
 
 	ovc_enc_result Result = Encoder->encode(Input, &NalUnits, &NumNalUnits);
+
+	size_t TotalSize = 0;
+	for (size_t i = 0; i < NumNalUnits; i++)
+	{
+		TotalSize += NalUnits[i].size;
+	}
+
+	LOG(LogOvcEncoder, LOG_SEVERITY_DETAILS, "Encoded size {}", TotalSize);
 
 	// Loop through all Nal Units that were received and write to file
 	// the Nal Unit length followed by the actual Nal Unit.

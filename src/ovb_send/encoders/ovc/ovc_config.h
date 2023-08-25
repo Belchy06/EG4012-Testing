@@ -8,7 +8,7 @@ public:
 	float OvcBitsPerPixel;
 	bool  OvcRepeatVPS;
 
-	int OvcNumStreamsExp = -1;
+	int OvcNumPartsExp = -1;
 	int OvcNumLevels = -1;
 
 	ovc_wavelet_family OvcWaveletFamily;
