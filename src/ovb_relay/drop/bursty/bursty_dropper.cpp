@@ -1,18 +1,14 @@
-#include <random>
-
 #include "ovb_relay/drop/bursty/bursty_dropper.h"
 
 BurstyDropper::BurstyDropper(DropSettings InOptions)
 	: CurrentState(State::GOOD)
 {
 	Options = InOptions;
+	Gen.seed(InOptions.Seed);
 }
 
 bool BurstyDropper::Drop()
 {
-	std::mt19937 Gen;
-	// Always use same seed for repeatability
-	Gen.seed(Seed);
 	// Test if we should change state
 	std::bernoulli_distribution Dis(CurrentState == State::GOOD ? Options.P : Options.R);
 	bool						ChangeState = Dis(Gen);

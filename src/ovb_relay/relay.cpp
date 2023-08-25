@@ -194,12 +194,14 @@ void Relay::PrintSettings()
     std::cout << "    --hb: " << Options.DropOptions.DropChanceBad << std::endl;
     std::cout << "    --p: " << Options.DropOptions.P << std::endl;
     std::cout << "    --r: " << Options.DropOptions.R << std::endl;
+    std::cout << "    --seed: " << Options.DropOptions.Seed << std::endl;
     } else if(Options.DropType == EDropType::LOSS_BURSTY) {
     std::cout << "  --drop-config: " << std::endl;
     std::cout << "    --prob: " << Options.DropOptions.DropChance << std::endl;
     }
     std::cout << "  --tamper-config: " << std::endl;
     std::cout << "    --prob: " << Options.TamperOptions.TamperChance << std::endl;
+    std::cout << "    --seed: " << Options.TamperOptions.Seed << std::endl;
     std::cout << "  --log-level: " << "LOG_SEVERITY_" << SeverityToString(Options.LogLevel) << std::endl;
 	// clang-format on
 }
@@ -216,6 +218,7 @@ void Relay::PrintHelp()
     std::cout << "Usage:" << std::endl;
 	std::cout << "  --send-ip <string> --send-port <int> --recv-port <int> [Optional parameters]" << std::endl << std::endl;
     std::cout << "Optional parameters:"  << std::endl;
+    std::cout << "  --seed <int>            " << std::endl;
     std::cout << "  --drop-type     <string>" << std::endl;
     std::cout << "      \"continuous\"      " << std::endl;
     std::cout << "      \"bursty\"          " << std::endl;
@@ -249,7 +252,7 @@ void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 	if (bDrop)
 	{
 		// Drop this packet
-		std::cout << "Dropping packet " << PacketId << std::endl;
+		LOG(LogRelay, LOG_SEVERITY_NOTICE, "Dropping packet {}", PacketId);
 		PacketId++;
 		return;
 	}
@@ -269,7 +272,7 @@ void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 		SendSock->Send(Data, InSize);
 	}
 
-	std::cout << "Passing packet " << PacketId << std::endl;
+	LOG(LogRelay, LOG_SEVERITY_DETAILS, "Passing packet {}", PacketId);
 
 	PacketId++;
 }

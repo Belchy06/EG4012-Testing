@@ -25,7 +25,7 @@ void Sender::ParseArgs(int argc, const char* argv[])
 {
 	if (argc <= 1)
 	{
-		std::cerr << "Error: No args specified" << std::endl;
+		LOG(LogSender, LOG_SEVERITY_ERROR, "No args specified");
 		PrintHelp();
 		std::exit(1);
 	}
@@ -33,21 +33,21 @@ void Sender::ParseArgs(int argc, const char* argv[])
 	// Parse command line
 	for (int i = 1; i < argc; i++)
 	{
-		std::string arg(argv[i]);
+		std::string Arg(argv[i]);
 
 		// clang-format off
 		if(argc - 1 == i) {
-            std::cerr << "Error: Missing argument value: " << arg << std::endl;
+            LOG(LogSender, LOG_SEVERITY_ERROR, "Missing argument value: {}", Arg);
             PrintHelp();
 			std::exit(1);
-        } else if (arg == "-h") {
+        } else if (Arg == "-h") {
 			PrintHelp();
 			std::exit(1);
-		} else if(arg == "--ip") {
+		} else if(Arg == "--ip") {
             std::stringstream(argv[++i]) >> Options.IP;
-        } else if(arg == "--port") {
+        } else if(Arg == "--port") {
             std::stringstream(argv[++i]) >> Options.Port;
-        } else if(arg == "--codec") {
+        } else if(Arg == "--codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "VVC") {
                 Options.Codec = ECodec::CODEC_VVC;
@@ -58,9 +58,9 @@ void Sender::ParseArgs(int argc, const char* argv[])
             } else {
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }
-        } else if(arg == "--file") {
-            std::stringstream(argv[++i]) >> Options.File;
-        } else if(arg == "--log-level") {
+        } else if(Arg == "--file") {
+            Options.File = std::string(argv[++i]);
+        } else if(Arg == "--log-level") {
             std::string LevelStr(argv[++i]);
             if(LevelStr == "silent") {
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
@@ -77,15 +77,86 @@ void Sender::ParseArgs(int argc, const char* argv[])
             } else if(LevelStr == "details") {
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_DETAILS;
             } else {
-                std::cerr << "Warning: Unknown log level " << LevelStr << "\n" << "Warning: Default to SEVERITY_INFO" << std::endl;
+                LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown log level \"{}\". Defaulting to LOG_SEVERITY_INFO", LevelStr);
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
             }
-        } else if(arg == "--config") {
-            std::string ConfigStr(argv[++i]);
-
-			// TODO (belchy06): Parse config string for encoder settings
+        } else if(Arg == "--encoder-config") {
+            std::istringstream Stream(argv[++i]);
+            std::string Option;
+            while(std::getline(Stream, Option, ','))
+            {
+                std::string Key = Option.substr(0, Option.find("="));
+                std::string Value = Option.substr(Option.find("=") + 1);
+                if(Key == "--ovc-bits-per-pixel") {
+                    std::stringstream(Value) >> Config.OvcBitsPerPixel;
+                } else if(Key == "--ovc-repeat-vps") {
+                    std::stringstream(Value) >> Config.OvcRepeatVPS;
+                } else if(Key == "--ovc-num-streams-exp") {
+                    std::stringstream(Value) >> Config.OvcNumStreamsExp;
+                } else if(Key == "--ovc-num-levels") {
+                    std::stringstream(Value) >> Config.OvcNumLevels;
+                } else if(Key == "--ovc-wavelet-family") {
+                    if(Value == "skip") {
+                        Config.OvcWaveletFamily = OVC_WAVELET_FAMILY_SKIP;
+                    } else if(Value == "biorthogonal") {
+                        Config.OvcWaveletFamily = OVC_WAVELET_FAMILY_BIORTHOGONAL;
+                    } else if(Value == "coiflets") {
+                        Config.OvcWaveletFamily = OVC_WAVELET_FAMILY_COIFLETS;
+                    } else if(Value == "daubechies") {
+                        Config.OvcWaveletFamily = OVC_WAVELET_FAMILY_DAUBECHIES;
+                    } else if(Value == "haar") {
+                        Config.OvcWaveletFamily = OVC_WAVELET_FAMILY_HAAR;
+                    } else if(Value == "reverse-biorthogonal") {
+                        Config.OvcWaveletFamily = OVC_WAVELET_FAMILY_REVERSE_BIORTHOGONAL;
+                    } else if(Value == "symlets") {
+                        Config.OvcWaveletFamily = OVC_WAVELET_FAMILY_SYMLETS;
+                    } else {
+                        LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown ovc_wavelet_family \"{}\"", Value);
+                    }
+                } else if(Key == "--ovc-wavelet-config") {
+                    Config.OvcWaveletConfig.value = atoi(Value.c_str());
+                } else if(Key == "--ovc-partition-type") {
+                    if(Value == "skip") {
+                        Config.OvcPartitionType = OVC_PARTITION_SKIP;
+                    } else if(Value == "offset-zerotree") {
+                        Config.OvcPartitionType = OVC_PARTITION_OFFSET_ZEROTREE;
+                    } else if(Value == "zertotree-preserving") {
+                        Config.OvcPartitionType = OVC_PARTITION_ZEROTREE_PRESERVING;
+                    } else {
+                        LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown ovc_partition_type \"{}\"", Value);
+                    }
+                } else if(Key == "--ovc-spiht") {
+                    if(Value == "skip") {
+                        Config.OvcSPIHT = OVC_SPIHT_SKIP;
+                    } else if(Value == "enable") {
+                        Config.OvcSPIHT = OVC_SPIHT_ENABLE;
+                    } else {
+                        LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown ovc_spiht \"{}\"", Value);
+                    }
+                } else if(Key == "--ovc-entropy-coder") {
+                    if(Value == "skip") {
+                        Config.OvcEntropyCoder = OVC_ENTROPY_CODER_SKIP;
+                    } else if(Value == "arithmetic") {
+                        Config.OvcEntropyCoder = OVC_ENTROPY_CODER_ARITHMETIC;
+                    } else if(Value == "huffman") {
+                        Config.OvcEntropyCoder = OVC_ENTROPY_CODER_HUFFMAN;
+                    } else {
+                        LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown ovc_entropy_coder \"{}\"", Value);
+                    }
+                } else if(Key == "--vvc-gop-size") {
+                    std::stringstream(Value) >> Config.VvcGOPSize;
+                } else if(Key == "--vvc-intra-period") {
+                    std::stringstream(Value) >> Config.VvcIntraPeriod;
+                } else if(Key == "--xvc-num-ref-pics") {
+                    std::stringstream(Value) >> Config.XvcNumRefPics;
+                } else if(Key == "--xvc-max-key-pic-distance") {
+                    std::stringstream(Value) >> Config.XvcMaxKeypicDistance;
+                } else {
+                    LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown encoder config option \"{}\"", Key);
+                }
+            }
         } else {
-            std::cerr << "Error: Unknown argument: " << arg << std::endl;
+            LOG(LogSender, LOG_SEVERITY_ERROR, "Unknown argument \"{}\"", Arg);
             PrintHelp();
             std::exit(1);
         }
@@ -115,16 +186,22 @@ void Sender::ValidateArgs()
 		std::exit(-1);
 	}
 	InputStream = &FileStream;
-	InputStream->seekg(0, std::ifstream::end);
-	FileSize = InputStream->tellg();
 	InputStream->seekg(0, std::ifstream::beg);
 
-	Y4mReader Reader(InputStream);
+	Y4mReader	  Reader(InputStream);
+	PictureFormat PicFormat;
 	if (!Reader.Read(PicFormat, PictureSkip))
 	{
 		LOG(LogSender, LOG_SEVERITY_ERROR, "Reading unsuccessful");
 		std::exit(-1);
 	}
+
+	Config.Width = PicFormat.Width;
+	Config.Height = PicFormat.Height;
+	Config.BitDepth = PicFormat.BitDepth;
+	Config.Framerate = PicFormat.Framerate;
+	Config.Format = PicFormat.Format;
+	Config.LogLevel = Options.LogLevel;
 
 	if (Options.Codec == ECodec::CODEC_UNDEFINED)
 	{
@@ -144,18 +221,10 @@ void Sender::Run()
 	WrappedEncoder = EncoderFactory::Create(Options.Codec);
 	Packetizer = PacketizerFactory::Create(Options.Codec);
 
-	EncoderConfig Config;
-	Config.Format = PicFormat.Format;
-	Config.Framerate = PicFormat.Framerate;
-	Config.Width = PicFormat.Width;
-	Config.Height = PicFormat.Height;
-	Config.BitDepth = PicFormat.BitDepth;
-	Config.LogLevel = Options.LogLevel;
-
 	EncodeResult* Result = WrappedEncoder->Init(Config);
 	if (!Result->IsSuccess())
 	{
-		std::cerr << "Error: Initializing config" << std::endl;
+		LOG(LogSender, LOG_SEVERITY_ERROR, "Erorr intializing config");
 		std::exit(-1);
 	}
 
@@ -179,6 +248,7 @@ void Sender::Run()
 		PictureSamples = 3 * Config.Width * Config.Height;
 	}
 
+	std::vector<uint8_t> PictureBytes;
 	PictureBytes.resize(Config.BitDepth == 8 ? PictureSamples : (PictureSamples << 1));
 
 	bool bContinue = true;
@@ -190,7 +260,7 @@ void Sender::Run()
 		Result = WrappedEncoder->Encode(PictureBytes, bLastPic);
 		if (!Result->IsSuccess())
 		{
-			std::cerr << "Error: Encoding \"" << Result->Error() << "\"" << std::endl;
+			LOG(LogSender, LOG_SEVERITY_ERROR, "{}", Result->Error());
 			std::exit(-1);
 		}
 	}
@@ -248,6 +318,36 @@ void Sender::PrintSettings()
 	std::cout << "  --port: " << Options.Port << std::endl;
     std::cout << "  --codec: " << CodecToString(Options.Codec) << std::endl;
     std::cout << "  --log-level: " << "LOG_SEVERITY_" << SeverityToString(Options.LogLevel) << std::endl;
+    std::cout << "  --encoder-config: " << std::endl;
+    if(Options.Codec == CODEC_OVC) {
+    std::cout << "    --ovc-bits-per-pixel: " << Config.OvcBitsPerPixel << std::endl;
+    std::cout << "    --ovc-repeat-vps: " << (Config.OvcRepeatVPS ? "true" : "false") << std::endl;
+    std::cout << "    --ovc-num-streams-exp: " << Config.OvcNumStreamsExp << std::endl;
+    std::cout << "    --ovc-num-levels: " << Config.OvcNumLevels << std::endl;
+    std::cout << "    --ovc-wavelet-family: " << wavelet_family_to_string(Config.OvcWaveletFamily) << std::endl;
+    if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_BIORTHOGONAL) {
+        std::cout << "    --ovc-wavelet-config: " << biorthogonal_config_to_string(Config.OvcWaveletConfig.biorthogonal_config) << std::endl;
+    } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_COIFLETS) {
+        std::cout << "    --ovc-wavelet-config: " << coiflets_config_to_string(Config.OvcWaveletConfig.coiflets_config) << std::endl;
+    } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_DAUBECHIES) {
+        std::cout << "    --ovc-wavelet-config: " << daubechies_config_to_string(Config.OvcWaveletConfig.daubechies_config) << std::endl;
+    } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_HAAR) {
+        std::cout << "    --ovc-wavelet-config: " << haar_config_to_string(Config.OvcWaveletConfig.haar_config) << std::endl;
+    } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_REVERSE_BIORTHOGONAL) {
+        std::cout << "    --ovc-wavelet-config: " << reverse_biorthogonal_config_to_string(Config.OvcWaveletConfig.reverse_biorthogonal_config) << std::endl;
+    } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_SYMLETS) {
+        std::cout << "    --ovc-wavelet-config: " << symlets_config_to_string(Config.OvcWaveletConfig.symlets_config) << std::endl;
+    }
+    std::cout << "    --ovc-partition-type: " << partition_to_string(Config.OvcPartitionType) << std::endl;
+    std::cout << "    --ovc-spiht: " << spiht_to_string(Config.OvcSPIHT) << std::endl;
+    std::cout << "    --ovc-entropy-coder: " << entropy_coder_to_string(Config.OvcEntropyCoder) << std::endl;
+    } else if(Options.Codec == CODEC_VVC) {
+    std::cout << "    --vvc-gop-size: " << Config.VvcGOPSize << std::endl;
+    std::cout << "    --vvc-intra-period: " << Config.VvcIntraPeriod << std::endl;
+    } else if(Options.Codec == CODEC_XVC) {
+    std::cout << "    --xvc-num-ref-pics: " << Config.XvcNumRefPics << std::endl;
+    std::cout << "    --xvc-max-key-pic-distance: " << Config.XvcMaxKeypicDistance << std::endl;
+    }
 	// clang-format on
 }
 

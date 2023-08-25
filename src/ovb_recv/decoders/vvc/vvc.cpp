@@ -38,7 +38,31 @@ DecodeResult* VvcDecoder::Init(DecoderConfig& InConfig)
 	Config = InConfig;
 
 	vvdec_params_default(Params);
-	Params->logLevel = VVDEC_VERBOSE;
+
+	switch (InConfig.LogLevel)
+	{
+		case LOG_SEVERITY_SILENT:
+			Params->logLevel = VVDEC_SILENT;
+			break;
+		case LOG_SEVERITY_ERROR:
+			Params->logLevel = VVDEC_ERROR;
+			break;
+		case LOG_SEVERITY_WARNING:
+			Params->logLevel = VVDEC_WARNING;
+			break;
+		case LOG_SEVERITY_INFO:
+			Params->logLevel = VVDEC_INFO;
+			break;
+		case LOG_SEVERITY_NOTICE:
+			Params->logLevel = VVDEC_NOTICE;
+			break;
+		case LOG_SEVERITY_VERBOSE:
+			Params->logLevel = VVDEC_VERBOSE;
+			break;
+		case LOG_SEVERITY_DETAILS:
+			Params->logLevel = VVDEC_DETAILS;
+			break;
+	}
 
 	vvdec_accessUnit_alloc_payload(AccessUnit, MAX_CODED_PICTURE_SIZE);
 
@@ -120,10 +144,21 @@ DecodeResult* VvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 	else if (Result != VVDEC_OK)
 	{
 		LOG(LogVvcDecoder, LOG_SEVERITY_ERROR, "{}", vvdec_get_last_error(Decoder));
-		if (std::string AdditionErr = vvdec_get_last_additional_error(Decoder); !AdditionErr.empty())
+		if (std::string AdditionalInfo = vvdec_get_last_additional_error(Decoder); !AdditionalInfo.empty())
 		{
-			LOG(LogVvcDecoder, LOG_SEVERITY_DETAILS, "{}", AdditionErr);
+			LOG(LogVvcDecoder, LOG_SEVERITY_DETAILS, "{}", AdditionalInfo);
 		}
+
+		if (Result == VVDEC_ERR_RESTART_REQUIRED)
+		{
+			vvdec_decoder_close(Decoder);
+
+			LOG(LogVvcDecoder, LOG_SEVERITY_NOTICE, "Recreating decoder");
+			Decoder = vvdec_decoder_open(Params);
+
+			vvdec_set_logging_callback(Decoder, &::msgFnc);
+		}
+
 		return new VvcResult(Result);
 	}
 

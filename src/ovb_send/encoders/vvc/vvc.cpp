@@ -39,35 +39,56 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 	vvenc_init_default(Params, InConfig.Width, InConfig.Height, (int)InConfig.Framerate, VVENC_RC_OFF, VVENC_AUTO_QP, VVENC_MEDIUM);
 
 	// TODO (belchy06): Support > 8bit profiles
-	Params->m_inputBitDepth[0] = 8;
-	Params->m_inputBitDepth[1] = 8;
+	Params->m_inputBitDepth[0] = InConfig.BitDepth;
+	Params->m_inputBitDepth[1] = InConfig.BitDepth;
 
-	Params->m_internalBitDepth[0] = 8;
-	Params->m_internalBitDepth[1] = 8;
+	Params->m_internalBitDepth[0] = InConfig.BitDepth;
+	Params->m_internalBitDepth[1] = InConfig.BitDepth;
 
-	Params->m_verbosity = VVENC_DETAILS;
+	switch (InConfig.LogLevel)
+	{
+		case LOG_SEVERITY_SILENT:
+			Params->m_verbosity = VVENC_SILENT;
+			break;
+		case LOG_SEVERITY_ERROR:
+			Params->m_verbosity = VVENC_ERROR;
+			break;
+		case LOG_SEVERITY_WARNING:
+			Params->m_verbosity = VVENC_WARNING;
+			break;
+		case LOG_SEVERITY_INFO:
+			Params->m_verbosity = VVENC_INFO;
+			break;
+		case LOG_SEVERITY_NOTICE:
+			Params->m_verbosity = VVENC_NOTICE;
+			break;
+		case LOG_SEVERITY_VERBOSE:
+			Params->m_verbosity = VVENC_VERBOSE;
+			break;
+		case LOG_SEVERITY_DETAILS:
+			Params->m_verbosity = VVENC_DETAILS;
+			break;
+	}
 
-	vvencChromaFormat internalFormat = VVENC_NUM_CHROMA_FORMAT;
 	switch (InConfig.Format)
 	{
 		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
-			internalFormat = VVENC_CHROMA_400;
+			Params->m_internChromaFormat = VVENC_CHROMA_400;
 			break;
 		case EChromaFormat::CHROMA_FORMAT_420:
-			internalFormat = VVENC_CHROMA_420;
+			Params->m_internChromaFormat = VVENC_CHROMA_420;
 			break;
 		case EChromaFormat::CHROMA_FORMAT_422:
-			internalFormat = VVENC_CHROMA_422;
+			Params->m_internChromaFormat = VVENC_CHROMA_422;
 			break;
 		case EChromaFormat::CHROMA_FORMAT_444:
-			internalFormat = VVENC_CHROMA_444;
+			Params->m_internChromaFormat = VVENC_CHROMA_444;
 			break;
 	}
-	Params->m_internChromaFormat = internalFormat;
 
 	// All intra configuration
-	Params->m_GOPSize = 1;
-	Params->m_IntraPeriod = 1;
+	Params->m_GOPSize = InConfig.VvcGOPSize;
+	Params->m_IntraPeriod = InConfig.VvcIntraPeriod;
 
 	Encoder = vvenc_encoder_create();
 

@@ -51,35 +51,26 @@ EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 		Params->framerate = Config.Framerate;
 	}
 
-	if (Config.BitDepth)
-	{
-		Params->input_bitdepth = Config.BitDepth;
-	}
-
-	if (Config.Format != EChromaFormat::CHROMA_FORMAT_UNDEFINED)
+	if (Config.Format != CHROMA_FORMAT_UNDEFINED)
 	{
 		// clang-format off
-        if(Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME) {
-            Params->chroma_format = xvc_enc_chroma_format::XVC_ENC_CHROMA_FORMAT_MONOCHROME;
-        } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_420) {
-            Params->chroma_format = xvc_enc_chroma_format::XVC_ENC_CHROMA_FORMAT_420;
-        } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_422) {
-            Params->chroma_format = xvc_enc_chroma_format::XVC_ENC_CHROMA_FORMAT_422;
-        } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_444) {
-            Params->chroma_format = xvc_enc_chroma_format::XVC_ENC_CHROMA_FORMAT_444;
+        if(Config.Format == CHROMA_FORMAT_MONOCHROME) {
+            Params->chroma_format = XVC_ENC_CHROMA_FORMAT_MONOCHROME;
+        } else if(Config.Format == CHROMA_FORMAT_420) {
+            Params->chroma_format = XVC_ENC_CHROMA_FORMAT_420;
+        } else if(Config.Format == CHROMA_FORMAT_422) {
+            Params->chroma_format = XVC_ENC_CHROMA_FORMAT_422;
+        } else if(Config.Format == CHROMA_FORMAT_444) {
+            Params->chroma_format = XVC_ENC_CHROMA_FORMAT_444;
         }
 		// clang-format on
 	}
 
-	// low delay
-	Params->low_delay = 1;
-	// SpeedMode::kFast
-	Params->speed_mode = 2;
 	// Intra only mode
-	Params->num_ref_pics = 0;
-	Params->max_keypic_distance = 0;
-	Params->input_bitdepth = 8;
-	Params->internal_bitdepth = 8;
+	Params->num_ref_pics = InConfig.XvcNumRefPics;
+	Params->max_keypic_distance = InConfig.XvcMaxKeypicDistance;
+	Params->input_bitdepth = InConfig.BitDepth;
+	Params->internal_bitdepth = InConfig.BitDepth;
 
 	xvc_enc_return_code Result = Api->parameters_check(Params);
 	if (Result != XVC_ENC_OK)

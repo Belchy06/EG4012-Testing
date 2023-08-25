@@ -1,5 +1,7 @@
 #pragma once
 
+#include <random>
+
 #include "ovb_relay/settings.h"
 
 class Dropper
@@ -9,5 +11,5 @@ public:
 
 protected:
 	DropSettings Options;
-	uint16_t	 Seed;
+	std::mt19937 Gen;
 };

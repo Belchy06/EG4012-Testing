@@ -36,13 +36,11 @@ private:
 	virtual void OnEncodeComplete(uint8_t* InData, size_t InSize) override;
 
 private:
-	std::istream*		 InputStream;
-	std::ifstream		 FileStream;
-	std::streamsize		 FileSize;
-	std::streamoff		 PictureSkip;
-	PictureFormat		 PicFormat;
-	SenderSettings		 Options;
-	std::vector<uint8_t> PictureBytes;
+	std::istream*  InputStream;
+	std::ifstream  FileStream;
+	std::streamoff PictureSkip;
+	SenderSettings Options;
+	EncoderConfig  Config;
 
 	std::shared_ptr<Encoder>	WrappedEncoder;
 	std::shared_ptr<Packetizer> Packetizer;

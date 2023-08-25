@@ -46,34 +46,34 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 		Params->height = Config.Height;
 	}
 
-	if (Config.Format != EChromaFormat::CHROMA_FORMAT_UNDEFINED)
+	if (Config.Format != CHROMA_FORMAT_UNDEFINED)
 	{
 		// clang-format off
-        if(Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME) {
-            Params->format = ovc_chroma_format::OVC_CHROMA_FORMAT_MONOCHROME;
-        } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_420) {
-            Params->format = ovc_chroma_format::OVC_CHROMA_FORMAT_420;
-        } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_422) {
-            Params->format = ovc_chroma_format::OVC_CHROMA_FORMAT_422;
-        } else if(Config.Format == EChromaFormat::CHROMA_FORMAT_444) {
-            Params->format = ovc_chroma_format::OVC_CHROMA_FORMAT_444;
+        if(Config.Format == CHROMA_FORMAT_MONOCHROME) {
+            Params->format = OVC_CHROMA_FORMAT_MONOCHROME;
+        } else if(Config.Format == CHROMA_FORMAT_420) {
+            Params->format = OVC_CHROMA_FORMAT_420;
+        } else if(Config.Format == CHROMA_FORMAT_422) {
+            Params->format = OVC_CHROMA_FORMAT_422;
+        } else if(Config.Format == CHROMA_FORMAT_444) {
+            Params->format = OVC_CHROMA_FORMAT_444;
         }
 		// clang-format on
 	}
 
-	Params->repeat_vps = 1;
+	Params->repeat_vps = InConfig.OvcRepeatVPS;
 
-	Params->wavelet_family = OVC_WAVELET_FAMILY_BIORTHOGONAL;
-	Params->wavelet_config = { .biorthogonal_config = OVC_WAVELET_BIORTHOGONAL_3p9 };
+	Params->wavelet_family = InConfig.OvcWaveletFamily;
+	Params->wavelet_config = InConfig.OvcWaveletConfig;
 
-	Params->partition_type = OVC_PARTITION_OFFSET_ZEROTREE;
-	Params->num_levels = 3;
-	Params->num_streams_exp = 1;
+	Params->partition_type = InConfig.OvcPartitionType;
+	Params->num_levels = InConfig.OvcNumLevels;
+	Params->num_streams_exp = InConfig.OvcNumStreamsExp;
 
-	Params->spiht = OVC_SPIHT_ENABLE;
-	Params->bits_per_pixel = 1.f;
+	Params->spiht = InConfig.OvcSPIHT;
+	Params->bits_per_pixel = InConfig.OvcBitsPerPixel;
 
-	Params->entropy_coder = ovc_entropy_coder::OVC_ENTROPY_CODER_ARITHMETIC;
+	Params->entropy_coder = InConfig.OvcEntropyCoder;
 
 	Encoder = new ovc_encoder();
 	if (!Encoder)

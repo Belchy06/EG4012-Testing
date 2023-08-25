@@ -43,7 +43,7 @@ void Receiver::ParseArgs(int argc, const char* argv[])
         } else if(Arg == "--port") {
 			std::stringstream(argv[++i]) >> Options.Port;
         } else if(Arg == "--file") {
-            std::stringstream(argv[++i]) >> Options.File;
+            Options.File = std::string(argv[++i]);
         } else if(Arg == "--codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "VVC") {

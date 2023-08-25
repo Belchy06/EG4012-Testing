@@ -26,6 +26,9 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 	// 	Packets.clear();
 	// }
 
+	PrevTimestamp = InPacket.GetTimeStamp();
+	PrevSequenceNumber = InPacket.GetSequenceNumber();
+
 	uint8_t* PacketData = InPacket.GetPayload();
 	size_t	 PacketSize = InPacket.GetPayloadSize();
 	// assert(PacketSize > 2);
@@ -131,9 +134,6 @@ void VvcDepacketizer::HandlePacket(RTPPacket InPacket)
 			}
 
 			DepacketizerListener->OnNALReceived(ReconstructedNalBytes.data(), ReconstructedNalBytes.size());
-
-			PrevTimestamp = Fragments[0].GetTimeStamp();
-			PrevSequenceNumber = Fragments[0].GetSequenceNumber();
 
 			Fragments.clear();
 		}
