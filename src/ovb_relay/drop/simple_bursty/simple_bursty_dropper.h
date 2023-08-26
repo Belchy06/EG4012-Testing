@@ -2,15 +2,15 @@
 
 #include "ovb_relay/drop/dropper.h"
 
-class BurstyDropper : public Dropper
+class SimpleBurstyDropper : public Dropper
 {
 public:
-	BurstyDropper(DropSettings InOptions);
+	SimpleBurstyDropper(DropSettings InOptions);
 
 	virtual bool Drop() override;
 
 private:
-	//
+	// https://ieeexplore-ieee-org.elibrary.jcu.edu.au/document/6769369
 	typedef enum
 	{
 		GOOD,

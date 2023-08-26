@@ -16,14 +16,17 @@ Relay::Relay()
 	Options.SendPort = 0;
 	Options.RecvPort = 0;
 	Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
-	Options.DropType = EDropType::LOSS_BURSTY;
+	Options.DropType = EDropType::LOSS_COMPLEX_BURSTY;
 	Options.DropOptions.Seed = Options.TamperOptions.Seed = 1337;
 
 	// Values from https://ieeexplore-ieee-org.elibrary.jcu.edu.au/document/6465309 Table 1
 	Options.DropOptions.DropChanceGood = 0.f;
-	Options.DropOptions.DropChanceBad = 1.f;
-	Options.DropOptions.P = 0.05f;
-	Options.DropOptions.R = 0.5f;
+	Options.DropOptions.DropChanceBad = 0.9998f;
+	Options.DropOptions.P1 = 0.0031f;
+	Options.DropOptions.P2 = 0.0034f;
+	Options.DropOptions.P3 = 0.0036f;
+	Options.DropOptions.P4 = 0.1004f;
+	Options.DropOptions.Q = 0.2786f;
 }
 
 Relay::~Relay()
@@ -87,11 +90,13 @@ void Relay::ParseArgs(int argc, const char* argv[])
             std::string LossStr(argv[++i]);
             if(LossStr == "continuous") {
                 Options.DropType = EDropType::LOSS_CONTINUOUS;
-            } else if(LossStr == "bursty") {
-                Options.DropType = EDropType::LOSS_BURSTY;
+            } else if(LossStr == "simple_bursty") {
+                Options.DropType = EDropType::LOSS_SIMPLE_BURSTY;
+            } else if(LossStr == "complex_bursty") {
+                Options.DropType = EDropType::LOSS_COMPLEX_BURSTY;
             } else {
-				LOG(LogRelay, LOG_SEVERITY_WARNING, "Unknown loss type \"{}\". Defaulting to LOSS_BURSTY", LossStr);
-                Options.DropType = EDropType::LOSS_BURSTY;
+				LOG(LogRelay, LOG_SEVERITY_WARNING, "Unknown loss type \"{}\". Defaulting to LOSS_COMPLEX_BURSTY", LossStr);
+                Options.DropType = EDropType::LOSS_COMPLEX_BURSTY;
             }
         } else if(Arg == "--drop-config") {
             std::string Config(argv[++i]);
@@ -105,10 +110,18 @@ void Relay::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Options.DropOptions.DropChanceGood;
                 } else if(Key == "--hb") {
                     std::stringstream(Value) >> Options.DropOptions.DropChanceBad;
+                } else if(Key == "--p1") {
+                    std::stringstream(Value) >> Options.DropOptions.P1;
+                } else if(Key == "--p2") {
+                    std::stringstream(Value) >> Options.DropOptions.P2;
+                } else if(Key == "--p3") {
+                    std::stringstream(Value) >> Options.DropOptions.P3;
+                } else if(Key == "--p4") {
+                    std::stringstream(Value) >> Options.DropOptions.P4;
+                } else if(Key == "--q") {
+                    std::stringstream(Value) >> Options.DropOptions.Q;
                 } else if(Key == "--p") {
                     std::stringstream(Value) >> Options.DropOptions.P;
-                } else if(Key == "--r") {
-                    std::stringstream(Value) >> Options.DropOptions.R;
                 } else if(Key == "--prob") {
                     std::stringstream(Value) >> Options.DropOptions.DropChance;
                 } else {
@@ -188,15 +201,22 @@ void Relay::PrintSettings()
 	std::cout << "  --send-port: " << Options.SendPort << std::endl;
 	std::cout << "  --recv-port: " << Options.RecvPort << std::endl;
     std::cout << "  --drop-type: " << DropTypeToString(Options.DropType) << std::endl;
-    if(Options.DropType == EDropType::LOSS_BURSTY) {
     std::cout << "  --drop-config: " << std::endl;
+    std::cout << "    --seed: " << Options.DropOptions.Seed << std::endl;
+    if(Options.DropType == EDropType::LOSS_SIMPLE_BURSTY) {
     std::cout << "    --hg: " << Options.DropOptions.DropChanceGood << std::endl;
     std::cout << "    --hb: " << Options.DropOptions.DropChanceBad << std::endl;
     std::cout << "    --p: " << Options.DropOptions.P << std::endl;
-    std::cout << "    --r: " << Options.DropOptions.R << std::endl;
-    std::cout << "    --seed: " << Options.DropOptions.Seed << std::endl;
-    } else if(Options.DropType == EDropType::LOSS_BURSTY) {
-    std::cout << "  --drop-config: " << std::endl;
+    std::cout << "    --q: " << Options.DropOptions.Q  << std::endl;
+    } else if(Options.DropType == EDropType::LOSS_COMPLEX_BURSTY) {
+    std::cout << "    --hg: " << Options.DropOptions.DropChanceGood << std::endl;
+    std::cout << "    --hb: " << Options.DropOptions.DropChanceBad << std::endl;
+    std::cout << "    --p1: " << Options.DropOptions.P1 << std::endl;
+    std::cout << "    --p2: " << Options.DropOptions.P2 << std::endl;
+    std::cout << "    --p3: " << Options.DropOptions.P3 << std::endl;
+    std::cout << "    --p4: " << Options.DropOptions.P4 << std::endl;
+    std::cout << "    --q: " << Options.DropOptions.Q  << std::endl;
+    } else if(Options.DropType == EDropType::LOSS_CONTINUOUS) {
     std::cout << "    --prob: " << Options.DropOptions.DropChance << std::endl;
     }
     std::cout << "  --tamper-config: " << std::endl;
@@ -225,8 +245,11 @@ void Relay::PrintHelp()
     std::cout << "  --drop-config   <string>" << std::endl;
     std::cout << "      --hg=<float>,       " << std::endl;
     std::cout << "      --hb=<float>,       " << std::endl;
-    std::cout << "      --p=<float>,        " << std::endl;
-    std::cout << "      --r=<float>,        " << std::endl;
+    std::cout << "      --p1=<float>,        " << std::endl;
+    std::cout << "      --p2=<float>,        " << std::endl;
+    std::cout << "      --p3=<float>,        " << std::endl;
+    std::cout << "      --p4=<float>,        " << std::endl;
+    std::cout << "      --q=<float>,        " << std::endl;
     std::cout << "      --prob=<float>      " << std::endl;
     std::cout << "  --tamper-config <string>" << std::endl;
     std::cout << "      --prob=<float>      " << std::endl;
