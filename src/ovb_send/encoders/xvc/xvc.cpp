@@ -71,6 +71,7 @@ EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 	Params->max_keypic_distance = InConfig.XvcMaxKeypicDistance;
 	Params->input_bitdepth = InConfig.BitDepth;
 	Params->internal_bitdepth = InConfig.BitDepth;
+	Params->qp = InConfig.XvcQP;
 
 	xvc_enc_return_code Result = Api->parameters_check(Params);
 	if (Result != XVC_ENC_OK)

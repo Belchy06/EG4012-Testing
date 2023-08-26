@@ -151,6 +151,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Config.XvcNumRefPics;
                 } else if(Key == "--xvc-max-key-pic-distance") {
                     std::stringstream(Value) >> Config.XvcMaxKeypicDistance;
+                } else if(Key == "--xvc-qp") {
+                    std::stringstream(Value) >> Config.XvcQP;
                 } else {
                     LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown encoder config option \"{}\"", Key);
                 }
@@ -350,6 +352,7 @@ void Sender::PrintSettings()
     } else if(Options.Codec == CODEC_XVC) {
     std::cout << "    --xvc-num-ref-pics: " << Config.XvcNumRefPics << std::endl;
     std::cout << "    --xvc-max-key-pic-distance: " << Config.XvcMaxKeypicDistance << std::endl;
+    std::cout << "    --xvc-qp: " << Config.XvcQP << std::endl;
     }
 	// clang-format on
 }

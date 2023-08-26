@@ -7,4 +7,5 @@ class XvcEncoderConfig
 public:
 	int		 XvcNumRefPics;
 	uint32_t XvcMaxKeypicDistance;
+	int		 XvcQP;
 };
