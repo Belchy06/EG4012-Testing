@@ -13,3 +13,6 @@
 [submodule "src/third_party/avc"]
 	path = src/third_party/avc
 	url = https://github.com/cisco/openh264
+[submodule "src/third_party/vmaf"]
+	path = src/third_party/vmaf
+	url = https://github.com/Netflix/vmaf/
