@@ -1,12 +1,12 @@
 [submodule ".\\src\\third_party\\xvc"]
 	path = .\\src\\third_party\\xvc
-	url = https://github.com/divideon/xvc
+	url = git://github.com/divideon/xvc
 [submodule ".\\src\\third_party\\vvc\\vvenc"]
 	path = .\\src\\third_party\\vvc\\vvenc
-	url = https://github.com/fraunhoferhhi/vvenc
+	url = git://github.com/fraunhoferhhi/vvenc
 [submodule ".\\src\\third_party\\vvc\\vvdec"]
 	path = .\\src\\third_party\\vvc\\vvdec
-	url = https://github.com/fraunhoferhhi/vvdec
+	url = git://github.com/fraunhoferhhi/vvdec
 [submodule ".\\src\\third_party\\ovc"]
 	path = .\\src\\third_party\\ovc
-	url = https://github.com/Belchy06/OpenVideoCoding
+	url = git://github.com/Belchy06/OpenVideoCoding
