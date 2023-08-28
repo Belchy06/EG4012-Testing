@@ -10,12 +10,23 @@
 #include "ovb_recv/depacketizer/depacketizer_factory.h"
 #include "ovb_recv/receiver.h"
 
+#include "libvmaf/model.h"
+
 #define LogReceiver "LogReceiver"
 
 Receiver::Receiver()
 	: RtpReceiver(RTPReceiver::Create())
 	, Writer(nullptr)
+	, Vmaf(nullptr)
 {
+}
+
+Receiver::~Receiver()
+{
+	if (Vmaf != nullptr)
+	{
+		VmafApiPtrs.VmafClose(Vmaf);
+	}
 }
 
 void Receiver::ParseArgs(int argc, const char* argv[])
@@ -111,6 +122,52 @@ void Receiver::ValidateArgs()
 	}
 	OutputStream = &FileStream;
 	Writer = Y4mWriter(OutputStream);
+
+	// Init VMAF
+	void* VMAFLibrary = VMAF::OpenVMAFLibrary();
+	if (VMAFLibrary == nullptr)
+	{
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to load libvmaf.dll");
+		return;
+	}
+	bool bSuccess = VMAF::LoadVMAFFunctions(VMAFLibrary, &VmafApiPtrs);
+	if (!bSuccess)
+	{
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to load functions from libvmaf.dll");
+		VMAF::CloseVMAFLibrary(VMAFLibrary);
+		return;
+	}
+
+	VmafConfiguration Config = { 0 };
+	int				  Result = VmafApiPtrs.VmafInit(&Vmaf, Config);
+	if (Result != 0)
+	{
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to initialize VMAF context");
+		Vmaf = nullptr;
+		return;
+	}
+
+	VmafModel* Model;
+
+	VmafModelConfig ModelConfig;
+	ModelConfig.name = std::string("model").c_str();
+
+	std::string ModelPath("./src/third_party/vmaf/model/vmaf_v0.6.1.json");
+	Result = VmafApiPtrs.VmafModelLoadFromPath(&Model, &ModelConfig, ModelPath.c_str());
+	if (Result != 0)
+	{
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to load VMAF model");
+		Vmaf = nullptr;
+		return;
+	}
+
+	Result = VmafApiPtrs.VmafUseFeaturesFromModel(Vmaf, Model);
+	if (Result != 0)
+	{
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to load feature extractors from model \"{}\"", ModelPath);
+		Vmaf = nullptr;
+		return;
+	}
 }
 
 void Receiver::Run()

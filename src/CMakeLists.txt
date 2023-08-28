@@ -4,7 +4,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 set(OVB_COMMON_SOURCES
-    "ovb_common/rtp/packet.h"
+    "ovb_common/platform/platform.cpp"
     "ovb_common/rtp/packet.cpp")
 
 set(OVB_RECV_SOURCES
@@ -19,6 +19,7 @@ set(OVB_RECV_SOURCES
     "ovb_recv/depacketizer/depacketizer_factory.cpp"
     "ovb_recv/rtp_receiver/rtp_receiver.cpp"
     "ovb_recv/socket/socket.cpp"
+    "ovb_recv/vmaf/vmaf.cpp"
     "ovb_recv/receiver.cpp"
     "ovb_recv/y4m_writer.cpp"
     "ovb_recv/main.cpp")
@@ -100,7 +101,8 @@ include_directories(
     "third_party/xvc/src"
     "third_party/vvc/vvenc/include"
     "third_party/vvc/vvdec/include"
-    "third_party/avc/codec/api")
+    "third_party/avc/codec/api"
+    "third_party/vmaf/vmaf-install/include")
 link_directories(
     "third_party/ovc/build/src/Debug"
     "third_party/xvc/build/src/Debug"
@@ -119,6 +121,10 @@ set_target_properties(ovb_recv PROPERTIES OUTPUT_NAME "ovbrecv")
 target_compile_options(ovb_recv PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_recv PUBLIC .)
 target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdec ovcdec vvdec welsdcore)
+add_custom_command(TARGET ovb_recv POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/vmaf/vmaf-install/bin/libvmaf.dll"      # <--this is in-file
+        $<TARGET_FILE_DIR:ovb_recv>)   
 
 # ovb_send
 add_executable(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_send_src_extra})

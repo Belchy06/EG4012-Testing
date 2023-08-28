@@ -11,6 +11,7 @@
 #include "ovb_common/rtp/packet.h"
 #include "ovb_recv/rtp_receiver/rtp_receiver.h"
 #include "ovb_recv/rtp_receiver/rtp_receiver_listener.h"
+#include "ovb_recv/vmaf/vmaf.h"
 #include "ovb_common/settings.h"
 #include "ovb_recv/y4m_writer.h"
 
@@ -18,6 +19,7 @@ class Receiver : public IRTPPacketListener, public IDecodeCompleteCallback, publ
 {
 public:
 	Receiver();
+	~Receiver();
 
 	void ParseArgs(int argc, const char* argv[]);
 	void ValidateArgs();
@@ -42,7 +44,11 @@ private:
 	Settings	  Options;
 	Y4mWriter	  Writer;
 
+	VmafContext*				  Vmaf;
 	std::shared_ptr<Decoder>	  WrappedDecoder;
 	std::shared_ptr<RTPReceiver>  RtpReceiver;
 	std::shared_ptr<Depacketizer> Depacketizer;
+
+private:
+	VMAF_API_FUNCTION_LIST VmafApiPtrs;
 };
