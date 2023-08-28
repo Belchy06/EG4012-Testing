@@ -24,6 +24,7 @@ set(OVB_RECV_SOURCES
     "ovb_recv/main.cpp")
 
 set(OVB_SEND_SOURCES
+    "ovb_send/encoders/avc/avc.cpp"
     "ovb_send/encoders/xvc/xvc.cpp"
     "ovb_send/encoders/ovc/ovc.cpp"
     "ovb_send/encoders/vvc/vvc.cpp"
@@ -98,12 +99,14 @@ include_directories(
     "third_party/ovc/src" 
     "third_party/xvc/src"
     "third_party/vvc/vvenc/include"
-    "third_party/vvc/vvdec/include")
+    "third_party/vvc/vvdec/include"
+    "third_party/avc/codec/api")
 link_directories(
     "third_party/ovc/build/src/Debug"
     "third_party/xvc/build/src/Debug"
     "third_party/vvc/vvenc/lib/debug-static"
-    "third_party/vvc/vvdec/lib/debug-static")
+    "third_party/vvc/vvdec/lib/debug-static"
+    "third_party/avc/bin/x64/Debug")
 
 # ovb_common
 add_library (ovb_common OBJECT ${OVB_COMMON_SOURCES})
@@ -115,14 +118,14 @@ add_executable(ovb_recv ${OVB_RECV_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_r
 set_target_properties(ovb_recv PROPERTIES OUTPUT_NAME "ovbrecv")
 target_compile_options(ovb_recv PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_recv PUBLIC .)
-target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdec ovcdec vvdec)
+target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdec ovcdec vvdec welsdcore)
 
 # ovb_send
 add_executable(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_send_src_extra})
 set_target_properties(ovb_send PROPERTIES OUTPUT_NAME "ovbsend")
 target_compile_options(ovb_send PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_send PUBLIC .)
-target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcenc ovcenc vvenc)
+target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcencd ovcenc vvenc welsecore)
 
 # ovb_relay
 add_executable(ovb_relay ${OVB_RELAY_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_relay_src_extra})

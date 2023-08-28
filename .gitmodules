@@ -3,7 +3,7 @@
 	url = https://github.com/Belchy06/OpenVideoCoding
 [submodule "src/third_party/xvc"]
 	path = src/third_party/xvc
-	url = https://github.com/divideon/xvc
+	url = https://github.com/Belchy06/xvc
 [submodule "src/third_party/vvc/vvdec"]
 	path = src/third_party/vvc/vvdec
 	url = https://github.com/fraunhoferhhi/vvdec
