@@ -10,3 +10,6 @@
 [submodule "src/third_party/vvc/vvenc"]
 	path = src/third_party/vvc/vvenc
 	url = https://github.com/fraunhoferhhi/vvenc
+[submodule "src/third_party/avc"]
+	path = src/third_party/avc
+	url = https://github.com/cisco/openh264
