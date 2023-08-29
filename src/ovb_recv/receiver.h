@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <memory>
+#include <string>
 
 #include "ovb_recv/image/decoded_image.h"
 #include "ovb_recv/decoders/decoder.h"
@@ -14,6 +15,12 @@
 #include "ovb_recv/vmaf/vmaf.h"
 #include "ovb_common/settings.h"
 #include "ovb_recv/y4m_writer.h"
+
+class ReceiverSettings : public Settings
+{
+public:
+	std::string ModelPath;
+};
 
 class Receiver : public IRTPPacketListener, public IDecodeCompleteCallback, public IDepacketizerListener
 {
@@ -39,10 +46,10 @@ private:
 	virtual void OnNALReceived(uint8_t* InData, size_t InSize) override;
 
 private:
-	std::ostream* OutputStream;
-	std::ofstream FileStream;
-	Settings	  Options;
-	Y4mWriter	  Writer;
+	std::ostream*	 OutputStream;
+	std::ofstream	 FileStream;
+	ReceiverSettings Options;
+	Y4mWriter		 Writer;
 
 	VmafContext*				  Vmaf;
 	std::shared_ptr<Decoder>	  WrappedDecoder;

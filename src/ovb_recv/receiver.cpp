@@ -55,6 +55,8 @@ void Receiver::ParseArgs(int argc, const char* argv[])
 			std::stringstream(argv[++i]) >> Options.Port;
         } else if(Arg == "--file") {
             Options.File = std::string(argv[++i]);
+        } else if(Arg == "--vmaf-model-path") {
+            Options.ModelPath = std::string(argv[++i]);
         } else if(Arg == "--codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "VVC") {
@@ -152,8 +154,12 @@ void Receiver::ValidateArgs()
 	VmafModelConfig ModelConfig;
 	ModelConfig.name = std::string("model").c_str();
 
-	std::string ModelPath("./src/third_party/vmaf/model/vmaf_v0.6.1.json");
-	Result = VmafApiPtrs.VmafModelLoadFromPath(&Model, &ModelConfig, ModelPath.c_str());
+	if (Options.ModelPath.empty())
+	{
+		LOG(LogReceiver, LOG_SEVERITY_WARNING, "Missing --vmaf-model-path argument");
+		return;
+	}
+	Result = VmafApiPtrs.VmafModelLoadFromPath(&Model, &ModelConfig, Options.ModelPath.c_str());
 	if (Result != 0)
 	{
 		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to load VMAF model");
@@ -164,7 +170,7 @@ void Receiver::ValidateArgs()
 	Result = VmafApiPtrs.VmafUseFeaturesFromModel(Vmaf, Model);
 	if (Result != 0)
 	{
-		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to load feature extractors from model \"{}\"", ModelPath);
+		LOG(LogReceiver, LOG_SEVERITY_ERROR, "Failed to load feature extractors from model \"{}\"", Options.ModelPath);
 		Vmaf = nullptr;
 		return;
 	}
@@ -217,6 +223,7 @@ void Receiver::PrintHelp()
 	std::cout << "  --file <string> [Optional parameters]" << std::endl << std::endl;
     std::cout << "Optional parameters:" << std::endl;
     std::cout << "  --port <int> (default: 8888)" << std::endl;
+    std::cout << "  --vmaf-model-path <string>        " << std::endl;
     std::cout << "  --loglevel <string> " << std::endl;
     std::cout << "      \"silent\"          " << std::endl;
     std::cout << "      \"error\"           " << std::endl;
@@ -241,6 +248,10 @@ void Receiver::PrintSettings()
 	std::cout << "  --port: " << Options.Port << std::endl;
     std::cout << "  --codec: " << CodecToString(Options.Codec) << std::endl;
     std::cout << "  --log-level: " << "LOG_SEVERITY_" << SeverityToString(Options.LogLevel) << std::endl;
+    if(!Options.ModelPath.empty())
+    {
+    std::cout << "  --vmaf-model-path: " << Options.ModelPath << std::endl;
+    }
 	// clang-format on
 }
 
