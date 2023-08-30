@@ -14,6 +14,11 @@
 
 #define LogOvcEncoder "LogOvcEncoder"
 
+void OvcLogFunction(int level, const char* fmt, va_list args)
+{
+	std::vfprintf(stdout, fmt, args);
+}
+
 OvcEncoder::OvcEncoder()
 	: Params(new ovc_enc_config()), Encoder(nullptr)
 {
@@ -49,7 +54,7 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 	if (Config.Format != CHROMA_FORMAT_UNDEFINED)
 	{
 		// clang-format off
-        if(Config.Format == CHROMA_FORMAT_MONOCHROME) {
+        if(Config.Format == CHROMA_FORMAT_400) {
             Params->format = OVC_CHROMA_FORMAT_MONOCHROME;
         } else if(Config.Format == CHROMA_FORMAT_420) {
             Params->format = OVC_CHROMA_FORMAT_420;
@@ -82,7 +87,11 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 		std::exit(-1);
 	}
 
-	return new OvcResult(Encoder->init(Params));
+	ovc_enc_result Result = Encoder->init(Params);
+
+	Encoder->set_logging_callback(&::OvcLogFunction);
+
+	return new OvcResult(Result);
 }
 
 EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInLastPicture)
@@ -93,7 +102,7 @@ EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 	ovc_picture* Input = new ovc_picture();
 
 	uint8_t* SrcBytes = InPictureBytes.data();
-	int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
+	int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_400 ? 1 : 3;
 	for (int c = 0; c < NumComponents; c++)
 	{
 		int Width = c == 0 ? Config.Width : ScaleX(Config.Width, Config.Format);

@@ -54,7 +54,7 @@ EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 	if (Config.Format != CHROMA_FORMAT_UNDEFINED)
 	{
 		// clang-format off
-        if(Config.Format == CHROMA_FORMAT_MONOCHROME) {
+        if(Config.Format == CHROMA_FORMAT_400) {
             Params->chroma_format = XVC_ENC_CHROMA_FORMAT_MONOCHROME;
         } else if(Config.Format == CHROMA_FORMAT_420) {
             Params->chroma_format = XVC_ENC_CHROMA_FORMAT_420;
@@ -99,7 +99,7 @@ EncodeResult* XvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 
 	std::vector<uint8_t*> PlanesVec;
 
-	int NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
+	int NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_400 ? 1 : 3;
 	for (int c = 0; c < NumComponents; c++)
 	{
 		int Width = c == 0 ? Config.Width : ScaleX(Config.Width, Config.Format);

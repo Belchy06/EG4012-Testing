@@ -11,6 +11,11 @@
 
 #define LogOvcDecoder "LogOvcDecoder"
 
+void OvcLogFunction(int level, const char* fmt, va_list args)
+{
+	std::vfprintf(stdout, fmt, args);
+}
+
 OvcDecoder::OvcDecoder()
 	: Params(new ovc_dec_config()), Decoder(nullptr)
 {
@@ -41,8 +46,13 @@ DecodeResult* OvcDecoder::Init(DecoderConfig& InConfig)
 	}
 
 	Params->log_verbosity = static_cast<ovc_verbosity>(InConfig.LogLevel);
+	Params->error_concealment = InConfig.OvcErrorConcealment;
 
-	return new OvcResult(Decoder->init(Params));
+	ovc_dec_result Result = Decoder->init(Params);
+
+	Decoder->set_logging_callback(&::OvcLogFunction);
+
+	return new OvcResult(Result);
 }
 
 DecodeResult* OvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
@@ -71,7 +81,7 @@ DecodeResult* OvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 			{
 				// clang-format off
 				if       (DecodedPicture.format == ovc_chroma_format::OVC_CHROMA_FORMAT_MONOCHROME) {
-					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_MONOCHROME;
+					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_400;
 				} else if(DecodedPicture.format == ovc_chroma_format::OVC_CHROMA_FORMAT_420) {
 					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_420;
 				} else if(DecodedPicture.format == ovc_chroma_format::OVC_CHROMA_FORMAT_422) {
@@ -91,7 +101,7 @@ DecodeResult* OvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 			// clang-format on
 			ImageBytes.reserve(FrameSize);
 
-			for (size_t c = 0; c < (size_t)(Image.Config.Format == CHROMA_FORMAT_MONOCHROME ? 1 : 3); c++)
+			for (size_t c = 0; c < (size_t)(Image.Config.Format == CHROMA_FORMAT_400 ? 1 : 3); c++)
 			{
 				ovc_plane			 Plane = DecodedPicture.planes[c];
 				std::vector<uint8_t> PlaneVec;

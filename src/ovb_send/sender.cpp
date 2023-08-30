@@ -15,6 +15,7 @@ Sender::Sender()
 	: InputStream(nullptr)
 	, FrameCount(0)
 {
+	Config.Format = EChromaFormat::CHROMA_FORMAT_UNDEFINED;
 }
 
 Sender::~Sender()
@@ -87,7 +88,20 @@ void Sender::ParseArgs(int argc, const char* argv[])
             {
                 std::string Key = Option.substr(0, Option.find("="));
                 std::string Value = Option.substr(Option.find("=") + 1);
-                if(Key == "--ovc-bits-per-pixel") {
+                if(Key == "--format") {
+                    if(Value == "400") {
+                        Config.Format = EChromaFormat::CHROMA_FORMAT_400;
+                    } else if(Value == "420") {
+                        Config.Format = EChromaFormat::CHROMA_FORMAT_420;
+                    } else if(Value == "422") {
+                        Config.Format = EChromaFormat::CHROMA_FORMAT_422;
+                    } else if(Value == "444") {
+                        Config.Format = EChromaFormat::CHROMA_FORMAT_444;
+                    } else {
+                        LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown format \"{}\". Defaulting to what's specified in the source file", Value);
+                    }
+
+                } else if(Key == "--ovc-bits-per-pixel") {
                     std::stringstream(Value) >> Config.OvcBitsPerPixel;
                 } else if(Key == "--ovc-repeat-vps") {
                     std::stringstream(Value) >> Config.OvcRepeatVPS;
@@ -192,21 +206,6 @@ void Sender::ValidateArgs()
 	InputStream = &FileStream;
 	InputStream->seekg(0, std::ifstream::beg);
 
-	Y4mReader	  Reader(InputStream);
-	PictureFormat PicFormat;
-	if (!Reader.Read(PicFormat, PictureSkip))
-	{
-		LOG(LogSender, LOG_SEVERITY_ERROR, "Reading unsuccessful");
-		std::exit(-1);
-	}
-
-	Config.Width = PicFormat.Width;
-	Config.Height = PicFormat.Height;
-	Config.BitDepth = PicFormat.BitDepth;
-	Config.Framerate = PicFormat.Framerate;
-	Config.Format = PicFormat.Format;
-	Config.LogLevel = Options.LogLevel;
-
 	if (Options.Codec == ECodec::CODEC_UNDEFINED)
 	{
 		LOG(LogSender, LOG_SEVERITY_ERROR, "Invalid codec");
@@ -225,6 +224,24 @@ void Sender::Run()
 	WrappedEncoder = EncoderFactory::Create(Options.Codec);
 	Packetizer = PacketizerFactory::Create(Options.Codec);
 
+	Y4mReader	  Reader(InputStream);
+	PictureFormat PicFormat;
+	if (!Reader.Read(PicFormat, PictureSkip))
+	{
+		LOG(LogSender, LOG_SEVERITY_ERROR, "Reading unsuccessful");
+		std::exit(-1);
+	}
+
+	Config.Width = PicFormat.Width;
+	Config.Height = PicFormat.Height;
+	Config.BitDepth = PicFormat.BitDepth;
+	Config.Framerate = PicFormat.Framerate;
+	if (Config.Format == EChromaFormat::CHROMA_FORMAT_UNDEFINED)
+	{
+		Config.Format = PicFormat.Format;
+	}
+	Config.LogLevel = Options.LogLevel;
+
 	EncodeResult* Result = WrappedEncoder->Init(Config);
 	if (!Result->IsSuccess())
 	{
@@ -235,19 +252,19 @@ void Sender::Run()
 	WrappedEncoder->RegisterEncodeCompleteCallback(this);
 
 	int PictureSamples = 0;
-	if (Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME)
+	if (PicFormat.Format == EChromaFormat::CHROMA_FORMAT_400)
 	{
 		PictureSamples = Config.Width * Config.Height;
 	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_420)
+	else if (PicFormat.Format == EChromaFormat::CHROMA_FORMAT_420)
 	{
 		PictureSamples = (3 * (Config.Width * Config.Height)) >> 1;
 	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_422)
+	else if (PicFormat.Format == EChromaFormat::CHROMA_FORMAT_422)
 	{
 		PictureSamples = 2 * Config.Width * Config.Height;
 	}
-	else if (Config.Format == EChromaFormat::CHROMA_FORMAT_444)
+	else if (PicFormat.Format == EChromaFormat::CHROMA_FORMAT_444)
 	{
 		PictureSamples = 3 * Config.Width * Config.Height;
 	}
@@ -324,6 +341,7 @@ void Sender::PrintSettings()
     std::cout << "  --codec: " << CodecToString(Options.Codec) << std::endl;
     std::cout << "  --log-level: " << "LOG_SEVERITY_" << SeverityToString(Options.LogLevel) << std::endl;
     std::cout << "  --encoder-config: " << std::endl;
+    std::cout << "    --format: " << FormatToString(Config.Format) << std::endl;
     if(Options.Codec == CODEC_OVC) {
     std::cout << "    --ovc-bits-per-pixel: " << Config.OvcBitsPerPixel << std::endl;
     std::cout << "    --ovc-repeat-vps: " << (Config.OvcRepeatVPS ? "true" : "false") << std::endl;

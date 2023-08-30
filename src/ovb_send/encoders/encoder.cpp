@@ -21,7 +21,7 @@ int Encoder::ScaleX(int InX, EChromaFormat InFormat)
 {
 	switch (InFormat)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+		case EChromaFormat::CHROMA_FORMAT_400:
 			return 0;
 		case EChromaFormat::CHROMA_FORMAT_444:
 			return InX;
@@ -37,7 +37,7 @@ int Encoder::ScaleY(int InY, EChromaFormat InFormat)
 {
 	switch (InFormat)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+		case EChromaFormat::CHROMA_FORMAT_400:
 			return 0;
 		case EChromaFormat::CHROMA_FORMAT_444:
 		case EChromaFormat::CHROMA_FORMAT_422:

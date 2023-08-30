@@ -66,6 +66,8 @@ DecodeResult* VvcDecoder::Init(DecoderConfig& InConfig)
 
 	vvdec_accessUnit_alloc_payload(AccessUnit, MAX_CODED_PICTURE_SIZE);
 
+	Params->errHandlingFlags = Config.VvcErrorHandlingFlags;
+
 	Decoder = vvdec_decoder_open(Params);
 
 	vvdec_set_logging_callback(Decoder, &::msgFnc);
@@ -172,7 +174,7 @@ DecodeResult* VvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 			{
 				// clang-format off
 				if       (PcFrame->colorFormat == VVDEC_CF_YUV400_PLANAR) {
-					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_MONOCHROME;
+					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_400;
 				} else if(PcFrame->colorFormat == VVDEC_CF_YUV420_PLANAR) {
 					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_420;
 				} else if(PcFrame->colorFormat == VVDEC_CF_YUV422_PLANAR) {
@@ -339,7 +341,7 @@ int VvcDecoder::ScaleX(int InX, EChromaFormat InFormat)
 {
 	switch (InFormat)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+		case EChromaFormat::CHROMA_FORMAT_400:
 			return 0;
 		case EChromaFormat::CHROMA_FORMAT_444:
 			return InX;
@@ -355,7 +357,7 @@ int VvcDecoder::ScaleY(int InY, EChromaFormat InFormat)
 {
 	switch (InFormat)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+		case EChromaFormat::CHROMA_FORMAT_400:
 			return 0;
 		case EChromaFormat::CHROMA_FORMAT_444:
 		case EChromaFormat::CHROMA_FORMAT_422:

@@ -69,7 +69,7 @@ DecodeResult* XvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 			{
 				// clang-format off
 				if       (DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_MONOCHROME) {
-					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_MONOCHROME;
+					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_400;
 				} else if(DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_420) {
 					Image.Config.Format = EChromaFormat::CHROMA_FORMAT_420;
 				} else if(DecodedPicture.stats.chroma_format == xvc_dec_chroma_format::XVC_DEC_CHROMA_FORMAT_422) {
@@ -127,12 +127,12 @@ int XvcDecoder::ScaleX(int InX, EChromaFormat InFormat)
 {
 	switch (InFormat)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+		case CHROMA_FORMAT_400:
 			return 0;
-		case EChromaFormat::CHROMA_FORMAT_444:
+		case CHROMA_FORMAT_444:
 			return InX;
-		case EChromaFormat::CHROMA_FORMAT_420:
-		case EChromaFormat::CHROMA_FORMAT_422:
+		case CHROMA_FORMAT_420:
+		case CHROMA_FORMAT_422:
 			return InX >> 1;
 		default:
 			return 0;
@@ -143,12 +143,12 @@ int XvcDecoder::ScaleY(int InY, EChromaFormat InFormat)
 {
 	switch (InFormat)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+		case CHROMA_FORMAT_400:
 			return 0;
-		case EChromaFormat::CHROMA_FORMAT_444:
-		case EChromaFormat::CHROMA_FORMAT_422:
+		case CHROMA_FORMAT_444:
+		case CHROMA_FORMAT_422:
 			return InY;
-		case EChromaFormat::CHROMA_FORMAT_420:
+		case CHROMA_FORMAT_420:
 			return InY >> 1;
 		default:
 			return 0;

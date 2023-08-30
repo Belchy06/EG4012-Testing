@@ -11,19 +11,19 @@
 
 typedef enum
 {
-	CHROMA_FORMAT_MONOCHROME,
+	CHROMA_FORMAT_UNDEFINED,
+	CHROMA_FORMAT_400,
 	CHROMA_FORMAT_420,
 	CHROMA_FORMAT_422,
 	CHROMA_FORMAT_444,
-	CHROMA_FORMAT_UNDEFINED = 255
 } EChromaFormat;
 
 static inline std::string FormatToString(EChromaFormat InFormat)
 {
 	switch (InFormat)
 	{
-		case CHROMA_FORMAT_MONOCHROME:
-			return "CHROMA_FORMAT_MONOCHROME";
+		case CHROMA_FORMAT_400:
+			return "CHROMA_FORMAT_400";
 		case CHROMA_FORMAT_420:
 			return "CHROMA_FORMAT_420";
 		case CHROMA_FORMAT_422:

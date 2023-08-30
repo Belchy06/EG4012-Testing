@@ -25,7 +25,11 @@ void Y4mWriter::WriteImage(DecodedImage& InImage)
 void Y4mWriter::WriteFileHeader(DecodedImage& InImage)
 {
 	std::string ChromaStr;
-	if (InImage.Config.Format == EChromaFormat::CHROMA_FORMAT_420)
+	if (InImage.Config.Format == EChromaFormat::CHROMA_FORMAT_400)
+	{
+		ChromaStr = "mono";
+	}
+	else if (InImage.Config.Format == EChromaFormat::CHROMA_FORMAT_420)
 	{
 		ChromaStr = "420";
 	}
@@ -33,13 +37,9 @@ void Y4mWriter::WriteFileHeader(DecodedImage& InImage)
 	{
 		ChromaStr = "422";
 	}
-	else if (InImage.Config.Format == EChromaFormat::CHROMA_FORMAT_420)
+	else if (InImage.Config.Format == EChromaFormat::CHROMA_FORMAT_444)
 	{
 		ChromaStr = "444";
-	}
-	else if (InImage.Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME)
-	{
-		ChromaStr = "mono";
 	}
 	else
 	{

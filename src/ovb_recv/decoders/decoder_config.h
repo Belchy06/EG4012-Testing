@@ -1,21 +1,12 @@
 #pragma once
 
-#include <ios>
-
 #include "ovb_common/common.h"
+#include "ovb_recv/decoders/ovc/ovc_config.h"
+#include "ovb_recv/decoders/vvc/vvc_config.h"
+#include "ovb_recv/decoders/xvc/xvc_config.h"
 
-class DecoderConfig
+class DecoderConfig : public OvcDecoderConfig, public VvcDecoderConfig, public XvcDecoderConfig
 {
 public:
-	size_t		  Width;
-	size_t		  Height;
-	size_t		  FramerateNum;
-	size_t		  FramerateDenom;
-	size_t		  BitDepth;
-	EChromaFormat Format;
-
-	std::streamoff StartSkip;
-	std::streamoff PictureSkip;
-
 	ELogSeverity LogLevel;
 };

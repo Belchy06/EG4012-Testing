@@ -50,6 +50,7 @@ private:
 	std::ofstream	 FileStream;
 	ReceiverSettings Options;
 	Y4mWriter		 Writer;
+	DecoderConfig	 Config;
 
 	VmafContext*				  Vmaf;
 	std::shared_ptr<Decoder>	  WrappedDecoder;

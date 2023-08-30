@@ -40,10 +40,13 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 
 	// TODO (belchy06): Support > 8bit profiles
 	Params->m_inputBitDepth[0] = InConfig.BitDepth;
-	Params->m_inputBitDepth[1] = InConfig.BitDepth;
+	Params->m_inputBitDepth[1] = (InConfig.Format == EChromaFormat::CHROMA_FORMAT_400 ? 0 : InConfig.BitDepth);
 
 	Params->m_internalBitDepth[0] = InConfig.BitDepth;
-	Params->m_internalBitDepth[1] = InConfig.BitDepth;
+	Params->m_internalBitDepth[1] = (InConfig.Format == EChromaFormat::CHROMA_FORMAT_400 ? 0 : InConfig.BitDepth);
+
+	Params->m_MSBExtendedBitDepth[0] = InConfig.BitDepth;
+	Params->m_MSBExtendedBitDepth[1] = (InConfig.Format == EChromaFormat::CHROMA_FORMAT_400 ? 0 : InConfig.BitDepth);
 
 	switch (InConfig.LogLevel)
 	{
@@ -72,7 +75,7 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 
 	switch (InConfig.Format)
 	{
-		case EChromaFormat::CHROMA_FORMAT_MONOCHROME:
+		case EChromaFormat::CHROMA_FORMAT_400:
 			Params->m_internChromaFormat = VVENC_CHROMA_400;
 			break;
 		case EChromaFormat::CHROMA_FORMAT_420:
@@ -144,7 +147,7 @@ EncodeResult* VvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 			SequenceNumber++;
 
 			uint8_t* SrcBytes = InPictureBytes.data();
-			int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_MONOCHROME ? 1 : 3;
+			int		 NumComponents = Config.Format == EChromaFormat::CHROMA_FORMAT_400 ? 1 : 3;
 			for (int c = 0; c < NumComponents; c++)
 			{
 				int Width = c == 0 ? Config.Width : ScaleX(Config.Width, Config.Format);

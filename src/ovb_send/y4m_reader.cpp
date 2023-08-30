@@ -129,7 +129,7 @@ bool Y4mReader::Read(PictureFormat& OutFormat, std::streamoff& OutPictureSkip)
 				else if (!strncmp(Buf + Pos, "mono", 4))
 				{
 					Picture.BitDepth = 8;
-					Picture.Format = EChromaFormat::CHROMA_FORMAT_MONOCHROME;
+					Picture.Format = EChromaFormat::CHROMA_FORMAT_400;
 					Pos += 4;
 				}
 				else

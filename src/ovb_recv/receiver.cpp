@@ -88,8 +88,37 @@ void Receiver::ParseArgs(int argc, const char* argv[])
 				LOG(LogReceiver, LOG_SEVERITY_WARNING, "Unknown log level \"{}\". Default to SEVERITY_INFO", LevelStr);
                 Options.LogLevel = ELogSeverity::LOG_SEVERITY_INFO;
             }
+        } else if(Arg == "--decoder-config") {
+            std::istringstream Stream(argv[++i]);
+            std::string Option;
+            while(std::getline(Stream, Option, ','))
+            {
+                std::string Key = Option.substr(0, Option.find("="));
+                std::string Value = Option.substr(Option.find("=") + 1);
+                if(Key == "--vvc-error-handling-flags") {
+                    if(Value == "off") {
+                        Config.VvcErrorHandlingFlags = VVDEC_ERR_HANDLING_OFF;
+                    } else if(Value == "try-continue") {
+                        Config.VvcErrorHandlingFlags = VVDEC_ERR_HANDLING_TRY_CONTINUE;
+                    } else {
+                        LOG(LogReceiver, LOG_SEVERITY_WARNING, "Unknown vvc-error-handling-flags value: \"{}\". Defaulting to \"off\"", Value);
+                    }
+                } else if(Key == "--ovc-error-concealment") {
+                    if(Value == "off") {
+                        Config.OvcErrorConcealment = OVC_ERROR_CONCEALMENT_SKIP;
+                    } else if(Value == "average-received") {
+                        Config.OvcErrorConcealment = OVC_ERROR_CONCEALMENT_AVERAGE_RECEIVED;
+                    } else if(Value == "average-surrounding") {
+                        Config.OvcErrorConcealment = OVC_ERROR_CONCEALMENT_AVERAGE_SURROUNDING;
+                    } else {
+                        LOG(LogReceiver, LOG_SEVERITY_WARNING, "Unknown vvc-error-handling-flags value: \"{}\". Defaulting to \"off\"", Value);
+                    }
+                } else {
+                    LOG(LogReceiver, LOG_SEVERITY_WARNING, "Unknown decoder config option: \"{}\"", Key);
+                }
+            }
         } else {
-			LOG(LogReceiver, LOG_SEVERITY_WARNING, "Unknown argument \"{}\"", Arg);
+			LOG(LogReceiver, LOG_SEVERITY_WARNING, "Unknown argument: \"{}\"", Arg);
             PrintHelp();
             std::exit(1);
         }
@@ -98,9 +127,9 @@ void Receiver::ParseArgs(int argc, const char* argv[])
 
 	OvbLogging::Verbosity = Options.LogLevel;
 
-	SocketConfig Config;
-	Config.Port = Options.Port;
-	RtpReceiver->Init(Config);
+	SocketConfig SConfig;
+	SConfig.Port = Options.Port;
+	RtpReceiver->Init(SConfig);
 	RtpReceiver->RegisterRTPPacketListener(this);
 
 	Depacketizer = DepacketizerFactory::Create(Options.Codec);
@@ -180,7 +209,7 @@ void Receiver::Run()
 {
 	WrappedDecoder = DecoderFactory::Create(Options.Codec);
 
-	DecoderConfig Config;
+	Config.LogLevel = Options.LogLevel;
 	DecodeResult* Result = WrappedDecoder->Init(Config);
 	if (!Result->IsSuccess())
 	{
@@ -251,6 +280,13 @@ void Receiver::PrintSettings()
     if(!Options.ModelPath.empty())
     {
     std::cout << "  --vmaf-model-path: " << Options.ModelPath << std::endl;
+    }
+    std::cout << "  --decoder-config: " << std::endl;
+    if(Options.Codec == CODEC_OVC) {
+    std::cout << "    --ovc-error-concealment: " << error_concealment_to_string(Config.OvcErrorConcealment) << std::endl;
+    } else if(Options.Codec == CODEC_VVC) {
+    std::cout << "    --vvc-error-handling-flags: " << ErrorHandlingFlagsToString(Config.VvcErrorHandlingFlags) << std::endl;
+    } else if(Options.Codec == CODEC_XVC) {
     }
 	// clang-format on
 }
