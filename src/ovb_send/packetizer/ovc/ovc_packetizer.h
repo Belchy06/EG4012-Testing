@@ -5,5 +5,8 @@
 class OvcPacketizer : public Packetizer
 {
 public:
-	std::vector<RTPPacket> Packetize(uint8_t* InData, size_t InSize) override;
+	OvcPacketizer();
+
+	virtual void				   Packetize(std::vector<NALU> InNALUs) override;
+	virtual std::vector<RTPPacket> Flush() override;
 };

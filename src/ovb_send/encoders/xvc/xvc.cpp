@@ -143,56 +143,21 @@ EncodeResult* XvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 
 	// Loop through all Nal Units that were received and write to file
 	// the Nal Unit length followed by the actual Nal Unit.
-	size_t	 CurrentSegmentBytes = 0;
-	int		 CurrentSegmentPics = 0;
-	int		 HighestQP = std::numeric_limits<int>::min();
-	uint64_t TotalSSE = 0;
-	size_t	 TotalBytes = 0;
-	size_t	 MaxSegmentBytes = 0;
-	int		 MaxSegmentPics = 0;
-	double	 SumPsnrY = 0;
-	double	 SumPsnrU = 0;
-	double	 SumPsnrV = 0;
-	char	 NalSize[4];
-
+	std::vector<NALU> NALUs;
 	for (int i = 0; i < NumNalUnits; i++)
 	{
-		NalSize[0] = NalUnits[i].size & 0xFF;
-		NalSize[1] = (NalUnits[i].size >> 8) & 0xFF;
-		NalSize[2] = (NalUnits[i].size >> 16) & 0xFF;
-		NalSize[3] = (NalUnits[i].size >> 24) & 0xFF;
-		if (NalUnits[i].stats.nal_unit_type == 16)
-		{
-			if (CurrentSegmentBytes > MaxSegmentBytes)
-			{
-				MaxSegmentBytes = CurrentSegmentBytes;
-				MaxSegmentPics = CurrentSegmentPics;
-			}
-			CurrentSegmentBytes = 0;
-			CurrentSegmentPics = -1;
-		}
-		else
-		{
-			TotalSSE += NalUnits[i].stats.sse;
-			SumPsnrY += NalUnits[i].stats.psnr_y;
-			SumPsnrU += NalUnits[i].stats.psnr_u;
-			SumPsnrV += NalUnits[i].stats.psnr_v;
-			HighestQP = std::max(HighestQP, NalUnits[i].stats.qp);
-		}
-		CurrentSegmentBytes += NalUnits[i].size;
-		CurrentSegmentPics++;
-		TotalBytes += NalUnits[i].size;
-
-		if (OnEncodedImageCallback != nullptr)
-		{
-			OnEncodedImageCallback->OnEncodeComplete(NalUnits[i].bytes, NalUnits[i].size);
-		}
+		NALUs.push_back(NALU(NalUnits[i].bytes, NalUnits[i].size));
 
 		// Conditionally print information for each Nal Unit
 		if (Config.LogLevel >= ELogSeverity::LOG_SEVERITY_DETAILS)
 		{
 			PrintNalInfo(NalUnits[i]);
 		}
+	}
+
+	if (OnEncodedImageCallback != nullptr)
+	{
+		OnEncodedImageCallback->OnEncodeComplete(NALUs);
 	}
 
 	return new XvcResult(Result);

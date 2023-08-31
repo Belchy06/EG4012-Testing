@@ -191,7 +191,8 @@ EncodeResult* VvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 			std::stringstream Stream;
 			Stream.write((const char*)AU.payload, AU.payloadUsedSize);
 
-			bool Continue = true;
+			std::vector<NALU> NALUs;
+			bool			  Continue = true;
 			while (Continue)
 			{
 				vvencAccessUnit Nal;
@@ -201,10 +202,11 @@ EncodeResult* VvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 				Continue = Res > 0;
 				if (Continue)
 				{
-
-					OnEncodedImageCallback->OnEncodeComplete(Nal.payload, Nal.payloadUsedSize);
+					NALUs.push_back(NALU(Nal.payload, Nal.payloadUsedSize));
 				}
 			}
+
+			OnEncodedImageCallback->OnEncodeComplete(NALUs);
 		}
 	}
 	return new VvcResult(VVENC_OK);

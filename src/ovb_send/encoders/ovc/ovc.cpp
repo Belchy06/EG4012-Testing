@@ -139,12 +139,16 @@ EncodeResult* OvcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bInL
 
 	// Loop through all Nal Units that were received and write to file
 	// the Nal Unit length followed by the actual Nal Unit.
+
+	std::vector<NALU> NALUs;
 	for (size_t i = 0; i < NumNalUnits; i++)
 	{
-		if (OnEncodedImageCallback != nullptr)
-		{
-			OnEncodedImageCallback->OnEncodeComplete(NalUnits[i].bytes, NalUnits[i].size);
-		}
+		NALUs.push_back(NALU(NalUnits[i].bytes, NalUnits[i].size));
+	}
+
+	if (OnEncodedImageCallback != nullptr)
+	{
+		OnEncodedImageCallback->OnEncodeComplete(NALUs);
 	}
 
 	return new OvcResult(Result);

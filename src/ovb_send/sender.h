@@ -33,7 +33,7 @@ private:
 	bool ReadNextPicture(std::istream* InStream, std::vector<uint8_t>& OutPictureBytes);
 
 	// EncodeCompleteCallback interface
-	virtual void OnEncodeComplete(uint8_t* InData, size_t InSize) override;
+	virtual void OnEncodeComplete(std::vector<NALU> InNALUs) override;
 
 private:
 	size_t		   FrameCount;

@@ -34,13 +34,13 @@ void XvcDepacketizer::HandlePacket(RTPPacket InPacket)
 	assert(PacketSize > 1);
 
 	// clang-format off
-	uint8_t NalUnitType =        (PacketData[0] & 0b00011111) >> 0;
+	uint8_t NalUnitType =        (PacketData[0] & 0b00111111) >> 0;
 	// clang-format on
 	LOG(LogXvcDepacketizer, LOG_SEVERITY_DETAILS, "Depacketizing NAL. Type: {}; Size: {}", +NalUnitType, PacketSize);
 
-	if (NalUnitType != 49)
+	if (NalUnitType != 48 && NalUnitType != 49)
 	{
-		// Assume single nal, no aggregration packets
+		// Single nal
 		if (Fragments.size() > 0)
 		{
 			// We've received a new single nal without finishing off the last fragmented unit. Warn and continue
@@ -50,16 +50,43 @@ void XvcDepacketizer::HandlePacket(RTPPacket InPacket)
 
 		DepacketizerListener->OnNALReceived(PacketData + 1, PacketSize - 1);
 	}
+	else if (NalUnitType == 48)
+	{
+		// Aggregation Packet
+		if (Fragments.size() > 0)
+		{
+			// We've received a new single nal without finishing off the last fragmented unit. Warn and continue
+			LOG(LogXvcDepacketizer, LOG_SEVERITY_WARNING, "Received new aggregation packet without finishing previously fragmented nal. Dropping {} fragments", Fragments.size());
+			Fragments.clear();
+		}
+
+		PacketData += 1;
+		PacketSize -= 1;
+
+		while (PacketSize > 0)
+		{
+			size_t	 ReadIdx = 0;
+			uint16_t NALSize = 0;
+			NALSize |= PacketData[ReadIdx++] << 8;
+			NALSize |= PacketData[ReadIdx++] << 0;
+			// Skip NALSize
+			PacketData += 2;
+			PacketSize -= 2;
+
+			DepacketizerListener->OnNALReceived(PacketData, NALSize);
+
+			PacketData += NALSize;
+			PacketSize -= NALSize;
+		}
+	}
 	else if (NalUnitType == 49)
 	{
 		// Fragmentaion packet
-		uint8_t FUHeaderByte = PacketData[0];
+		uint8_t FUHeaderByte = PacketData[1];
 		// clang-format off
-        uint8_t ZeroBit  = (FUHeaderByte & 0b10000000) >> 7;
-		uint8_t bIsFirst = (FUHeaderByte & 0b01000000) >> 6;
-		uint8_t bIsLast  = (FUHeaderByte & 0b00100000) >> 5;
+		uint8_t bIsFirst = (FUHeaderByte & 0b10000000) >> 6;
+		uint8_t bIsLast  = (FUHeaderByte & 0b01000000) >> 5;
 		// clang-format on
-		assert(ZeroBit == 0);
 
 		if (bIsFirst && Fragments.size() > 0)
 		{

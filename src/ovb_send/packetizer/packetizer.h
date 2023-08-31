@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ovb_common/rtp/packet.h"
+#include "ovb_common/video/nal.h"
 
 #ifndef RTP_PAYLOAD_SIZE
 	#define RTP_PAYLOAD_SIZE 1200
@@ -12,9 +13,15 @@
 class Packetizer
 {
 public:
-	virtual std::vector<RTPPacket> Packetize(uint8_t* InData, size_t InSize) = 0;
+	Packetizer() {}
+
+	virtual void				   Packetize(std::vector<NALU> InNALUs) = 0;
+	virtual std::vector<RTPPacket> Flush() = 0;
 
 protected:
-	uint16_t SequenceNumber;
-	uint32_t LastTimestamp;
+	uint16_t  SequenceNumber;
+	uint32_t  LastTimestamp;
+	RTPPacket AggregatedPacket;
+
+	std::vector<RTPPacket> Packets;
 };

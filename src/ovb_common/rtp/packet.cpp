@@ -2,6 +2,12 @@
 
 #include "packet.h"
 
+RTPPacket::RTPPacket()
+{
+	PayloadSize = 0;
+	Payload = nullptr;
+}
+
 RTPPacket::RTPPacket(uint8_t InPType, uint16_t InFrameNB, uint32_t InTime, const uint8_t* InData, size_t InDataLength, bool InbIsLast)
 {
 	// Constant header fields:
@@ -94,9 +100,21 @@ uint8_t* RTPPacket::GetPayload()
 	return Payload;
 }
 
+void RTPPacket::SetPayload(uint8_t* InPayload, size_t InPayloadSize)
+{
+	Payload = new uint8_t[InPayloadSize];
+	memcpy(Payload, InPayload, InPayloadSize);
+	PayloadSize = InPayloadSize;
+}
+
 size_t RTPPacket::GetPayloadSize()
 {
 	return PayloadSize;
+}
+
+void RTPPacket::SetPayloadSize(size_t InPayloadSize)
+{
+	PayloadSize = InPayloadSize;
 }
 
 int RTPPacket::GetVersion()

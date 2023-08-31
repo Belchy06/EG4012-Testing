@@ -1,7 +1,11 @@
 #pragma once
 
+#include <vector>
+
+#include "ovb_common/video/nal.h"
+
 class IEncodeCompleteCallback
 {
 public:
-	virtual void OnEncodeComplete(uint8_t* InData, size_t InSize) = 0;
+	virtual void OnEncodeComplete(std::vector<NALU> InNALUs) = 0;
 };

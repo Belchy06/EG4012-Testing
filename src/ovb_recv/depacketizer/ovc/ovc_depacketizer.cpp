@@ -42,9 +42,9 @@ void OvcDepacketizer::HandlePacket(RTPPacket InPacket)
 
 	LOG(LogOvcDepacketizer, LOG_SEVERITY_DETAILS, "Depacketizing NAL. Type: {}; Size: {}", +NalUnitType, PacketSize);
 
-	if (NalUnitType != 49)
+	if (NalUnitType != 49 && NalUnitType != 48)
 	{
-		// Assume single nal, no aggregration packets
+		// Single nal
 		if (Fragments.size() > 0)
 		{
 			// We've received a new single nal without finishing off the last fragmented unit. Warn and continue
@@ -95,6 +95,77 @@ void OvcDepacketizer::HandlePacket(RTPPacket InPacket)
 		}
 
 		DepacketizerListener->OnNALReceived(PacketData, PacketSize);
+	}
+	else if (NalUnitType == 48)
+	{
+		if (Fragments.size() > 0)
+		{
+			// We've received a new AP without finishing off the last fragmented unit. Warn and continue
+			LOG(LogOvcDepacketizer, LOG_SEVERITY_WARNING, "Received new fragmented nal without finishing previously fragmented nal. Reconstructing previous {} fragments", Fragments.size());
+
+			uint8_t* FragmentData = Fragments[0].GetPayload();
+
+			// clang-format off
+			uint8_t OldStartByte   = (FragmentData[0] & 0b11111111) >> 0;
+			uint8_t OldZeroBits    = (FragmentData[1] & 0b11000000) >> 6;
+			// clang-format off
+
+			// Fragmentaion packet
+			uint8_t OldFUHeaderByte = FragmentData[2];
+			// clang-format off
+			uint8_t OldFUType = (OldFUHeaderByte & 0b00111111) >> 0;
+			// clang-format on
+
+			std::vector<uint8_t> ReconstructedNalBytes;
+
+			std::vector<uint8_t> NalHeader;
+			uint8_t				 NalHeaderByte;
+			// clang-format off
+			NalHeaderByte = 0;
+            NalHeaderByte |= OldStartByte;
+            NalHeader.push_back(NalHeaderByte);
+			// clang-format on
+
+			// clang-format off
+			NalHeaderByte = 0;
+            NalHeaderByte |= (OldZeroBits << 6) & 0b11000000;
+            NalHeaderByte |= (OldFUType   << 0) & 0b00111111;
+            NalHeader.push_back(NalHeaderByte);
+			// clang-format on
+
+			ReconstructedNalBytes.reserve(NalHeader.size() + ReconstructedNalBytes.size());
+			ReconstructedNalBytes.insert(ReconstructedNalBytes.end(), NalHeader.begin(), NalHeader.end());
+			for (RTPPacket Fragment : Fragments)
+			{
+				for (size_t i = 3; i < Fragment.GetPayloadSize(); i++)
+				{
+					ReconstructedNalBytes.push_back(Fragment.GetPayload()[i]);
+				}
+			}
+
+			DepacketizerListener->OnNALReceived(ReconstructedNalBytes.data(), ReconstructedNalBytes.size());
+			Fragments.clear();
+		}
+
+		// Skip PayloadHdr
+		PacketData += 2;
+		PacketSize -= 2;
+
+		while (PacketSize > 0)
+		{
+			size_t	 ReadIdx = 0;
+			uint16_t NALSize = 0;
+			NALSize |= PacketData[ReadIdx++] << 8;
+			NALSize |= PacketData[ReadIdx++] << 0;
+			// Skip NALSize
+			PacketData += 2;
+			PacketSize -= 2;
+
+			DepacketizerListener->OnNALReceived(PacketData, NALSize);
+
+			PacketData += NALSize;
+			PacketSize -= NALSize;
+		}
 	}
 	else if (NalUnitType == 49)
 	{

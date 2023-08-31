@@ -5,13 +5,16 @@
 class RTPPacket
 {
 public:
+	RTPPacket();
 	RTPPacket(uint8_t InPType, uint16_t InFrameNB, uint32_t InTime, const uint8_t* InData, size_t InDataLength, bool InbIsLast);
 	RTPPacket(const uint8_t* InData, int64_t InDataLength);
 
 	uint8_t* GetHeader();
 	size_t	 GetHeaderSize();
 	uint8_t* GetPayload();
+	void	 SetPayload(uint8_t* InPayload, size_t InPayloadSize);
 	size_t	 GetPayloadSize();
+	void	 SetPayloadSize(size_t InPayloadSize);
 
 	// Fields that compose the RTP header
 	int		 GetVersion();

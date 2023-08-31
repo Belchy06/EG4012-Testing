@@ -288,11 +288,22 @@ void Sender::Run()
 	}
 }
 
-void Sender::OnEncodeComplete(uint8_t* InData, size_t InSize)
+void Sender::OnEncodeComplete(std::vector<NALU> InNALUs)
 {
-	LOG(LogSender, LOG_SEVERITY_NOTICE, "OnEncodeComplete: Size {}", InSize);
+	LOG(LogSender, LOG_SEVERITY_NOTICE, "OnEncodeComplete: Size {}", InNALUs.size());
 
-	std::vector<RTPPacket> Packets = Packetizer->Packetize(InData, InSize);
+	Packetizer->Packetize(InNALUs);
+	std::vector<RTPPacket> Packets = Packetizer->Flush();
+
+	std::string SizeStr = "[ ";
+	for (RTPPacket& Packet : Packets)
+	{
+		std::stringstream ss;
+		ss << Packet.GetPayloadSize() << " ";
+		SizeStr += ss.str();
+	}
+	SizeStr += "]";
+	LOG(LogSender, LOG_SEVERITY_NOTICE, "Sending {} packets. Size {}", Packets.size(), SizeStr);
 	RtpSender->Send(Packets);
 }
 
