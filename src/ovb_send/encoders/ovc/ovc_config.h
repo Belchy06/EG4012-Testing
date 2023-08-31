@@ -16,4 +16,5 @@ public:
 	ovc_partition	   OvcPartitionType;
 	ovc_spiht		   OvcSPIHT;
 	ovc_entropy_coder  OvcEntropyCoder;
+	ovc_interleave	   OvcInterleaver;
 };

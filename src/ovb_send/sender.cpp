@@ -157,6 +157,14 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     } else {
                         LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown ovc_entropy_coder \"{}\"", Value);
                     }
+                } else if(Key == "--ovc-interleaver") {
+                    if(Value == "skip") {
+                        Config.OvcInterleaver = OVC_INTERLEAVE_SKIP;
+                    } else if(Value == "random") {
+                        Config.OvcInterleaver = OVC_INTERLEAVE_RANDOM;
+                    } else {
+                        LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown ovc_spiht \"{}\"", Value);
+                    }
                 } else if(Key == "--vvc-gop-size") {
                     std::stringstream(Value) >> Config.VvcGOPSize;
                 } else if(Key == "--vvc-intra-period") {
@@ -375,6 +383,7 @@ void Sender::PrintSettings()
     std::cout << "    --ovc-partition-type: " << partition_to_string(Config.OvcPartitionType) << std::endl;
     std::cout << "    --ovc-spiht: " << spiht_to_string(Config.OvcSPIHT) << std::endl;
     std::cout << "    --ovc-entropy-coder: " << entropy_coder_to_string(Config.OvcEntropyCoder) << std::endl;
+    std::cout << "    --ovc-interleaver: " << interleave_to_string(Config.OvcInterleaver) << std::endl;
     } else if(Options.Codec == CODEC_VVC) {
     std::cout << "    --vvc-gop-size: " << Config.VvcGOPSize << std::endl;
     std::cout << "    --vvc-intra-period: " << Config.VvcIntraPeriod << std::endl;

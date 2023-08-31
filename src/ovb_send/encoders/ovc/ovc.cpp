@@ -80,6 +80,8 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 
 	Params->entropy_coder = InConfig.OvcEntropyCoder;
 
+	Params->interleaver = InConfig.OvcInterleaver;
+
 	Encoder = new ovc_encoder();
 	if (!Encoder)
 	{

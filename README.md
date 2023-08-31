@@ -1,8 +1,9 @@
 ## TODO: Update readme
 
-`git submodule update --remote .\third_party\ovc`
+`git submodule update --init --recursive`
 
 ## Buildings steps
+
 ### 1. Build OVC
 ```cmd
 cd ./third_party/ovc
@@ -42,7 +43,16 @@ cmake -G "Visual Studio 17 2022" -A x64 ..
 cmake --build . --target vvdec_lib
 ```
 
-### 4. Build VMAF
+### 4. Build AVC
+```cmd
+cd ./third_party/avc
+mkdir build
+cd build
+cmake -G "Visual Studio 17 2022" -A x64 ..
+cmake --build . --target vvdec_lib
+```
+
+### 5. Build VMAF
 Using a mingw terminal
 ```sh
 cd ./third_party/vmaf

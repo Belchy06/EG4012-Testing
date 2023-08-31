@@ -10,8 +10,6 @@
 #include "ovb_recv/depacketizer/depacketizer_factory.h"
 #include "ovb_recv/receiver.h"
 
-#include "libvmaf/model.h"
-
 #define LogReceiver "LogReceiver"
 
 Receiver::Receiver()

@@ -102,7 +102,7 @@ include_directories(
     "third_party/vvc/vvenc/include"
     "third_party/vvc/vvdec/include"
     "third_party/avc/codec/api"
-    "third_party/vmaf/vmaf-install/include")
+    "third_party/vmaf/libvmaf/include")
 link_directories(
     "third_party/ovc/build/src/Debug"
     "third_party/xvc/build/src/Debug"
@@ -120,11 +120,13 @@ add_executable(ovb_recv ${OVB_RECV_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_r
 set_target_properties(ovb_recv PROPERTIES OUTPUT_NAME "ovbrecv")
 target_compile_options(ovb_recv PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_recv PUBLIC .)
-target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdec ovcdec vvdec welsdcore)
-add_custom_command(TARGET ovb_recv POST_BUILD
+target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdecd ovcdec vvdec welsdcore)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/vmaf/vmaf-install/bin/libvmaf.dll")
+  add_custom_command(TARGET ovb_recv POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/vmaf/vmaf-install/bin/libvmaf.dll"      # <--this is in-file
-        $<TARGET_FILE_DIR:ovb_recv>)   
+      "${CMAKE_CURRENT_SOURCE_DIR}/third_party/vmaf/vmaf-install/bin/libvmaf.dll"      # <--this is in-file
+      $<TARGET_FILE_DIR:ovb_recv>)   
+endif()
 
 # ovb_send
 add_executable(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_send_src_extra})
