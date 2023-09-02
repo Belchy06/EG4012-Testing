@@ -13,7 +13,7 @@
                 "--file",
                 "${workspaceFolder}\\resources\\carphone_qcif.y4m",
                 "--codec",
-                "OVC",
+                "AVC",
                 // "--encoder-config",
                 // "--format=400",
                 "--encoder-config",

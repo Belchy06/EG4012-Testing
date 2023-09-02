@@ -1,3 +1,4 @@
+#include "ovb_recv/decoders/avc/avc.h"
 #include "ovb_recv/decoders/ovc/ovc.h"
 #include "decoder_factory.h"
 #include "ovb_recv/decoders/vvc/vvc.h"
@@ -16,6 +17,10 @@ std::shared_ptr<Decoder> DecoderFactory::Create(ECodec InCodec)
 	else if (InCodec == ECodec::CODEC_OVC)
 	{
 		return std::make_shared<OvcDecoder>();
+	}
+	else if (InCodec == ECodec::CODEC_AVC)
+	{
+		return std::make_shared<AvcDecoder>();
 	}
 	return nullptr;
 }

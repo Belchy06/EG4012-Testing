@@ -8,11 +8,13 @@ set(OVB_COMMON_SOURCES
     "ovb_common/rtp/packet.cpp")
 
 set(OVB_RECV_SOURCES
-    "ovb_recv/decoders/xvc/xvc.cpp"
+    "ovb_recv/decoders/avc/avc.cpp"
     "ovb_recv/decoders/ovc/ovc.cpp"
     "ovb_recv/decoders/vvc/vvc.cpp"
+    "ovb_recv/decoders/xvc/xvc.cpp"
     "ovb_recv/decoders/decoder_factory.cpp"
     "ovb_recv/decoders/decoder.cpp"
+    "ovb_recv/depacketizer/avc/avc_depacketizer.cpp"
     "ovb_recv/depacketizer/ovc/ovc_depacketizer.cpp"
     "ovb_recv/depacketizer/vvc/vvc_depacketizer.cpp"
     "ovb_recv/depacketizer/xvc/xvc_depacketizer.cpp"
@@ -26,11 +28,12 @@ set(OVB_RECV_SOURCES
 
 set(OVB_SEND_SOURCES
     "ovb_send/encoders/avc/avc.cpp"
-    "ovb_send/encoders/xvc/xvc.cpp"
     "ovb_send/encoders/ovc/ovc.cpp"
     "ovb_send/encoders/vvc/vvc.cpp"
+    "ovb_send/encoders/xvc/xvc.cpp"
     "ovb_send/encoders/encoder_factory.cpp"
     "ovb_send/encoders/encoder.cpp"
+    "ovb_send/packetizer/avc/avc_packetizer.cpp"
     "ovb_send/packetizer/ovc/ovc_packetizer.cpp"
     "ovb_send/packetizer/vvc/vvc_packetizer.cpp"
     "ovb_send/packetizer/xvc/xvc_packetizer.cpp"
@@ -134,6 +137,18 @@ set_target_properties(ovb_send PROPERTIES OUTPUT_NAME "ovbsend")
 target_compile_options(ovb_send PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_send PUBLIC .)
 target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcencd ovcenc vvenc welsecore welsenc)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsenc.dll")
+  add_custom_command(TARGET ovb_send POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsenc.dll"      # <--this is in-file
+      $<TARGET_FILE_DIR:ovb_send>)   
+endif()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsvp.dll")
+  add_custom_command(TARGET ovb_send POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsvp.dll"      # <--this is in-file
+      $<TARGET_FILE_DIR:ovb_send>)   
+endif()
 
 # ovb_relay
 add_executable(ovb_relay ${OVB_RELAY_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_relay_src_extra})

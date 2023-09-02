@@ -63,6 +63,8 @@ void Receiver::ParseArgs(int argc, const char* argv[])
                 Options.Codec = ECodec::CODEC_XVC;
             } else if(CodecStr == "OVC") {
                 Options.Codec = ECodec::CODEC_OVC;
+            } else if(CodecStr == "AVC") {
+                Options.Codec = ECodec::CODEC_AVC;
             } else {
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }

@@ -50,10 +50,20 @@ EncodeResult* AvcEncoder::Init(EncoderConfig& InConfig)
 	Params->iPicHeight = InConfig.Height;
 	Params->iTargetBitrate = UNSPECIFIED_BIT_RATE;
 
-	Encoder->Initialize(Params);
+	Result = Encoder->Initialize(Params);
+	if (Result != 0)
+	{
+		LOG(LogAvcEncoder, LOG_SEVERITY_ERROR, "Failed to allocate encoder");
+		std::exit(-1);
+	}
 
 	int videoFormat = videoFormatI420;
-	Encoder->SetOption(ENCODER_OPTION_DATAFORMAT, &videoFormat);
+	Result = Encoder->SetOption(ENCODER_OPTION_DATAFORMAT, &videoFormat);
+	if (Result != 0)
+	{
+		LOG(LogAvcEncoder, LOG_SEVERITY_ERROR, "Failed to allocate encoder");
+		std::exit(-1);
+	}
 
 	return new AvcResult(cmResultSuccess);
 }
