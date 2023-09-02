@@ -120,7 +120,7 @@ add_executable(ovb_recv ${OVB_RECV_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_r
 set_target_properties(ovb_recv PROPERTIES OUTPUT_NAME "ovbrecv")
 target_compile_options(ovb_recv PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_recv PUBLIC .)
-target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdecd ovcdec vvdec welsdcore)
+target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdecd ovcdec vvdec welsdcore welsdec)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/vmaf/vmaf-install/bin/libvmaf.dll")
   add_custom_command(TARGET ovb_recv POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -133,7 +133,7 @@ add_executable(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_s
 set_target_properties(ovb_send PROPERTIES OUTPUT_NAME "ovbsend")
 target_compile_options(ovb_send PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_send PUBLIC .)
-target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcencd ovcenc vvenc welsecore)
+target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcencd ovcenc vvenc welsecore welsenc)
 
 # ovb_relay
 add_executable(ovb_relay ${OVB_RELAY_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_relay_src_extra})

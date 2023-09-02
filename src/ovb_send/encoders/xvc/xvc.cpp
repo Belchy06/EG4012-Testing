@@ -9,6 +9,8 @@
 #include "xvc.h"
 #include "xvc_result.h"
 
+#define LogXvcEncoder "LogXvcEncoder"
+
 XvcEncoder::XvcEncoder()
 	: Api(xvc_encoder_api_get())
 	, Params(Api->parameters_create())
@@ -82,7 +84,7 @@ EncodeResult* XvcEncoder::Init(EncoderConfig& InConfig)
 	Encoder = Api->encoder_create(Params);
 	if (!Encoder)
 	{
-		std::cerr << "Error: Failed to allocate encoder" << std::endl;
+		LOG(LogXvcEncoder, LOG_SEVERITY_ERROR, "Failed to allocate encoder");
 		std::exit(-1);
 	}
 
@@ -231,3 +233,5 @@ void XvcEncoder::PrintNalInfo(xvc_enc_nal_unit NalUnit)
 	}
 	std::cout << std::endl;
 }
+
+#undef LogXvcEncoder

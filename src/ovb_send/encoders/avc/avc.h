@@ -16,5 +16,5 @@ public:
 
 private:
 	SEncParamBase* Params;
-	ISVCDecoder*   Encoder;
+	ISVCEncoder*   Encoder;
 };
