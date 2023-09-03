@@ -40,6 +40,7 @@ static inline std::string FormatToString(EChromaFormat InFormat)
 typedef enum
 {
 	CODEC_AVC,
+	CODEC_HEVC,
 	CODEC_XVC,
 	CODEC_OVC,
 	CODEC_VVC,
@@ -52,6 +53,8 @@ static inline std::string CodecToString(ECodec InCodec)
 	{
 		case CODEC_AVC:
 			return "CODEC_AVC";
+		case CODEC_HEVC:
+			return "CODEC_HEVC";
 		case CODEC_XVC:
 			return "CODEC_XVC";
 		case CODEC_OVC:

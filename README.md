@@ -52,6 +52,15 @@ cmake -G "Visual Studio 17 2022" -A x64 ..
 cmake --build . --target vvdec_lib
 ```
 
+### 4. Build HEVC
+```cmd
+cd ./third_party/hevc
+mkdir build
+cd build
+cmake -G "Visual Studio 17 2022" -A x64 .. -DENABLE_ENCODER=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_SDL=OFF
+cmake --build . --target de265
+```
+
 ### 5. Build VMAF
 Using a mingw terminal
 ```sh

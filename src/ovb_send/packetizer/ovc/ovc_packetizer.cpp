@@ -36,86 +36,86 @@ void OvcPacketizer::Packetize(std::vector<NALU> InNALUs)
 				AggregatedPacket = RTPPacket();
 			}
 
-			// // This NAL can fit into a single packet. Check if it should be aggregated first
-			// if (AggregatedPacket.GetPayloadSize() == 0 && (i + 1) < InNALUs.size() && Nal.Size + InNALUs[i + 1].Size < RTP_PAYLOAD_SIZE)
-			// {
-			// 	/* The Structure of an Aggregated Packet
-			// 	 +---------------+---------------+---------------+---------------+
-			// 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-			// 	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-			// 	 |    PayloadHdr (Type = 48)     |          NAL 1 Size           |
-			// 	 +---------------+---------------+---------------+---------------+
-			// 	 |                       NAL 1 Data ...                          |
-			// 	 +---------------+---------------+-------------------------------+
-			// 	 |          NAL 2 Size           |          NAL 2 Data ...       |
-			// 	 +---------------+---------------+---------------+---------------+
-			// 	*/
+			// This NAL can fit into a single packet. Check if it should be aggregated first
+			if (AggregatedPacket.GetPayloadSize() == 0 && (i + 1) < InNALUs.size() && Nal.Size + InNALUs[i + 1].Size < RTP_PAYLOAD_SIZE)
+			{
+				/* The Structure of an Aggregated Packet
+				 +---------------+---------------+---------------+---------------+
+				 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+				 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+				 |    PayloadHdr (Type = 48)     |          NAL 1 Size           |
+				 +---------------+---------------+---------------+---------------+
+				 |                       NAL 1 Data ...                          |
+				 +---------------+---------------+-------------------------------+
+				 |          NAL 2 Size           |          NAL 2 Data ...       |
+				 +---------------+---------------+---------------+---------------+
+				*/
 
-			// 	std::vector<uint8_t> RTPPayload;
+				std::vector<uint8_t> RTPPayload;
 
-			// 	// The next packet will fit into an aggregated packet as well, start aggregating
-			// 	// This is the first packet in the AP.
-			// 	uint8_t APByte;
-			// 	// clang-format off
-			//     APByte = 0;
-			//     RTPPayload.push_back(APByte);
-			// 	// clang-format on
+				// The next packet will fit into an aggregated packet as well, start aggregating
+				// This is the first packet in the AP.
+				uint8_t APByte;
+				// clang-format off
+			    APByte = 0;
+			    RTPPayload.push_back(APByte);
+				// clang-format on
 
-			// 	// clang-format off
-			//     APByte = 0;
-			//     APByte |= (0           << 6) & 0b11000000;
-			//     //      AP Type
-			//     APByte |= (48 << 0) & 0b00111111;
-			//     RTPPayload.push_back(APByte);
-			// 	// clang-format on
+				// clang-format off
+			    APByte = 0;
+			    APByte |= (0           << 6) & 0b11000000;
+			    //      AP Type
+			    APByte |= (48 << 0) & 0b00111111;
+			    RTPPayload.push_back(APByte);
+				// clang-format on
 
-			// 	// NALU Size
-			// 	RTPPayload.push_back(((uint16_t)Nal.Size >> 8) & 0b11111111);
-			// 	RTPPayload.push_back(((uint16_t)Nal.Size >> 0) & 0b11111111);
+				// NALU Size
+				RTPPayload.push_back(((uint16_t)Nal.Size >> 8) & 0b11111111);
+				RTPPayload.push_back(((uint16_t)Nal.Size >> 0) & 0b11111111);
 
-			// 	// NALU HDR + NALU Data
-			// 	for (size_t j = 0; j < Nal.Size; j++)
-			// 	{
-			// 		RTPPayload.push_back(Nal.Data[j]);
-			// 	}
+				// NALU HDR + NALU Data
+				for (size_t j = 0; j < Nal.Size; j++)
+				{
+					RTPPayload.push_back(Nal.Data[j]);
+				}
 
-			// 	AggregatedPacket.SetPayload(RTPPayload.data(), RTPPayload.size());
-			// }
-			// else if (AggregatedPacket.GetPayloadSize() > 0 && AggregatedPacket.GetPayloadSize() + Nal.Size <= RTP_PAYLOAD_SIZE)
-			// {
-			// 	// Continue populating the aggregated packet
-			// 	/* The Structure of an Aggregated Packet
-			// 	 +---------------+---------------+---------------+---------------+
-			// 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-			// 	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-			// 	 |    PayloadHdr (Type = 48)     |          NAL 1 Size           |
-			// 	 +---------------+---------------+---------------+---------------+
-			// 	 |                       NAL 1 Data ...                          |
-			// 	 +---------------+---------------+-------------------------------+
-			// 	 |          NAL 2 Size           |          NAL 2 Data ...       |
-			// 	 +---------------+---------------+---------------+---------------+
-			// 	*/
-			// 	std::vector<uint8_t> RTPPayload;
+				AggregatedPacket.SetPayload(RTPPayload.data(), RTPPayload.size());
+			}
+			else if (AggregatedPacket.GetPayloadSize() > 0 && AggregatedPacket.GetPayloadSize() + Nal.Size <= RTP_PAYLOAD_SIZE)
+			{
+				// Continue populating the aggregated packet
+				/* The Structure of an Aggregated Packet
+				 +---------------+---------------+---------------+---------------+
+				 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+				 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+				 |    PayloadHdr (Type = 48)     |          NAL 1 Size           |
+				 +---------------+---------------+---------------+---------------+
+				 |                       NAL 1 Data ...                          |
+				 +---------------+---------------+-------------------------------+
+				 |          NAL 2 Size           |          NAL 2 Data ...       |
+				 +---------------+---------------+---------------+---------------+
+				*/
+				std::vector<uint8_t> RTPPayload;
 
-			// 	uint8_t* APPayload = AggregatedPacket.GetPayload();
-			// 	for (size_t j = 0; j < AggregatedPacket.GetPayloadSize(); j++)
-			// 	{
-			// 		RTPPayload.push_back(APPayload[j]);
-			// 	}
+				uint8_t* APPayload = AggregatedPacket.GetPayload();
+				for (size_t j = 0; j < AggregatedPacket.GetPayloadSize(); j++)
+				{
+					RTPPayload.push_back(APPayload[j]);
+				}
 
-			// 	// NALU Size
-			// 	RTPPayload.push_back(((uint16_t)Nal.Size >> 8) & 0b11111111);
-			// 	RTPPayload.push_back(((uint16_t)Nal.Size >> 0) & 0b11111111);
+				// NALU Size
+				RTPPayload.push_back(((uint16_t)Nal.Size >> 8) & 0b11111111);
+				RTPPayload.push_back(((uint16_t)Nal.Size >> 0) & 0b11111111);
 
-			// 	// NALU HDR + NALU Data
-			// 	for (size_t j = 0; j < Nal.Size; j++)
-			// 	{
-			// 		RTPPayload.push_back(Nal.Data[j]);
-			// 	}
+				// NALU HDR + NALU Data
+				for (size_t j = 0; j < Nal.Size; j++)
+				{
+					RTPPayload.push_back(Nal.Data[j]);
+				}
 
-			// 	AggregatedPacket.SetPayload(RTPPayload.data(), RTPPayload.size());
-			// }
-			// else
+				AggregatedPacket.SetPayload(RTPPayload.data(), RTPPayload.size());
+			}
+			else
 			{
 				// Single NAL packet
 				if (AggregatedPacket.GetPayloadSize() > 0)

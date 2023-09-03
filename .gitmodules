@@ -16,3 +16,6 @@
 [submodule "src/third_party/vmaf"]
 	path = src/third_party/vmaf
 	url = https://github.com/Netflix/vmaf/
+[submodule "src/third_party/hevc"]
+	path = src/third_party/hevc
+	url = https://github.com/strukturag/libde265

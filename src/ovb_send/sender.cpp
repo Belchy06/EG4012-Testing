@@ -58,6 +58,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
                 Options.Codec = ECodec::CODEC_OVC;
             } else if(CodecStr == "AVC") {
                 Options.Codec = ECodec::CODEC_AVC;
+            } else if(CodecStr == "HEVC") {
+                Options.Codec = ECodec::CODEC_HEVC;
             } else {
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }
@@ -348,6 +350,7 @@ void Sender::PrintHelp()
     std::cout << "      \"details\"         " << std::endl;
     std::cout << "  --codec <string>        " << std::endl;
     std::cout << "      \"AVC\"             " << std::endl;
+    std::cout << "      \"HEVC\"            " << std::endl;
     std::cout << "      \"OVC\"             " << std::endl;
     std::cout << "      \"VVC\"             " << std::endl;
     std::cout << "      \"XVC\"             " << std::endl;
@@ -398,6 +401,7 @@ void Sender::PrintSettings()
     std::cout << "    --xvc-qp: " << Config.XvcQP << std::endl;
     } else if(Options.Codec == CODEC_AVC) {
     std::cout << "    --avc-target-bitrate: " << Config.AvcTargetBitrate << std::endl;
+    } else if(Options.Codec == CODEC_HEVC) {
     }
 	// clang-format on
 }

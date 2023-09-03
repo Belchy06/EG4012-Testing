@@ -65,6 +65,8 @@ void Receiver::ParseArgs(int argc, const char* argv[])
                 Options.Codec = ECodec::CODEC_OVC;
             } else if(CodecStr == "AVC") {
                 Options.Codec = ECodec::CODEC_AVC;
+            } else if(CodecStr == "HEVC") {
+                Options.Codec = ECodec::CODEC_HEVC;
             } else {
                 Options.Codec = ECodec::CODEC_UNDEFINED;
             }
@@ -262,9 +264,11 @@ void Receiver::PrintHelp()
     std::cout << "      \"verbose\"         " << std::endl;
     std::cout << "      \"details\"         " << std::endl;
     std::cout << "  --codec <string>        " << std::endl;
+    std::cout << "      \"AVC\"             " << std::endl;
+    std::cout << "      \"HEVC\"             " << std::endl;
+    std::cout << "      \"OVC\"             " << std::endl;
     std::cout << "      \"VVC\"             " << std::endl;
     std::cout << "      \"XVC\"             " << std::endl;
-    std::cout << "      \"OVC\"             " << std::endl;
 	// clang-format on
 }
 
@@ -287,6 +291,8 @@ void Receiver::PrintSettings()
     } else if(Options.Codec == CODEC_VVC) {
     std::cout << "    --vvc-error-handling-flags: " << ErrorHandlingFlagsToString(Config.VvcErrorHandlingFlags) << std::endl;
     } else if(Options.Codec == CODEC_XVC) {
+    } else if(Options.Codec == CODEC_AVC) {
+    } else if(Options.Codec == CODEC_HEVC) {
     }
 	// clang-format on
 }

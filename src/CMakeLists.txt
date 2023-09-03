@@ -9,12 +9,14 @@ set(OVB_COMMON_SOURCES
 
 set(OVB_RECV_SOURCES
     "ovb_recv/decoders/avc/avc_decoder.cpp"
+    "ovb_recv/decoders/hevc/hevc_decoder.cpp"
     "ovb_recv/decoders/ovc/ovc_decoder.cpp"
     "ovb_recv/decoders/vvc/vvc_decoder.cpp"
     "ovb_recv/decoders/xvc/xvc_decoder.cpp"
     "ovb_recv/decoders/decoder_factory.cpp"
     "ovb_recv/decoders/decoder.cpp"
     "ovb_recv/depacketizer/avc/avc_depacketizer.cpp"
+    "ovb_recv/depacketizer/hevc/hevc_depacketizer.cpp"
     "ovb_recv/depacketizer/ovc/ovc_depacketizer.cpp"
     "ovb_recv/depacketizer/vvc/vvc_depacketizer.cpp"
     "ovb_recv/depacketizer/xvc/xvc_depacketizer.cpp"
@@ -28,12 +30,14 @@ set(OVB_RECV_SOURCES
 
 set(OVB_SEND_SOURCES
     "ovb_send/encoders/avc/avc_encoder.cpp"
+    "ovb_send/encoders/hevc/hevc_encoder.cpp"
     "ovb_send/encoders/ovc/ovc_encoder.cpp"
     "ovb_send/encoders/vvc/vvc_encoder.cpp"
     "ovb_send/encoders/xvc/xvc_encoder.cpp"
     "ovb_send/encoders/encoder_factory.cpp"
     "ovb_send/encoders/encoder.cpp"
     "ovb_send/packetizer/avc/avc_packetizer.cpp"
+    "ovb_send/packetizer/hevc/hevc_packetizer.cpp"
     "ovb_send/packetizer/ovc/ovc_packetizer.cpp"
     "ovb_send/packetizer/vvc/vvc_packetizer.cpp"
     "ovb_send/packetizer/xvc/xvc_packetizer.cpp"
@@ -70,6 +74,9 @@ if(MSVC)
     /wd4752 # disabled: found Intel(R) Advanced Vector Extensions; consider using /arch:AVX
     /wd4244
     /wd4458
+    /wd4388
+    /wd4267
+    /wd4996
   )
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   set(cxx_base_flags -Wall -Wshadow)
@@ -105,13 +112,16 @@ include_directories(
     "third_party/vvc/vvenc/include"
     "third_party/vvc/vvdec/include"
     "third_party/avc/codec/api"
-    "third_party/vmaf/libvmaf/include")
+    "third_party/vmaf/libvmaf/include"
+    "third_party/hevc")
 link_directories(
     "third_party/ovc/build/src/Debug"
     "third_party/xvc/build/src/Debug"
     "third_party/vvc/vvenc/lib/debug-static"
     "third_party/vvc/vvdec/lib/debug-static"
-    "third_party/avc/bin/x64/Debug")
+    "third_party/avc/bin/x64/Debug"
+    "third_party/hevc/build/libde265/encoder/encoder.dir/Debug"
+    "third_party/hevc/build/libde265/Debug")
 
 # ovb_common
 add_library (ovb_common OBJECT ${OVB_COMMON_SOURCES})
@@ -123,7 +133,7 @@ add_executable(ovb_recv ${OVB_RECV_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_r
 set_target_properties(ovb_recv PROPERTIES OUTPUT_NAME "ovbrecv")
 target_compile_options(ovb_recv PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_recv PUBLIC .)
-target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdecd ovcdec vvdec welsdcore welsdec)
+target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdecd ovcdec vvdec welsdcore welsdec de265)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsdec.dll")
   add_custom_command(TARGET ovb_recv POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -142,7 +152,7 @@ add_executable(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_s
 set_target_properties(ovb_send PROPERTIES OUTPUT_NAME "ovbsend")
 target_compile_options(ovb_send PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_send PUBLIC .)
-target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcencd ovcenc vvenc welsecore welsenc)
+target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcencd ovcenc vvenc welsecore welsenc de265)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsenc.dll")
   add_custom_command(TARGET ovb_send POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -153,6 +163,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsvp.dll"
   add_custom_command(TARGET ovb_send POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
       "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsvp.dll"      # <--this is in-file
+      $<TARGET_FILE_DIR:ovb_send>)   
+endif()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/hevc/build/libde265/Debug/libde265.dll")
+  add_custom_command(TARGET ovb_send POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${CMAKE_CURRENT_SOURCE_DIR}/third_party/hevc/build/libde265/Debug/libde265.dll"      # <--this is in-file
       $<TARGET_FILE_DIR:ovb_send>)   
 endif()
 

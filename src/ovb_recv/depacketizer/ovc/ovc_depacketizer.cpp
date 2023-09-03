@@ -101,7 +101,7 @@ void OvcDepacketizer::HandlePacket(RTPPacket InPacket)
 		if (Fragments.size() > 0)
 		{
 			// We've received a new AP without finishing off the last fragmented unit. Warn and continue
-			LOG(LogOvcDepacketizer, LOG_SEVERITY_WARNING, "Received new fragmented nal without finishing previously fragmented nal. Reconstructing previous {} fragments", Fragments.size());
+			LOG(LogOvcDepacketizer, LOG_SEVERITY_WARNING, "Received new aggregated packet without finishing previously fragmented nal. Reconstructing previous {} fragments", Fragments.size());
 
 			uint8_t* FragmentData = Fragments[0].GetPayload();
 
