@@ -58,7 +58,7 @@ void AvcDepacketizer::HandlePacket(RTPPacket InPacket)
 		if (Fragments.size() > 0)
 		{
 			// We've received a new AP without finishing off the last fragmented unit. Warn and continue
-			LOG(LogAvcDepacketizer, LOG_SEVERITY_WARNING, "Received new fragmented nal without finishing previously fragmented nal. Dropping {} fragments", Fragments.size());
+			LOG(LogAvcDepacketizer, LOG_SEVERITY_WARNING, "Received new aggregated packet without finishing previously fragmented nal. Dropping {} fragments", Fragments.size());
 			Fragments.clear();
 		}
 
@@ -115,7 +115,7 @@ void AvcDepacketizer::HandlePacket(RTPPacket InPacket)
 			{
 				uint8_t* FragmentData = Fragment.GetPayload();
 				// Skip FU Header
-				for (size_t i = 1; i < Fragment.GetPayloadSize(); i++)
+				for (size_t i = 2; i < Fragment.GetPayloadSize(); i++)
 				{
 					ReconstructedNalBytes.push_back(FragmentData[i]);
 				}

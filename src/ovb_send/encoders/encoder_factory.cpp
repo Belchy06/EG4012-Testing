@@ -1,8 +1,8 @@
 #include "encoder_factory.h"
-#include "ovb_send/encoders/avc/avc.h"
-#include "ovb_send/encoders/ovc/ovc.h"
-#include "ovb_send/encoders/vvc/vvc.h"
-#include "ovb_send/encoders/xvc/xvc.h"
+#include "ovb_send/encoders/avc/avc_encoder.h"
+#include "ovb_send/encoders/ovc/ovc_encoder.h"
+#include "ovb_send/encoders/vvc/vvc_encoder.h"
+#include "ovb_send/encoders/xvc/xvc_encoder.h"
 
 std::shared_ptr<Encoder> EncoderFactory::Create(ECodec InCodec)
 {

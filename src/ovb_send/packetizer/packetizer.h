@@ -13,7 +13,9 @@
 class Packetizer
 {
 public:
-	Packetizer() {}
+	Packetizer()
+		: SequenceNumber(0)
+		, LastTimestamp(0) {}
 
 	virtual void				   Packetize(std::vector<NALU> InNALUs) = 0;
 	virtual std::vector<RTPPacket> Flush() = 0;

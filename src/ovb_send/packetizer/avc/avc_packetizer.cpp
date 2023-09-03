@@ -15,10 +15,10 @@ void AvcPacketizer::Packetize(std::vector<NALU> InNALUs)
 	for (size_t i = 0; i < InNALUs.size(); i++)
 	{
 		NALU& Nal = InNALUs[i];
-
 		assert(Nal.Size > 0);
+
 		// clang-format off
-		uint8_t StartByte   = (Nal.Data[0] & 0b11111111) >> 0;
+		uint8_t StartByte   = (Nal.Data[4] & 0b11111111) >> 0;
 		uint8_t FBit        = (StartByte   & 0b10000000) >> 7;
 		uint8_t NRI         = (StartByte   & 0b01100000) >> 5;
 		uint8_t NalUnitType = (StartByte   & 0b00011111) >> 0;
@@ -152,11 +152,6 @@ void AvcPacketizer::Packetize(std::vector<NALU> InNALUs)
 			uint8_t NalByte;
 			// clang-format off
 		    NalByte = 0;
-		    NALHeader.push_back(NalByte);
-			// clang-format on
-
-			// clang-format off
-		    NalByte = 0;
 		    NalByte |= (0  << 6) & 0b11000000;
 		    NalByte |= (28 << 0) & 0b00111111;
 		    NALHeader.push_back(NalByte);
@@ -164,7 +159,7 @@ void AvcPacketizer::Packetize(std::vector<NALU> InNALUs)
 
 			size_t	SizePacketized = 0;
 			uint8_t bIsFirst = 1;
-			size_t	MaxSize = (size_t)RTP_PAYLOAD_SIZE - 3;
+			size_t	MaxSize = (size_t)RTP_PAYLOAD_SIZE - 2;
 			while (SizePacketized < Nal.Size)
 			{
 				size_t	PacketSize = std::min(MaxSize, Nal.Size - SizePacketized);

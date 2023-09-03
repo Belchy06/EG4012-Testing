@@ -177,6 +177,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Config.XvcMaxKeypicDistance;
                 } else if(Key == "--xvc-qp") {
                     std::stringstream(Value) >> Config.XvcQP;
+                } else if(Key == "--avc-target-bitrate") {
+                    std::stringstream(Value) >> Config.AvcTargetBitrate;
                 } else {
                     LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown encoder config option \"{}\"", Key);
                 }
@@ -345,9 +347,10 @@ void Sender::PrintHelp()
     std::cout << "      \"verbose\"         " << std::endl;
     std::cout << "      \"details\"         " << std::endl;
     std::cout << "  --codec <string>        " << std::endl;
+    std::cout << "      \"AVC\"             " << std::endl;
+    std::cout << "      \"OVC\"             " << std::endl;
     std::cout << "      \"VVC\"             " << std::endl;
     std::cout << "      \"XVC\"             " << std::endl;
-    std::cout << "      \"OVC\"             " << std::endl;
 	// clang-format on
 }
 
@@ -393,6 +396,8 @@ void Sender::PrintSettings()
     std::cout << "    --xvc-num-ref-pics: " << Config.XvcNumRefPics << std::endl;
     std::cout << "    --xvc-max-key-pic-distance: " << Config.XvcMaxKeypicDistance << std::endl;
     std::cout << "    --xvc-qp: " << Config.XvcQP << std::endl;
+    } else if(Options.Codec == CODEC_AVC) {
+    std::cout << "    --avc-target-bitrate: " << Config.AvcTargetBitrate << std::endl;
     }
 	// clang-format on
 }

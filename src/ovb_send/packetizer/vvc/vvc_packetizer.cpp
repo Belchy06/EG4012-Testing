@@ -197,16 +197,6 @@ void VvcPacketizer::Packetize(std::vector<NALU> InNALUs)
 				bIsFirst = 0;
 			}
 		}
-
-		if (AggregatedPacket.GetPayloadSize() + Nal.Size < RTP_PAYLOAD_SIZE)
-		{
-		}
-		else if (Nal.Size < RTP_PAYLOAD_SIZE)
-		{
-		}
-		else
-		{
-		}
 	}
 }
 

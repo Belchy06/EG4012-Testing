@@ -1,8 +1,8 @@
-#include "ovb_recv/decoders/avc/avc.h"
-#include "ovb_recv/decoders/ovc/ovc.h"
+#include "ovb_recv/decoders/avc/avc_decoder.h"
+#include "ovb_recv/decoders/ovc/ovc_decoder.h"
 #include "decoder_factory.h"
-#include "ovb_recv/decoders/vvc/vvc.h"
-#include "ovb_recv/decoders/xvc/xvc.h"
+#include "ovb_recv/decoders/vvc/vvc_decoder.h"
+#include "ovb_recv/decoders/xvc/xvc_decoder.h"
 
 std::shared_ptr<Decoder> DecoderFactory::Create(ECodec InCodec)
 {
