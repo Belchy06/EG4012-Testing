@@ -44,13 +44,12 @@ cmake --build . --target vvdec_lib
 ```
 
 ### 4. Build AVC
-```cmd
-cd ./third_party/avc
-mkdir build
-cd build
-cmake -G "Visual Studio 17 2022" -A x64 ..
-cmake --build . --target vvdec_lib
-```
+1. Open ./third_party/avc/codec/build/win32/dec/WelsDecoder.sln
+2. Set `WelsDecCore` and `WelsDecPlus` projects to use `MT` Runtime Library
+3. Build all projects
+4. Open ./third_party/avc/codec/build/win32/dec/WelsEncoder.sln
+2. Set `WelsEncCore`, `WelsEncPlus` and `WelsEncVP` projects to use `MT` Runtime Library
+3. Build all projects
 
 ### 4. Build HEVC
 ```cmd
