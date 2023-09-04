@@ -93,6 +93,8 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 	Params->m_GOPSize = InConfig.VvcGOPSize;
 	Params->m_IntraPeriod = InConfig.VvcIntraPeriod;
 
+	Params->m_QP = Config.VvcQP;
+
 	Encoder = vvenc_encoder_create();
 
 	vvenc_set_logging_callback(nullptr, msgFnc);		// register global log callback (deprecated, will be removed)

@@ -6,4 +6,5 @@ class HevcEncoderConfig
 {
 public:
 	std::string HevcSopStructure;
+	int			HevcQP;
 };

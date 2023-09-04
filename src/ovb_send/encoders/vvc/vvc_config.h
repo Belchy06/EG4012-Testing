@@ -7,4 +7,5 @@ class VvcEncoderConfig
 public:
 	int VvcGOPSize;
 	int VvcIntraPeriod;
+	int VvcQP;
 };

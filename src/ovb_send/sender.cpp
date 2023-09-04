@@ -173,16 +173,20 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Config.VvcGOPSize;
                 } else if(Key == "--vvc-intra-period") {
                     std::stringstream(Value) >> Config.VvcIntraPeriod;
-                } else if(Key == "--xvc-num-ref-pics") {
+                } else if(Key == "--vvc-qp") {
+                    std::stringstream(Value) >> Config.VvcQP;
+                }  else if(Key == "--xvc-num-ref-pics") {
                     std::stringstream(Value) >> Config.XvcNumRefPics;
                 } else if(Key == "--xvc-max-key-pic-distance") {
                     std::stringstream(Value) >> Config.XvcMaxKeypicDistance;
                 } else if(Key == "--xvc-qp") {
                     std::stringstream(Value) >> Config.XvcQP;
-                } else if(Key == "--avc-target-bitrate") {
-                    std::stringstream(Value) >> Config.AvcTargetBitrate;
+                } else if(Key == "--avc-qp") {
+                    std::stringstream(Value) >> Config.AvcQP;
                 } else if(Key == "--hevc-sop-structure") {
                     Config.HevcSopStructure = Value;
+                } else if(Key == "--hevc-qp") {
+                    std::stringstream(Value) >> Config.HevcQP;
                 } else {
                     LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown encoder config option \"{}\"", Key);
                 }
@@ -397,14 +401,16 @@ void Sender::PrintSettings()
     } else if(Options.Codec == CODEC_VVC) {
     std::cout << "    --vvc-gop-size: " << Config.VvcGOPSize << std::endl;
     std::cout << "    --vvc-intra-period: " << Config.VvcIntraPeriod << std::endl;
+    std::cout << "    --vvc-qp: " << Config.VvcQP << std::endl;
     } else if(Options.Codec == CODEC_XVC) {
     std::cout << "    --xvc-num-ref-pics: " << Config.XvcNumRefPics << std::endl;
     std::cout << "    --xvc-max-key-pic-distance: " << Config.XvcMaxKeypicDistance << std::endl;
     std::cout << "    --xvc-qp: " << Config.XvcQP << std::endl;
     } else if(Options.Codec == CODEC_AVC) {
-    std::cout << "    --avc-target-bitrate: " << Config.AvcTargetBitrate << std::endl;
+    std::cout << "    --avc-qp: " << Config.AvcQP << std::endl;
     } else if(Options.Codec == CODEC_HEVC) {
     std::cout << "    --hevc-sop-structure: " << Config.HevcSopStructure << std::endl;
+    std::cout << "    --hevc-qp: " << Config.HevcQP << std::endl;
     }
 	// clang-format on
 }

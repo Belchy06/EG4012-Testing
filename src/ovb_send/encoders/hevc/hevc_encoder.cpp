@@ -36,10 +36,19 @@ EncodeResult* HevcEncoder::Init(EncoderConfig& InConfig)
 		std::exit(-1);
 	}
 
+	en265_show_parameters(Encoder);
+
 	de265_error Result = en265_set_parameter_choice(Encoder, "sop-structure", Config.HevcSopStructure.c_str());
 	if (Result != DE265_OK)
 	{
 		LOG(LogHevcEncoder, LOG_SEVERITY_ERROR, "Failed to set encoder sop-structure");
+		std::exit(-1);
+	}
+
+	Result = en265_set_parameter_int(Encoder, "CTB-QScale-Constant", Config.HevcQP);
+	if (Result != DE265_OK)
+	{
+		LOG(LogHevcEncoder, LOG_SEVERITY_ERROR, "Failed to set encoder qp");
 		std::exit(-1);
 	}
 

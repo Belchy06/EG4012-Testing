@@ -50,12 +50,15 @@ EncodeResult* AvcEncoder::Init(EncoderConfig& InConfig)
 	Params->fMaxFrameRate = InConfig.Framerate;
 	Params->iPicWidth = InConfig.Width;
 	Params->iPicHeight = InConfig.Height;
-	Params->iTargetBitrate = InConfig.AvcTargetBitrate;
+	Params->iTargetBitrate = 10000000;
+	Params->iRCMode = RC_QUALITY_MODE;
+	Params->iMinQp = InConfig.AvcQP;
+	Params->iMaxQp = InConfig.AvcQP;
 
 	Params->sSpatialLayers[0].iVideoWidth = InConfig.Width;
 	Params->sSpatialLayers[0].iVideoHeight = InConfig.Height;
 	Params->sSpatialLayers[0].fFrameRate = InConfig.Framerate;
-	Params->sSpatialLayers[0].iSpatialBitrate = Params->iTargetBitrate;
+	Params->sSpatialLayers[0].iSpatialBitrate = 10000000;
 
 	Result = Encoder->InitializeExt(Params);
 	if (Result != 0)
