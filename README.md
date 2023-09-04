@@ -56,7 +56,7 @@ cmake --build . --target vvdec_lib
 cd ./third_party/hevc
 mkdir build
 cd build
-cmake -G "Visual Studio 17 2022" -A x64 .. -DENABLE_ENCODER=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_SDL=OFF
+cmake -G "Visual Studio 17 2022" -A x64 .. -DENABLE_ENCODER=ON -DENABLE_SDL=OFF
 cmake --build . --target de265
 ```
 

@@ -36,7 +36,7 @@ EncodeResult* HevcEncoder::Init(EncoderConfig& InConfig)
 		std::exit(-1);
 	}
 
-	de265_error Result = en265_set_parameter_choice(Encoder, "sop-structure", "intra");
+	de265_error Result = en265_set_parameter_choice(Encoder, "sop-structure", Config.HevcSopStructure.c_str());
 	if (Result != DE265_OK)
 	{
 		LOG(LogHevcEncoder, LOG_SEVERITY_ERROR, "Failed to set encoder sop-structure");
@@ -95,8 +95,7 @@ EncodeResult* HevcEncoder::Encode(std::vector<uint8_t>& InPictureBytes, bool bIn
 			PlanePtr += Width;
 		}
 
-		uint8_t* Plane = InputImage->get_image_plane(c);
-		memcpy(Plane, PlanePtr - Width * Height, Width * Height);
+		de265_alloc_image_plane(InputImage, c, PlanePtr - Width * Height, Width, NULL);
 	}
 
 	de265_error Result;

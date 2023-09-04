@@ -58,6 +58,7 @@ DecodeResult* HevcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 			} else if(de265_get_chroma_format(OutputImage) == de265_chroma_444) {
 				Image.Config.Format = CHROMA_FORMAT_444;
 			}
+            // Image.Config.Format = CHROMA_FORMAT_400;
 
 			// clang-format on
 			int FrameWidth = de265_get_image_width(OutputImage, 0);

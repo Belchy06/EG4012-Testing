@@ -181,6 +181,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Config.XvcQP;
                 } else if(Key == "--avc-target-bitrate") {
                     std::stringstream(Value) >> Config.AvcTargetBitrate;
+                } else if(Key == "--hevc-sop-structure") {
+                    Config.HevcSopStructure = Value;
                 } else {
                     LOG(LogSender, LOG_SEVERITY_WARNING, "Unknown encoder config option \"{}\"", Key);
                 }
@@ -376,17 +378,17 @@ void Sender::PrintSettings()
     std::cout << "    --ovc-num-levels: " << Config.OvcNumLevels << std::endl;
     std::cout << "    --ovc-wavelet-family: " << wavelet_family_to_string(Config.OvcWaveletFamily) << std::endl;
     if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_BIORTHOGONAL) {
-        std::cout << "    --ovc-wavelet-config: " << biorthogonal_config_to_string(Config.OvcWaveletConfig.biorthogonal_config) << std::endl;
+    std::cout << "    --ovc-wavelet-config: " << biorthogonal_config_to_string(Config.OvcWaveletConfig.biorthogonal_config) << std::endl;
     } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_COIFLETS) {
-        std::cout << "    --ovc-wavelet-config: " << coiflets_config_to_string(Config.OvcWaveletConfig.coiflets_config) << std::endl;
+    std::cout << "    --ovc-wavelet-config: " << coiflets_config_to_string(Config.OvcWaveletConfig.coiflets_config) << std::endl;
     } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_DAUBECHIES) {
-        std::cout << "    --ovc-wavelet-config: " << daubechies_config_to_string(Config.OvcWaveletConfig.daubechies_config) << std::endl;
+    std::cout << "    --ovc-wavelet-config: " << daubechies_config_to_string(Config.OvcWaveletConfig.daubechies_config) << std::endl;
     } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_HAAR) {
-        std::cout << "    --ovc-wavelet-config: " << haar_config_to_string(Config.OvcWaveletConfig.haar_config) << std::endl;
+    std::cout << "    --ovc-wavelet-config: " << haar_config_to_string(Config.OvcWaveletConfig.haar_config) << std::endl;
     } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_REVERSE_BIORTHOGONAL) {
-        std::cout << "    --ovc-wavelet-config: " << reverse_biorthogonal_config_to_string(Config.OvcWaveletConfig.reverse_biorthogonal_config) << std::endl;
+    std::cout << "    --ovc-wavelet-config: " << reverse_biorthogonal_config_to_string(Config.OvcWaveletConfig.reverse_biorthogonal_config) << std::endl;
     } else if(Config.OvcWaveletFamily == OVC_WAVELET_FAMILY_SYMLETS) {
-        std::cout << "    --ovc-wavelet-config: " << symlets_config_to_string(Config.OvcWaveletConfig.symlets_config) << std::endl;
+    std::cout << "    --ovc-wavelet-config: " << symlets_config_to_string(Config.OvcWaveletConfig.symlets_config) << std::endl;
     }
     std::cout << "    --ovc-partition-type: " << partition_to_string(Config.OvcPartitionType) << std::endl;
     std::cout << "    --ovc-spiht: " << spiht_to_string(Config.OvcSPIHT) << std::endl;
@@ -402,6 +404,7 @@ void Sender::PrintSettings()
     } else if(Options.Codec == CODEC_AVC) {
     std::cout << "    --avc-target-bitrate: " << Config.AvcTargetBitrate << std::endl;
     } else if(Options.Codec == CODEC_HEVC) {
+    std::cout << "    --hevc-sop-structure: " << Config.HevcSopStructure << std::endl;
     }
 	// clang-format on
 }

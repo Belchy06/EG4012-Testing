@@ -24,6 +24,8 @@
                 "--vvc-gop-size=1,--vvc-intra-period=1",
                 "--encoder-config",
                 "--avc-target-bitrate=5000000",
+                "--encoder-config",
+                "--hevc-sop-structure=intra",
                 "--ip",
                 "127.0.0.1",
                 "--port",
