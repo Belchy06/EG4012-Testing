@@ -6,10 +6,10 @@
 	url = https://github.com/Belchy06/xvc
 [submodule "src/third_party/vvc/vvdec"]
 	path = src/third_party/vvc/vvdec
-	url = https://github.com/fraunhoferhhi/vvdec
+	url = https://github.com/Belchy06/vvdec
 [submodule "src/third_party/vvc/vvenc"]
 	path = src/third_party/vvc/vvenc
-	url = https://github.com/fraunhoferhhi/vvenc
+	url = https://github.com/Belchy06/vvenc
 [submodule "src/third_party/avc"]
 	path = src/third_party/avc
 	url = https://github.com/cisco/openh264
@@ -18,4 +18,4 @@
 	url = https://github.com/Netflix/vmaf/
 [submodule "src/third_party/hevc"]
 	path = src/third_party/hevc
-	url = https://github.com/strukturag/libde265
+	url = https://github.com/Belchy06/libde265
