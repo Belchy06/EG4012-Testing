@@ -5,7 +5,8 @@
 class VvcEncoderConfig
 {
 public:
-	int VvcGOPSize;
-	int VvcIntraPeriod;
-	int VvcQP;
+	int VvcGOPSize = 0;
+	int VvcIntraPeriod = 0;
+	int VvcQP = -1;
+	int VvcBitrate = -1;
 };

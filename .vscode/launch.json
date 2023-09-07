@@ -23,7 +23,7 @@
                 "--encoder-config",
                 "--vvc-gop-size=1,--vvc-intra-period=1",
                 "--encoder-config",
-                "--avc-qp=21",
+                "--avc-target-bitrate=5000000",
                 "--encoder-config",
                 "--hevc-sop-structure=intra,--hevc-qp=15",
                 "--ip",
@@ -73,7 +73,7 @@
             "preLaunchTask": "",
             "args": [
                 "--file",
-                "${workspaceFolder}\\output\\hevc\\out.y4m",
+                "${workspaceFolder}\\output\\unideal\\ovc\\1337.y4m",
                 "--codec",
                 "HEVC",
                 "--port",

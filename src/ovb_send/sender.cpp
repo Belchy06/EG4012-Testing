@@ -175,7 +175,9 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Config.VvcIntraPeriod;
                 } else if(Key == "--vvc-qp") {
                     std::stringstream(Value) >> Config.VvcQP;
-                }  else if(Key == "--xvc-num-ref-pics") {
+                } else if(Key == "--vvc-bitrate") {
+                    std::stringstream(Value) >> Config.VvcBitrate;
+                } else if(Key == "--xvc-num-ref-pics") {
                     std::stringstream(Value) >> Config.XvcNumRefPics;
                 } else if(Key == "--xvc-max-key-pic-distance") {
                     std::stringstream(Value) >> Config.XvcMaxKeypicDistance;
@@ -183,6 +185,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Config.XvcQP;
                 } else if(Key == "--avc-qp") {
                     std::stringstream(Value) >> Config.AvcQP;
+                } else if(Key == "--avc-bitrate") {
+                    std::stringstream(Value) >> Config.AvcBitrate;
                 } else if(Key == "--hevc-sop-structure") {
                     Config.HevcSopStructure = Value;
                 } else if(Key == "--hevc-qp") {
@@ -265,7 +269,7 @@ void Sender::Run()
 	EncodeResult* Result = WrappedEncoder->Init(Config);
 	if (!Result->IsSuccess())
 	{
-		LOG(LogSender, LOG_SEVERITY_ERROR, "Erorr intializing config");
+		LOG(LogSender, LOG_SEVERITY_ERROR, "Error intializing config");
 		std::exit(-1);
 	}
 
@@ -311,6 +315,15 @@ void Sender::Run()
 void Sender::OnEncodeComplete(std::vector<NALU> InNALUs)
 {
 	LOG(LogSender, LOG_SEVERITY_NOTICE, "OnEncodeComplete: Size {}", InNALUs.size());
+
+	// Calculate bitrate from compressed frame size
+	size_t TotalSize = 0;
+	for (NALU& Nal : InNALUs)
+	{
+		TotalSize += Nal.Size;
+	}
+	double Bitrate = TotalSize * Config.Framerate * 8;
+	LOG(LogSender, LOG_SEVERITY_INFO, "Bitrate {}", Bitrate);
 
 	Packetizer->Packetize(InNALUs);
 	std::vector<RTPPacket> Packets = Packetizer->Flush();
@@ -402,12 +415,14 @@ void Sender::PrintSettings()
     std::cout << "    --vvc-gop-size: " << Config.VvcGOPSize << std::endl;
     std::cout << "    --vvc-intra-period: " << Config.VvcIntraPeriod << std::endl;
     std::cout << "    --vvc-qp: " << Config.VvcQP << std::endl;
+    std::cout << "    --vvc-bitrate: " << Config.VvcBitrate << std::endl;
     } else if(Options.Codec == CODEC_XVC) {
     std::cout << "    --xvc-num-ref-pics: " << Config.XvcNumRefPics << std::endl;
     std::cout << "    --xvc-max-key-pic-distance: " << Config.XvcMaxKeypicDistance << std::endl;
     std::cout << "    --xvc-qp: " << Config.XvcQP << std::endl;
     } else if(Options.Codec == CODEC_AVC) {
     std::cout << "    --avc-qp: " << Config.AvcQP << std::endl;
+    std::cout << "    --avc-bitrate: " << Config.AvcBitrate << std::endl;
     } else if(Options.Codec == CODEC_HEVC) {
     std::cout << "    --hevc-sop-structure: " << Config.HevcSopStructure << std::endl;
     std::cout << "    --hevc-qp: " << Config.HevcQP << std::endl;

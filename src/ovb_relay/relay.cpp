@@ -11,6 +11,7 @@
 
 Relay::Relay()
 	: PacketId(0)
+	, NumPacketsDropped(0)
 {
 	Options.SendIP = "";
 	Options.SendPort = 0;
@@ -275,7 +276,7 @@ void Relay::OnPacketReceived(const uint8_t* InData, size_t InSize)
 	if (bDrop)
 	{
 		// Drop this packet
-		LOG(LogRelay, LOG_SEVERITY_NOTICE, "Dropping packet {}", PacketId);
+		LOG(LogRelay, LOG_SEVERITY_NOTICE, "Dropping packet {}({})", PacketId, ++NumPacketsDropped);
 		PacketId++;
 		return;
 	}

@@ -3,5 +3,6 @@
 class AvcEncoderConfig
 {
 public:
-	int AvcQP;
+	int AvcBitrate = -1;
+	int AvcQP = -1;
 };

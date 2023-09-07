@@ -25,6 +25,7 @@ private:
 	virtual void OnPacketReceived(const uint8_t* InData, size_t InSize) override;
 
 private:
+	uint64_t	  NumPacketsDropped;
 	RelaySettings Options;
 
 	std::shared_ptr<RecvSocket> RecvSock;
