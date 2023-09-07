@@ -8,7 +8,7 @@
 #include "ovb_send/packetizer/packetizer_factory.h"
 #include "ovb_send/rtp_sender/rtp_sender.h"
 #include "ovb_common/settings.h"
-#include "ovb_send/y4m_reader.h"
+#include "ovb_common/y4m/y4m_reader.h"
 
 class SenderSettings : public Settings
 {

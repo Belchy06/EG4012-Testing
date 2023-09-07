@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "ovb_recv/image/decoded_image.h"
+#include "ovb_common/image/decoded_image.h"
 
 class IDecodeCompleteCallback
 {

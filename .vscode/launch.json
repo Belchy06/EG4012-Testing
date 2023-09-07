@@ -90,5 +90,29 @@
             "console": "integratedTerminal",
             "type": "cppvsdbg",
         },
+        {
+            "name": "Launch Editor (Debug)",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/Debug/ovbeditor.exe",
+            "preLaunchTask": "",
+            "args": [
+                "--original",
+                "${workspaceFolder}\\resources\\carphone_qcif.y4m",
+                "--distorted",
+                "${workspaceFolder}\\output\\ideal\\avc\\0.25.y4m",
+                "--output",
+                "${workspaceFolder}\\dsis\\avc\\0.25.y4m",
+                "--framerate",
+                "30",
+                "--method",
+                "dsis",
+                "--log-level",
+                "details"
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "type": "cppvsdbg",
+        },
     ]
 }

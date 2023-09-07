@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "ovb_recv/image/decoded_image.h"
+#include "ovb_common/image/decoded_image.h"
 #include "ovc_decoder.h"
 #include "ovc_result.h"
 

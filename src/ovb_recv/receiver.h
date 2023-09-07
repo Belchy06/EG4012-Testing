@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-#include "ovb_recv/image/decoded_image.h"
+#include "ovb_common/image/decoded_image.h"
 #include "ovb_recv/decoders/decoder.h"
 #include "ovb_recv/depacketizer/depacketizer.h"
 #include "ovb_recv/depacketizer/depacketizer_listener.h"
@@ -14,7 +14,7 @@
 #include "ovb_recv/rtp_receiver/rtp_receiver_listener.h"
 #include "ovb_recv/vmaf/vmaf.h"
 #include "ovb_common/settings.h"
-#include "ovb_recv/y4m_writer.h"
+#include "ovb_common/y4m/y4m_writer.h"
 
 class ReceiverSettings : public Settings
 {

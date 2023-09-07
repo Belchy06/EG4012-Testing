@@ -5,7 +5,9 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 set(OVB_COMMON_SOURCES
     "ovb_common/platform/platform.cpp"
-    "ovb_common/rtp/packet.cpp")
+    "ovb_common/rtp/packet.cpp"
+    "ovb_common/y4m/y4m_writer.cpp"
+    "ovb_common/y4m/y4m_reader.cpp")
 
 set(OVB_RECV_SOURCES
     "ovb_recv/decoders/avc/avc_decoder.cpp"
@@ -25,7 +27,7 @@ set(OVB_RECV_SOURCES
     "ovb_recv/socket/socket.cpp"
     "ovb_recv/vmaf/vmaf.cpp"
     "ovb_recv/receiver.cpp"
-    "ovb_recv/y4m_writer.cpp"
+    
     "ovb_recv/main.cpp")
 
 set(OVB_SEND_SOURCES
@@ -45,7 +47,6 @@ set(OVB_SEND_SOURCES
     "ovb_send/rtp_sender/rtp_sender.cpp"
     "ovb_send/socket/socket.cpp"
     "ovb_send/sender.cpp"
-    "ovb_send/y4m_reader.cpp"
     "ovb_send/main.cpp")
 
 set(OVB_RELAY_SOURCES
@@ -58,6 +59,10 @@ set(OVB_RELAY_SOURCES
     "ovb_relay/send_socket/socket.cpp"
     "ovb_relay/relay.cpp"
     "ovb_relay/main.cpp")
+
+set(OVB_EDITOR_SOURCES
+    "ovb_editor/editor.cpp"
+    "ovb_editor/main.cpp")
 
 if(MSVC)
   set(cxx_base_flags /GS /W4 /WX)
@@ -133,7 +138,7 @@ add_executable(ovb_recv ${OVB_RECV_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_r
 set_target_properties(ovb_recv PROPERTIES OUTPUT_NAME "ovbrecv")
 target_compile_options(ovb_recv PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_recv PUBLIC .)
-target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdecd ovcdec vvdec welsdcore welsdec de265)
+target_link_libraries(ovb_recv INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcdec ovcdec vvdec welsdcore welsdec de265)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsdec.dll")
   add_custom_command(TARGET ovb_recv POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -152,7 +157,7 @@ add_executable(ovb_send ${OVB_SEND_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_s
 set_target_properties(ovb_send PROPERTIES OUTPUT_NAME "ovbsend")
 target_compile_options(ovb_send PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_send PUBLIC .)
-target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcencd ovcenc vvenc welsecore welsenc de265)
+target_link_libraries(ovb_send INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH} xvcenc ovcenc vvenc welsecore welsenc de265)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/avc/bin/x64/Debug/welsenc.dll")
   add_custom_command(TARGET ovb_send POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -178,6 +183,13 @@ set_target_properties(ovb_relay PROPERTIES OUTPUT_NAME "ovbrelay")
 target_compile_options(ovb_relay PRIVATE ${cxx_default} ${cxx_strict})
 target_include_directories (ovb_relay PUBLIC .)
 target_link_libraries(ovb_relay INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH})
+
+# ovb_editor
+add_executable(ovb_editor ${OVB_EDITOR_SOURCES} $<TARGET_OBJECTS:ovb_common> ${ovb_editor_src_extra})
+set_target_properties(ovb_editor PROPERTIES OUTPUT_NAME "ovbeditor")
+target_compile_options(ovb_editor PRIVATE ${cxx_default} ${cxx_strict})
+target_include_directories (ovb_editor PUBLIC .)
+target_link_libraries(ovb_editor INTERFACE ${linker_flags} PUBLIC Threads::Threads ${ws2_32_LIBRARY_PATH})
 
 install(FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/ovb_send/sender.h"
