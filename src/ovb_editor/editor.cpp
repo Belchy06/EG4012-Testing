@@ -10,6 +10,8 @@
 
 #define LogEditor "LogEditor"
 
+uint8_t Editor::MidGrey[3] = { 106, 130, 126 };
+
 Editor::Editor()
 {
 	Options.LogLevel = LOG_SEVERITY_INFO;
@@ -261,9 +263,7 @@ void Editor::Run()
 				{
 					for (int x = 0; x < Width; x++)
 					{
-						uint8_t Value = c == 0 ? 106 : c == 1 ? 130
-															  : 126;
-						PlaneVec.push_back(Value);
+						PlaneVec.push_back(MidGrey[c]);
 					}
 				}
 				PictureBytes.insert(PictureBytes.end(), PlaneVec.begin(), PlaneVec.end());
@@ -370,9 +370,7 @@ void Editor::Run()
 				{
 					for (int x = 0; x < Width; x++)
 					{
-						uint8_t Value = c == 0 ? 106 : c == 1 ? 130
-															  : 126;
-						PlaneVec.push_back(Value);
+						PlaneVec.push_back(MidGrey[c]);
 					}
 				}
 				PictureBytes.insert(PictureBytes.end(), PlaneVec.begin(), PlaneVec.end());

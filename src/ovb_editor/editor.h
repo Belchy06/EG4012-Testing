@@ -25,4 +25,6 @@ private:
 
 private:
 	EditorSettings Options;
+
+	static uint8_t MidGrey[3];
 };
