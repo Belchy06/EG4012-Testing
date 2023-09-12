@@ -130,7 +130,7 @@ DecodeResult* AvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 			Image.Config.Width = DstBufInfo.UsrData.sSystemBuffer.iWidth;
 			Image.Config.Height = DstBufInfo.UsrData.sSystemBuffer.iHeight;
 
-			Image.Config.FramerateNum = 29997;
+			Image.Config.FramerateNum = 50000;
 			Image.Config.FramerateDenom = 1000;
 
 			OnDecodedImageCallback->OnDecodeComplete(Image);

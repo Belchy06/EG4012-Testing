@@ -102,7 +102,7 @@ DecodeResult* HevcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 			Image.Config.Width = FrameWidth;
 			Image.Config.Height = FrameHeight;
 
-			Image.Config.FramerateNum = 29997;
+			Image.Config.FramerateNum = 50000;
 			Image.Config.FramerateDenom = 1000;
 
 			OnDecodedImageCallback->OnDecodeComplete(Image);

@@ -13,7 +13,8 @@
 class SenderSettings : public Settings
 {
 public:
-	std::string IP;
+	std::string IP = "";
+	bool		DryRun = false;
 };
 
 // Sender should own the socket and the encoder

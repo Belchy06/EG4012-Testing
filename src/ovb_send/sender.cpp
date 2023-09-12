@@ -48,6 +48,8 @@ void Sender::ParseArgs(int argc, const char* argv[])
             std::stringstream(argv[++i]) >> Options.IP;
         } else if(Arg == "--port") {
             std::stringstream(argv[++i]) >> Options.Port;
+        } else if(Arg == "--dry-run") {
+            std::stringstream(argv[++i]) >> Options.DryRun;
         } else if(Arg == "--codec") {
             std::string CodecStr(argv[++i]);
             if(CodecStr == "VVC") {
@@ -187,6 +189,10 @@ void Sender::ParseArgs(int argc, const char* argv[])
                     std::stringstream(Value) >> Config.AvcQP;
                 } else if(Key == "--avc-bitrate") {
                     std::stringstream(Value) >> Config.AvcBitrate;
+                } else if(Key == "--avc-intra-period") {
+                    std::stringstream(Value) >> Config.AvcIntraPeriod;
+                } else if(Key == "--avc-num-ref-frame") {
+                    std::stringstream(Value) >> Config.AvcNumRefFrame;
                 } else if(Key == "--hevc-sop-structure") {
                     Config.HevcSopStructure = Value;
                 } else if(Key == "--hevc-qp") {
@@ -325,6 +331,11 @@ void Sender::OnEncodeComplete(std::vector<NALU> InNALUs)
 	double Bitrate = TotalSize * Config.Framerate * 8;
 	LOG(LogSender, LOG_SEVERITY_INFO, "Bitrate {}", Bitrate);
 
+	if (Options.DryRun)
+	{
+		return;
+	}
+
 	Packetizer->Packetize(InNALUs);
 	std::vector<RTPPacket> Packets = Packetizer->Flush();
 
@@ -357,6 +368,7 @@ void Sender::PrintHelp()
     std::cout << "Usage:" << std::endl;
 	std::cout << "  --file <string> [Optional parameters]" << std::endl << std::endl;
     std::cout << "Optional parameters:" << std::endl;
+    std::cout << "  --dry-run <1/0>     (default: 0)" << std::endl;
     std::cout << "  --ip <string>       (default: \"127.0.0.1\")" << std::endl;
     std::cout << "  --port <int>        (default: 8888)" << std::endl;
     std::cout << "  --log-level <string> " << std::endl;
@@ -382,6 +394,7 @@ void Sender::PrintSettings()
 	std::cout << std::endl;
     std::cout << "Running Sender:" << std::endl;
 	std::cout << "  --file: " << Options.File << std::endl;
+    std::cout << "  --dry-run: " << (Options.DryRun ? "true" : "false") << std::endl;
 	std::cout << "  --ip: " << Options.IP << std::endl;
 	std::cout << "  --port: " << Options.Port << std::endl;
     std::cout << "  --codec: " << CodecToString(Options.Codec) << std::endl;

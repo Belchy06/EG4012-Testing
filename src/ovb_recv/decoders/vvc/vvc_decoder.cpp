@@ -216,7 +216,7 @@ DecodeResult* VvcDecoder::Decode(uint8_t* InNalBytes, size_t InNalSize)
 			Image.Config.Height = PcFrame->height;
 
 			// TODO (belchy06): Don't hardcode this
-			Image.Config.FramerateNum = 30001;
+			Image.Config.FramerateNum = 50000;
 			Image.Config.FramerateDenom = 1000;
 
 			OnDecodedImageCallback->OnDecodeComplete(Image);

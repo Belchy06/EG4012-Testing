@@ -36,7 +36,7 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 {
 	Config = InConfig;
 
-	vvenc_init_default(Params, InConfig.Width, InConfig.Height, (int)InConfig.Framerate, Config.VvcBitrate != -1 ? Config.VvcBitrate : VVENC_RC_OFF, Config.VvcQP != -1 ? Config.VvcQP : VVENC_AUTO_QP, VVENC_MEDIUM);
+	vvenc_init_default(Params, InConfig.Width, InConfig.Height, (int)InConfig.Framerate, Config.VvcBitrate != -1 ? Config.VvcBitrate : VVENC_RC_OFF, Config.VvcQP != -1 ? Config.VvcQP : VVENC_AUTO_QP, VVENC_FASTER);
 
 	// TODO (belchy06): Support > 8bit profiles
 	Params->m_inputBitDepth[0] = InConfig.BitDepth;
@@ -92,6 +92,11 @@ EncodeResult* VvcEncoder::Init(EncoderConfig& InConfig)
 	// All intra configuration
 	Params->m_GOPSize = InConfig.VvcGOPSize;
 	Params->m_IntraPeriod = InConfig.VvcIntraPeriod;
+
+	Params->m_DecodingRefreshType = VVENC_DRT_NONE;
+	Params->m_picReordering = 0;
+	Params->m_maxParallelFrames = 1;
+	Params->m_bipredSearchRange = 0;
 
 	Encoder = vvenc_encoder_create();
 

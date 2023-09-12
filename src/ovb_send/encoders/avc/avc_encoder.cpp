@@ -50,6 +50,8 @@ EncodeResult* AvcEncoder::Init(EncoderConfig& InConfig)
 	Params->fMaxFrameRate = InConfig.Framerate;
 	Params->iPicWidth = InConfig.Width;
 	Params->iPicHeight = InConfig.Height;
+	Params->uiIntraPeriod = InConfig.AvcIntraPeriod;
+	Params->iNumRefFrame = InConfig.AvcNumRefFrame;
 
 	Params->sSpatialLayers[0].iVideoWidth = InConfig.Width;
 	Params->sSpatialLayers[0].iVideoHeight = InConfig.Height;
