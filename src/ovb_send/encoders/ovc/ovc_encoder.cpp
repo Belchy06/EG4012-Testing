@@ -82,6 +82,8 @@ EncodeResult* OvcEncoder::Init(EncoderConfig& InConfig)
 
 	Params->interleaver = InConfig.OvcInterleaver;
 
+	Params->multithreading = false;
+
 	Encoder = new ovc_encoder();
 	if (!Encoder)
 	{

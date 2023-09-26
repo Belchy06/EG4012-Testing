@@ -1,7 +1,10 @@
 #include <thread> // std::this_thread::sleep_for
 #include <chrono> // std::chrono::seconds
 
+#include "ovb_common/common.h"
 #include "rtp_sender.h"
+
+#define LogRtpSender "LogRtpSender"
 
 std::shared_ptr<RTPSender> RTPSender::Self = nullptr;
 
@@ -31,9 +34,12 @@ bool RTPSender::Send(std::vector<RTPPacket> InPackets)
 	bool bSuccess = true;
 	for (RTPPacket Packet : InPackets)
 	{
+		LOG(LogRtpSender, LOG_SEVERITY_DETAILS, "Sending packet {}", Packet.GetSequenceNumber());
 		bSuccess &= Sock->Send(&Packet);
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 
 	return bSuccess;
 }
+
+#undef LogRtpSender

@@ -36,7 +36,7 @@ void AvcPacketizer::Packetize(std::vector<NALU> InNALUs)
 				AggregatedPacket = RTPPacket();
 			}
 
-			// // This NAL can fit into a single packet. Check if it should be aggregated first
+			// This NAL can fit into a single packet. Check if it should be aggregated first
 			if (AggregatedPacket.GetPayloadSize() == 0 && (i + 1) < InNALUs.size() && Nal.Size + InNALUs[i + 1].Size < RTP_PAYLOAD_SIZE)
 			{
 				/* The Structure of an Aggregated Packet

@@ -65,16 +65,40 @@ bool Socket::Init(SocketConfig InConfig)
 		return false;
 	}
 
+	int RecvBufSize = 0;
+	int RecvBufSizeLen = sizeof(int);
+	if (getsockopt(Sock, SOL_SOCKET, SO_RCVBUF, (char*)&RecvBufSize, &RecvBufSizeLen) == SOCKET_ERROR)
+	{
+		LOG(LogRecvSocket, LOG_SEVERITY_ERROR, "getsockopt failed with error: {}", WSAGetLastError());
+		return false;
+	}
+
+	LOG(LogRecvSocket, LOG_SEVERITY_DETAILS, "recvbufsize: {}", RecvBufSize);
+
+	RecvBufSize = 1048576; // 2^17
+	if (setsockopt(Sock, SOL_SOCKET, SO_RCVBUF, (char*)&RecvBufSize, sizeof(int)) == SOCKET_ERROR)
+	{
+		LOG(LogRecvSocket, LOG_SEVERITY_ERROR, "setsockopt failed with error: {}", WSAGetLastError());
+		return false;
+	}
+
+	if (getsockopt(Sock, SOL_SOCKET, SO_RCVBUF, (char*)&RecvBufSize, &RecvBufSizeLen) == SOCKET_ERROR)
+	{
+		LOG(LogRecvSocket, LOG_SEVERITY_ERROR, "getsockopt failed with error: {}", WSAGetLastError());
+		return false;
+	}
+
+	LOG(LogRecvSocket, LOG_SEVERITY_DETAILS, "recvbufsize: {}", RecvBufSize);
+
 	return true;
 }
 
 bool Socket::Receive()
 {
-	char* Buf = new char[DEFAULT_BUFFER_LENGTH];
 	while (true)
 	{
 		// clear the buffer by filling null, it might have previously received data
-		memset(Buf, '\0', DEFAULT_BUFFER_LENGTH);
+		char* Buf = new char[DEFAULT_BUFFER_LENGTH];
 
 		// try to receive some data, this is a blocking call
 		int RecvLen;

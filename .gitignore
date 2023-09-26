@@ -1,1 +1,7 @@
 build/
+
+output/**/*.y4m
+resources/ducks.y4m
+resources/park.y4m
+resources/tree.y4m
+resources/town.y4m

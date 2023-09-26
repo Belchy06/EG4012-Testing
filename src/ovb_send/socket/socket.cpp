@@ -76,6 +76,8 @@ bool Socket::Send(RTPPacket* Packet)
 		Buf[i + HeaderSize] = PayloadData[i];
 	}
 
+	// LOG(LogSendSocket, LOG_SEVERITY_DETAILS, "Sending packet {}", Packet->GetSequenceNumber());
+
 	if (sendto(Sock, Buf, (int)TotalSize, 0, (struct sockaddr*)&Other, sizeof(Other)) == SOCKET_ERROR)
 	{
 		LOG(LogSendSocket, LOG_SEVERITY_ERROR, "sendto failed with error {}", WSAGetLastError());

@@ -6,6 +6,7 @@
 void OvcDepacketizer::HandlePacket(RTPPacket InPacket)
 {
 	// TODO (belchy06): Reordering?
+	LOG(LogOvcDepacketizer, LOG_SEVERITY_DETAILS, "received packet {}", InPacket.GetSequenceNumber());
 
 	if (InPacket.GetSequenceNumber() < PrevSequenceNumber)
 	{
