@@ -49,7 +49,7 @@ cmake --build . --target vvdec_lib
 2. Set `WelsEncCore`, `WelsEncPlus` and `WelsEncVP` projects to use `MT` Runtime Library
 3. Build all projects
 
-### 4. Build HEVC
+### 5. Build HEVC
 ```cmd
 cd ./third_party/hevc
 mkdir build
@@ -58,7 +58,7 @@ cmake -G "Visual Studio 17 2022" -A x64 .. -DENABLE_ENCODER=ON -DENABLE_SDL=OFF
 cmake --build . --target de265
 ```
 
-### 5. Build Framework
+### 6. Build Framework
 ```cmd
 mkdir build 
 cd build
