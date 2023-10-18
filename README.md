@@ -10,8 +10,7 @@ cd ./third_party/ovc
 mkdir build
 cd build
 cmake -G "Visual Studio 17 2022" -A x64 ..
-cmake --build . --target ovc_enc
-cmake --build . --target ovc_dec
+cmake --build . --target ovc_enc ovc_dec
 ```
 
 ### 2. Build XVC
@@ -20,8 +19,7 @@ cd ./third_party/xvc
 mkdir build
 cd build
 cmake -G "Visual Studio 17 2022" -A x64 ..
-cmake --build . --target xvc_enc_lib
-cmake --build . --target xvc_dec_lib
+cmake --build . --target xvc_enc_lib xvc_dec_lib
 ```
 
 ### 3. Build VVC
@@ -60,20 +58,9 @@ cmake -G "Visual Studio 17 2022" -A x64 .. -DENABLE_ENCODER=ON -DENABLE_SDL=OFF
 cmake --build . --target de265
 ```
 
-### 5. Build VMAF
-Using a mingw terminal
-```sh
-cd ./third_party/vmaf
-mkdir vmaf-install
-meson setup --wipe libvmaf libvmaf/build --buildtype release --default-library static --prefix {path/to/OpenVideoBenchmark}/src/third_party/vmaf/vmaf-install
-meson install -C libvmaf/build
-```
-
-
-### 3. Build Framework
+### 5. Build Framework
 ```cmd
 mkdir build 
 cd build
 cmake -G "Visual Studio 17 2022" -A x64 ..
-cmake --build . --target ovb_send
-cmake --build . --target ovb_recv
+cmake --build . --target ovb_send ovb_relay ovb_recv
